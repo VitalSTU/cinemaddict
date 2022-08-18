@@ -1,12 +1,11 @@
-//TODO Delete eslint disable
-// eslint-disable-next-line no-unused-vars
-import { ShowMoreButtonView } from './view/show-more-button-view.js';
+import ComponentsPresenter from '../src/presenter/components-presenter.js';
+import UserProfileView from '../src/view/user-profile-view.js';
+import { render } from '../src/render.js';
 
-//TODO Delete eslint disable
-// eslint-disable-next-line no-unused-vars
-import { render } from '../render';
+const siteHeaderElement = document.querySelector('.header');
+const siteMainElement = document.querySelector('.main');
+const componentsPresenter = new ComponentsPresenter();
 
-// const siteMainElement = document.querySelector('.main');
-// const siteHeaderElement = siteMainElement.querySelector('.main__control');
+render(new UserProfileView(), siteHeaderElement);
 
-// render(new ShowMoreButtonView(), siteHeaderElement);
+componentsPresenter.init(siteMainElement);
