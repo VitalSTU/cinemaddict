@@ -10,8 +10,8 @@ import ShowMoreButtonView from '../view/content/show-more-button-view.js';
 
 import EmojiSmileView from '../view/popup/emoji-smile-view.js';
 import PopupAddCommentsView from '../view/popup/popup-add-comment-view.js';
-import PopupView from '../view/popup/popup-view.js';
-import PopupWithoutCommentsView from '../view/popup/popup-without-comments-view.js';
+// import PopupView from '../view/popup/popup-view.js';
+// import PopupWithoutCommentsView from '../view/popup/popup-without-comments-view.js';
 import { render } from '../render.js';
 
 export default class ComponentsPresenter {
