@@ -1,33 +1,11 @@
-import FilmBoardView from '../view/content/films-main-section-view.js';
-import FilmsListLoadingView from '../view/filter/films-list-loading-view.js';
-import FilmsListEmptyView from '../view/filter/films-list-empty-view.js';
-import FilmsListAllUpcomingView from '../view/filter/films-list-all-upcoming-view.js';
-import FilmsListTopRatedView from '../view/filter/films-list-top-rated-view.js';
-import FilmsListMostCommentedView from '../view/filter/films-list-most-commented-view.js';
+// import FilmBoardView from '../view/content/films-main-section-view.js';
 
-import FilmCardView from '../view/content/film-card-view.js';
-import ShowMoreButtonView from '../view/content/show-more-button-view.js';
-
-import EmojiSmileView from '../view/popup/emoji-smile-view.js';
-import PopupAddCommentsView from '../view/popup/popup-add-comment-view.js';
-// import PopupView from '../view/popup/popup-view.js';
-// import PopupWithoutCommentsView from '../view/popup/popup-without-comments-view.js';
 import { render } from '../render.js';
 
 export default class ComponentsPresenter {
-  filmBoardComponent = new FilmBoardView();
-  popupBoardComponent = new FilmBoardView();
-  filmsListLoadingComponent = new FilmsListLoadingView();
-  filmsListEmptyComponent = new FilmsListEmptyView();
-  filmsListAllUpcomingComponent = new FilmsListAllUpcomingView();
-  filmsListTopRatedComponent = new FilmsListTopRatedView();
-  filmsListMostCommentedComponent = new FilmsListMostCommentedView();
-  showMoreButtonComponent = new ShowMoreButtonView();
-  popupAddCommentsComponent = new PopupAddCommentsView();
-  emojiSmileComponent = new EmojiSmileView();
+  // filmBoardComponent = new FilmBoardView();
 
   init = (contentContainer) => {
-    // debugger;
     this.contentContainer = contentContainer;
 
     render(this.filmBoardComponent, this.contentContainer);

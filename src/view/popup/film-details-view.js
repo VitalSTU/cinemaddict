@@ -1,10 +1,11 @@
 import { createElement } from '../../render';
 
-const createEmojiSmileTemplate = () => '<img src="images/emoji/smile.png" width="55" height="55" alt="emoji-smile">';
+const createFilmDetailsTemplate = () => `<section class="film-details">
+</section>`;
 
-export default class EmojiSmileView {
+export default class FilmDetailsView {
   getTemplate() {
-    return createEmojiSmileTemplate();
+    return createFilmDetailsTemplate();
   }
 
   getElement() {
