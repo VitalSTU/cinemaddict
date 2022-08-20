@@ -1,7 +1,7 @@
 import ComponentsPresenter from './presenter/components-presenter.js';
 import UserProfileView from './view/header/user-profile-view.js';
-import StatisticsView from "./view/footer/statistics-view.js";
-import PopupView from "./view/popup/popup-view.js";
+import StatisticsView from './view/footer/statistics-view.js';
+import PopupView from './view/popup/popup-view.js';
 
 import { render } from './render.js';
 

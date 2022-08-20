@@ -19,7 +19,7 @@ const createFilmsListEmptyTemplate = (filter) => {
     default:
       title = 'Unknown filter';
       break;
-  };
+  }
 
   return `
     <section class="films-list">

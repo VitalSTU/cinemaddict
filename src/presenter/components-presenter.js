@@ -1,13 +1,13 @@
-import NavigationView from "../view/main/navigation-view.js";
-import SortView from "../view/main/sort-view.js";
+import NavigationView from '../view/main/navigation-view.js';
+import SortView from '../view/main/sort-view.js';
 
-import FilmsMainSectionView from "../view/content/films-main-section-view.js";
-import FilmsListAllUpcomingView from "../view/content/films-list-all-upcoming-view.js";
-import FilmsListTopRatedView from "../view/content/films-list-top-rated-view";
-import FilmsListMostCommentedView from "../view/content/films-list-most-commented-view";
-import FilmsListContainerView from "../view/content/films-list-container-view.js";
-import FilmCardView from "../view/content/film-card-view.js";
-import ShowMoreButtonView from "../view/content/show-more-button-view.js";
+import FilmsMainSectionView from '../view/content/films-main-section-view.js';
+import FilmsListAllUpcomingView from '../view/content/films-list-all-upcoming-view.js';
+import FilmsListTopRatedView from '../view/content/films-list-top-rated-view';
+import FilmsListMostCommentedView from '../view/content/films-list-most-commented-view';
+import FilmsListContainerView from '../view/content/films-list-container-view.js';
+import FilmCardView from '../view/content/film-card-view.js';
+import ShowMoreButtonView from '../view/content/show-more-button-view.js';
 
 import { render } from '../render.js';
 
