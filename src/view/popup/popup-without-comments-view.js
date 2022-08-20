@@ -1,6 +1,7 @@
 import { createElement } from '../../render';
 
-const createPopupWithoutCommentsTemplate = () => `<section class="film-details">
+const createPopupWithoutCommentsTemplate = () => `
+<section class="film-details">
 <div class="film-details__inner">
   <div class="film-details__top-container">
     <div class="film-details__close">

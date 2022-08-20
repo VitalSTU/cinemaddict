@@ -1,14 +1,12 @@
 import { createElement } from '../../render';
 
-const createFilmsListTopRatedTemplate = () => `   <section class="films-list films-list--extra">
-      <h2 class="films-list__title">Top rated</h2>
+const createFilmsListContainerTemplate = () => `
       <div class="films-list__container">
-      </div>
-    </section>`;
+      </div>`;
 
-export default class FilmsListTopRatedView {
+export default class FilmsListContainerView {
   getTemplate() {
-    return createFilmsListTopRatedTemplate();
+    return createFilmsListContainerTemplate();
   }
 
   getElement() {

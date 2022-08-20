@@ -21,7 +21,8 @@ const createFilmsListEmptyTemplate = (filter) => {
       break;
   };
 
-  return `    <section class="films-list">
+  return `
+    <section class="films-list">
       <h2 class="films-list__title">${title}</h2>
     </section>`;
 };

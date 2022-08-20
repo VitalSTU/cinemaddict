@@ -1,6 +1,7 @@
 import { createElement } from '../../render';
 
-const createFilmDetailsTemplate = () => `<section class="film-details">
+const createFilmDetailsTemplate = () => `
+<section class="film-details">
 </section>`;
 
 export default class FilmDetailsView {
