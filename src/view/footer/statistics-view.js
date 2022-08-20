@@ -1,10 +1,10 @@
 import { createElement } from '../../render';
 
-const createShowMoreButtonTemplate = () => '      <button class="films-list__show-more">Show more</button>';
+const createStatisticsTemplate = () => `    <p>0 movies inside</p>`;
 
-export default class ShowMoreButtonView {
+export default class StatisticsView {
   getTemplate() {
-    return createShowMoreButtonTemplate();
+    return createStatisticsTemplate();
   }
 
   getElement() {

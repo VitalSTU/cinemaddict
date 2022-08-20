@@ -1,8 +1,8 @@
 import { createElement } from '../../render';
 
-const createFilmsListLoadingTemplate = () => `<section class="films-list">
-  <h2 class="films-list__title">Loading...</h2>
-</section>`;
+const createFilmsListLoadingTemplate = () => `    <section class="films-list">
+      <h2 class="films-list__title">Loading...</h2>
+    </section>`;
 
 export default class FilmsListLoadingView {
   getTemplate() {

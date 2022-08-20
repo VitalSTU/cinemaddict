@@ -1,4 +1,4 @@
-import FilmBoardView from '../view/content/film-board-view.js';
+import FilmBoardView from '../view/content/films-main-section-view.js';
 import FilmsListLoadingView from '../view/filter/films-list-loading-view.js';
 import FilmsListEmptyView from '../view/filter/films-list-empty-view.js';
 import FilmsListAllUpcomingView from '../view/filter/films-list-all-upcoming-view.js';
