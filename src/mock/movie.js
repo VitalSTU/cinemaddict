@@ -8,7 +8,7 @@ export const generateMovie = () => ({
     title: 'A Little Pony Without The Carpet',
     alternativeTitle: 'Laziness Who Sold Themselves',
     totalRating: 5.3,
-    poster: 'images/posters/blue-blazes.jpg',
+    poster: 'images/posters/the-dance-of-life.jpg',
     ageRating: 0,
     director: 'Tom Ford',
     writers: [
