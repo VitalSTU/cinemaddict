@@ -114,6 +114,12 @@ const createPopupWithoutCommentsTemplate = () => `
 </section>`;
 
 export default class PopupWithoutCommentsView {
+
+  constructor(movie, comments) {
+    this.movie = movie;
+    this.comments = comments;
+  }
+
   getTemplate() {
     return createPopupWithoutCommentsTemplate();
   }
