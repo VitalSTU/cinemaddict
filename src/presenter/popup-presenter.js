@@ -15,7 +15,7 @@ export default class PopupPresenter {
     this.popupTopContainer = new FilmDetailsTopContainerView(this.movie);
     this.popupBottomContainer = new FilmDetailsBottomContainerView(this.comments);
     this.commentsContainerView = new FilmDetailsCommentsContainerView();
-    this.filmDetailsAddCommentView = new FilmDetailsAddCommentView(this.movie, this.comments);//TODO
+    this.filmDetailsAddCommentView = new FilmDetailsAddCommentView(this.movie, this.comments);
   };
 
   init = (contentContainer, movie, commentsModel) => {
@@ -32,6 +32,6 @@ export default class PopupPresenter {
     for (let i = 0; i < this.comments.length; i++) {
       render(new FilmDetailsCommentView(this.comments[i]), this.commentsContainerView.getElement());
     }
-    render(this.filmDetailsAddCommentView, this.popupBottomContainer.getElement());//TODO
+    render(this.filmDetailsAddCommentView, this.popupBottomContainer.getElement());
   };
 }
