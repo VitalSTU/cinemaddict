@@ -1,12 +1,14 @@
 import { createElement } from '../../render';
 
-const createFilmDetailsTemplate = () => `
-<section class="film-details">
-</section>`;
+const createFilmDetailsCommentsContainerTemplate = () => `
 
-export default class FilmDetailsView {
+        <ul class="film-details__comments-list">
+        </ul>`;
+
+export default class FilmDetailsCommentsContainerView {
+
   getTemplate() {
-    return createFilmDetailsTemplate();
+    return createFilmDetailsCommentsContainerTemplate();
   }
 
   getElement() {

@@ -14,7 +14,6 @@ import { render } from '../render.js';
 const FILM_EXTRA_TEST_CARDS_QUANTITY = 2;
 
 export default class MoviesPresenter {
-  navigationView = new NavigationView();
   sortView = new SortView();
   filmsMainSectionComponent = new FilmsMainSectionView();
 
@@ -28,9 +27,15 @@ export default class MoviesPresenter {
   filmsListMostCommentedView = new FilmsListMostCommentedView();
   filmsListContainerMostCommentedView = new FilmsListContainerView();
 
+  initialiseData = () => {
+    this.navigationView = new NavigationView(this.movies);
+  };
+
   init = (contentContainer, moviesModel) => {
     this.contentContainer = contentContainer;
     this.movies = [...moviesModel.getMovies()];
+
+    this.initialiseData();
 
     render(this.navigationView, this.contentContainer);
     render(this.sortView, this.contentContainer);

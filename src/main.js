@@ -20,4 +20,6 @@ const popupPresenter = new PopupPresenter();
 render(new UserProfileView(), siteHeaderElement);
 render(new StatisticsView(), siteFooterElement);
 moviesPresenter.init(siteMainElement, moviesModel);
-popupPresenter.init(siteBodyElement, [...moviesModel.getMovies()][0], commentsModel);
+
+const testMovie = [...moviesModel.getMovies()][0];
+popupPresenter.init(siteBodyElement, testMovie, commentsModel);

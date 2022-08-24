@@ -1,51 +1,25 @@
-import dayjs from 'dayjs';
+import * as utils from '../view-utils.js';
+
 import { createElement } from '../../render.js';
-
-const MINUTES_IN_ONE_HOUR = 60;
-const DESCRIPTION_MAX_LENGTH = 140;
-
-const isNotExist = (parameter) => (parameter === null || parameter === undefined);
-const getTitle = ({title}) => isNotExist(title) ? '' : title;
-const getRating = ({totalRating}) => isNotExist(totalRating) ? '' : totalRating;
-const getReleaseDateOrNull = ({release: {date}}) => date;
-const getYearOfTDate = (tDate) => isNotExist(tDate) ? '' : dayjs(tDate).format('YYYY');
-const getRuntime = ({runtime}) => isNotExist(runtime) ? '' : runtime;
-const getGenres = ({genre}) => (isNotExist(genre) || genre.length === 0) ? '' : genre.join(', ');
-const getPosterURI = ({poster}) => isNotExist(poster) ? '' : `./${poster}`;
-
-const getShortDescription = ({description}) => {
-  if (isNotExist(description)) {
-    return '';
-  } else if (description.length > DESCRIPTION_MAX_LENGTH) {
-    return `${description.slice(0, DESCRIPTION_MAX_LENGTH)}...`
-  }
-
-  return description;
-};
-
-const getCommentsQuantity = (comments) => isNotExist(comments) ? 0 : comments.length;
-const getFlagIfActive = (flag) => flag ? ' film-card__controls-item--active' : '';
-
-const humanizeMinutes = (minutes) => `${Math.floor(minutes / MINUTES_IN_ONE_HOUR)}h ${Math.floor(minutes % MINUTES_IN_ONE_HOUR)}m`;
 
 const createFilmCardTemplate = ({comments, filmInfo: movie, userDetails}) => `
         <article class="film-card">
           <a class="film-card__link">
-            <h3 class="film-card__title">${getTitle(movie)}</h3>
-            <p class="film-card__rating">${getRating(movie)}</p>
+            <h3 class="film-card__title">${utils.getTitle(movie)}</h3>
+            <p class="film-card__rating">${utils.getRating(movie)}</p>
             <p class="film-card__info">
-              <span class="film-card__year">${getYearOfTDate(getReleaseDateOrNull(movie))}</span>
-              <span class="film-card__duration">${humanizeMinutes(getRuntime(movie))}</span>
-              <span class="film-card__genre">${getGenres(movie)}</span>
+              <span class="film-card__year">${utils.getYearOfTDate(utils.getReleaseDateOrNull(movie))}</span>
+              <span class="film-card__duration">${utils.humanizeMinutes(utils.getRuntime(movie))}</span>
+              ${utils.getGenres(movie)}
             </p>
-            <img src="${getPosterURI(movie)}" alt="" class="film-card__poster">
-            <p class="film-card__description">${getShortDescription(movie)}</p>
-            <span class="film-card__comments">${getCommentsQuantity(comments)} comments</span>
+            <img src="${utils.getPosterURI(movie)}" alt="" class="film-card__poster">
+            <p class="film-card__description">${utils.getShortDescription(movie)}</p>
+            <span class="film-card__comments">${utils.getCommentsQuantity(comments)} comments</span>
           </a>
           <div class="film-card__controls">
-            <button class="film-card__controls-item film-card__controls-item--add-to-watchlist${getFlagIfActive(userDetails.watchlist)}" type="button">Add to watchlist</button>
-            <button class="film-card__controls-item film-card__controls-item--mark-as-watched${getFlagIfActive(userDetails.alreadyWatched)}" type="button">Mark as watched</button>
-            <button class="film-card__controls-item film-card__controls-item--favorite${getFlagIfActive(userDetails.favorite)}" type="button">Mark as favorite</button>
+            <button class="film-card__controls-item film-card__controls-item--add-to-watchlist${utils.getFlagIfActive(userDetails.watchlist)}" type="button">Add to watchlist</button>
+            <button class="film-card__controls-item film-card__controls-item--mark-as-watched${utils.getFlagIfActive(userDetails.alreadyWatched)}" type="button">Mark as watched</button>
+            <button class="film-card__controls-item film-card__controls-item--favorite${utils.getFlagIfActive(userDetails.favorite)}" type="button">Mark as favorite</button>
           </div>
         </article>`;
 

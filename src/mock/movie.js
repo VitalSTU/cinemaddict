@@ -1,8 +1,9 @@
 export const generateMovie = () => ({
-  id: '0',
+  id: 0,
   comments: [
-    42,
-    42
+    0,
+    2,
+    3
   ],
   filmInfo: {
     title: 'A Little Pony Without The Carpet',
@@ -12,14 +13,14 @@ export const generateMovie = () => ({
     ageRating: 0,
     director: 'Tom Ford',
     writers: [
-      'Takeshi Kitano'
+      'Takeshi Kitano', 'George Lucas'
     ],
     actors: [
-      'Morgan Freeman'
+      'Morgan Freeman', 'Arnold Schwarzenegger', 'Whoopi Goldberg'
     ],
     release: {
-      date: '2019-05-11T00:00:00.000Z',
-      releaseRountry: 'Finland'
+      date: '2019-05-08T00:00:00.000Z',
+      releaseCountry: 'Finland'
     },
     runtime: 77,
     genre: [
