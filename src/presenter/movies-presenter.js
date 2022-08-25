@@ -11,10 +11,9 @@ import ShowMoreButtonView from '../view/content/show-more-button-view.js';
 
 import { render } from '../render.js';
 
-const FILM_TEST_CARDS_QUANTITY = 5;
+const FILM_EXTRA_TEST_CARDS_QUANTITY = 2;
 
-export default class ComponentsPresenter {
-  navigationView = new NavigationView();
+export default class MoviesPresenter {
   sortView = new SortView();
   filmsMainSectionComponent = new FilmsMainSectionView();
 
@@ -28,8 +27,15 @@ export default class ComponentsPresenter {
   filmsListMostCommentedView = new FilmsListMostCommentedView();
   filmsListContainerMostCommentedView = new FilmsListContainerView();
 
-  init = (contentContainer) => {
+  initialiseData = () => {
+    this.navigationView = new NavigationView(this.movies);
+  };
+
+  init = (contentContainer, moviesModel) => {
     this.contentContainer = contentContainer;
+    this.movies = [...moviesModel.getMovies()];
+
+    this.initialiseData();
 
     render(this.navigationView, this.contentContainer);
     render(this.sortView, this.contentContainer);
@@ -37,21 +43,21 @@ export default class ComponentsPresenter {
 
     render(this.filmsListAllUpcomingView, this.filmsMainSectionComponent.getElement());
     render(this.filmsListContainerAllView, this.filmsListAllUpcomingView.getElement());
-    for (let i = 0; i < FILM_TEST_CARDS_QUANTITY; i++) {
-      render(new FilmCardView(), this.filmsListContainerAllView.getElement());
+    for (let i = 0; i < this.movies.length; i++) {
+      render(new FilmCardView(this.movies[i]), this.filmsListContainerAllView.getElement());
     }
     render(this.showMoreButtonAllView, this.filmsListAllUpcomingView.getElement());
 
     render(this.filmsListTopRatedView, this.filmsMainSectionComponent.getElement());
     render(this.filmsListContainerTopRatedView, this.filmsListTopRatedView.getElement());
-    for (let i = 0; i < FILM_TEST_CARDS_QUANTITY; i++) {
-      render(new FilmCardView(), this.filmsListContainerTopRatedView.getElement());
+    for (let i = 0; i < FILM_EXTRA_TEST_CARDS_QUANTITY; i++) {
+      render(new FilmCardView(this.movies[i]), this.filmsListContainerTopRatedView.getElement());
     }
 
     render(this.filmsListMostCommentedView, this.filmsMainSectionComponent.getElement());
     render(this.filmsListContainerMostCommentedView, this.filmsListMostCommentedView.getElement());
-    for (let i = 0; i < FILM_TEST_CARDS_QUANTITY; i++) {
-      render(new FilmCardView(), this.filmsListContainerMostCommentedView.getElement());
+    for (let i = 0; i < FILM_EXTRA_TEST_CARDS_QUANTITY; i++) {
+      render(new FilmCardView(this.movies[i]), this.filmsListContainerMostCommentedView.getElement());
     }
   };
 }
