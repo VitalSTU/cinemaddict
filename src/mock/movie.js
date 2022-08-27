@@ -19,7 +19,7 @@ export const generateMovie = () => {
       title: `${getRandomElementOrNull(CONST.movies)}`,
       alternativeTitle: `${getRandomElementOrNull(CONST.movies)}`,
       totalRating: 5.3,
-      poster: 'images/posters/the-dance-of-life.jpg',
+      poster: `images/posters/${getRandomElementOrNull(CONST.posters)}`,
       ageRating: 0,
       director: `${getRandomElementOrNull(CONST.names)}`,
       writers: [

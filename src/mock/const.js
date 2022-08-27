@@ -140,3 +140,13 @@ export const movies = [
   'Woodstock',
   'Zero Dark Thirty',
 ];
+
+export const posters = [
+  'made-for-each-other.png',
+  'the-dance-of-life.jpg',
+  'popeye-meets-sinbad.png',
+  'the-great-flamarion.jpg',
+  'sagebrush-trail.jpg',
+  'the-man-with-the-golden-arm.jpg',
+  'santa-claus-conquers-the-martians.jpg',
+];
