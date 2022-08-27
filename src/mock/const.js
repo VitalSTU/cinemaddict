@@ -35,7 +35,7 @@ export const names = [
   'Tom Ford', 'Takeshi Kitano', 'George Lucas', 'Vitaly Kolyshkin', 'Morgan Freeman', 'Arnold Schwarzenegger', 'Whoopi Goldberg',
 ];
 
-export const emotions = ['smile', 'sleeping', 'puke', 'angry'];
+export const emotions = ['smile', 'sleeping', 'puke', 'angry',];
 
 export const movies = [
   '12 Angry Men',

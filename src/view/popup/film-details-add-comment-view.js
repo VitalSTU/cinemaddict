@@ -33,25 +33,28 @@ const createFilmDetailsAddCommentTemplate = () => `
       </form>`;
 
 export default class FilmDetailsAddCommentView {
+  #movie = null;
+  #comments = null;
+  #element = null;
 
   constructor(movie, comments) {
-    this.movie = movie;
-    this.comments = comments;
+    this.#movie = movie;
+    this.#comments = comments;
   }
 
-  getTemplate() {
+  get template() {
     return createFilmDetailsAddCommentTemplate();
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }

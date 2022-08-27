@@ -9,29 +9,37 @@ import { render } from '../render.js';
 import { getCommentsByIds } from '../utils.js';
 
 export default class PopupPresenter {
+  #popupMainContainer;
+  #popupTopContainer;
+  #popupBottomContainer;
+  #commentsContainerView;
+  #filmDetailsAddCommentView;
+  #contentContainer;
+  #movie;
+  #comments;
 
-  initialiseData = () => {
-    this.popupMainContainer = new FilmDetailsMainContainerView();
-    this.popupTopContainer = new FilmDetailsTopContainerView(this.movie);
-    this.popupBottomContainer = new FilmDetailsBottomContainerView(this.comments);
-    this.commentsContainerView = new FilmDetailsCommentsContainerView();
-    this.filmDetailsAddCommentView = new FilmDetailsAddCommentView(this.movie, this.comments);
+  #initialiseData = () => {
+    this.#popupMainContainer = new FilmDetailsMainContainerView();
+    this.#popupTopContainer = new FilmDetailsTopContainerView(this.#movie);
+    this.#popupBottomContainer = new FilmDetailsBottomContainerView(this.#comments);
+    this.#commentsContainerView = new FilmDetailsCommentsContainerView();
+    this.#filmDetailsAddCommentView = new FilmDetailsAddCommentView(this.#movie, this.#comments);
   };
 
   init = (contentContainer, movie, commentsModel) => {
-    this.contentContainer = contentContainer;
-    this.movie = movie;
-    this.comments = getCommentsByIds(this.movie.comments, [...commentsModel.getComments()]);
+    this.#contentContainer = contentContainer;
+    this.#movie = movie;
+    this.#comments = getCommentsByIds(this.#movie.comments, [...commentsModel.comments]);
 
-    this.initialiseData();
+    this.#initialiseData();
 
-    render(this.popupMainContainer, this.contentContainer);
-    render(this.popupTopContainer, this.popupMainContainer.getElement());
-    render(this.popupBottomContainer, this.popupMainContainer.getElement());
-    render(this.commentsContainerView, this.popupBottomContainer.getElement());
-    for (let i = 0; i < this.comments.length; i++) {
-      render(new FilmDetailsCommentView(this.comments[i]), this.commentsContainerView.getElement());
+    render(this.#popupMainContainer, this.#contentContainer);
+    render(this.#popupTopContainer, this.#popupMainContainer.element);
+    render(this.#popupBottomContainer, this.#popupMainContainer.element);
+    render(this.#commentsContainerView, this.#popupBottomContainer.element);
+    for (let i = 0; i < this.#comments.length; i++) {
+      render(new FilmDetailsCommentView(this.#comments[i]), this.#commentsContainerView.element);
     }
-    render(this.filmDetailsAddCommentView, this.popupBottomContainer.getElement());
+    render(this.#filmDetailsAddCommentView, this.#popupBottomContainer.element);
   };
 }

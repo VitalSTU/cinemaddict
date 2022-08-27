@@ -21,5 +21,5 @@ render(new UserProfileView(), siteHeaderElement);
 render(new StatisticsView(), siteFooterElement);
 moviesPresenter.init(siteMainElement, moviesModel);
 
-const testMovie = [...moviesModel.getMovies()][0];
+const testMovie = [...moviesModel.movies][0];
 popupPresenter.init(siteBodyElement, testMovie, commentsModel);

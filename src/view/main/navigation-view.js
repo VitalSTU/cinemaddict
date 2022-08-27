@@ -9,17 +9,19 @@ const createNavigationTemplate = (moviesInWatchList, moviesInHistory, moviesInFa
   </nav>`;
 
 export default class NavigationView {
+  #movies = null;
+  #element = null;
 
   constructor(movies) {
-    this.movies = movies;
+    this.#movies = movies;
   }
 
-  getTemplate() {
+  get template() {
     let moviesInWatchList = 0;
     let moviesInHistory = 0;
     let moviesInFavorites = 0;
 
-    for (const movie of this.movies) {
+    for (const movie of this.#movies) {
       moviesInWatchList += movie.userDetails.watchlist;
       moviesInHistory += movie.userDetails.alreadyWatched;
       moviesInFavorites += movie.userDetails.favorite;
@@ -28,15 +30,15 @@ export default class NavigationView {
     return createNavigationTemplate(moviesInWatchList, moviesInHistory, moviesInFavorites);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }
