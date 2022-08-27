@@ -1,7 +1,10 @@
+import * as CONST from './const.js';
+import { getRandomElementOrNull } from './mock-utils.js';
+
 export const generateComment = () => ({
   id: 42,
-  author: 'Ilya O\'Reilly',
-  comment: 'a film that changed my life, a true masterpiece, post-credit scene was just amazing omg.',
+  author: `${getRandomElementOrNull(CONST.names)}`,
+  comment: `${getRandomElementOrNull(CONST.longReads)}`,
   date: '2019-05-09T16:13:32.554Z',
-  emotion: 'sleeping'
+  emotion: `${getRandomElementOrNull(CONST.emotions)}`,
 });

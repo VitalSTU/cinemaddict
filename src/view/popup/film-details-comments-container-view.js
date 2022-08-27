@@ -6,20 +6,21 @@ const createFilmDetailsCommentsContainerTemplate = () => `
         </ul>`;
 
 export default class FilmDetailsCommentsContainerView {
+  #element = null;
 
-  getTemplate() {
+  get template() {
     return createFilmDetailsCommentsContainerTemplate();
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }

@@ -6,7 +6,7 @@ const createFilmDetailsCommentTemplate = ({author, comment, date, emotion}) => `
 
           <li class="film-details__comment">
             <span class="film-details__comment-emoji">
-              <img src="${utils.getEmojieUri(emotion)}" width="55" height="55" alt="emoji-smile">
+              <img src="${utils.getEmojieUri(emotion)}" width="55" height="55" alt="emoji-${emotion}">
             </span>
             <div>
               <p class="film-details__comment-text">${comment}</p>
@@ -20,24 +20,26 @@ const createFilmDetailsCommentTemplate = ({author, comment, date, emotion}) => `
 `;
 
 export default class FilmDetailsCommentView {
+  #comment = null;
+  #element = null;
 
   constructor(comment) {
-    this.comment = comment;
+    this.#comment = comment;
   }
 
-  getTemplate() {
-    return createFilmDetailsCommentTemplate(this.comment);
+  get template() {
+    return createFilmDetailsCommentTemplate(this.#comment);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }
