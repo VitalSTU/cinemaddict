@@ -1,6 +1,8 @@
 import * as CONST from './const.js';
 import { getRandomInteger, getRandomElementOrNull } from './mock-utils.js';
 
+const BOOLEAN_MAX_INTEGER_EQUIVALENT = 1;
+
 export const generateMovie = () => {
   const comments = Array.from(
     new Set(
@@ -37,10 +39,10 @@ export const generateMovie = () => {
       description: `${getRandomElementOrNull(CONST.longReads)}`,
     },
     userDetails: {
-      watchlist: false,
-      alreadyWatched: true,
+      watchlist: Boolean(getRandomInteger(BOOLEAN_MAX_INTEGER_EQUIVALENT)),
+      alreadyWatched: getRandomInteger(BOOLEAN_MAX_INTEGER_EQUIVALENT),
       watchingDate: '2019-04-12T16:12:32.554Z',
-      favorite: false
+      favorite: getRandomInteger(BOOLEAN_MAX_INTEGER_EQUIVALENT),
     }
   };
 };

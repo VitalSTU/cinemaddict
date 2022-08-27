@@ -26,12 +26,39 @@ export default class PopupPresenter {
     this.#filmDetailsAddCommentView = new FilmDetailsAddCommentView(this.#movie, this.#comments);
   };
 
+  #setEventListeners = (element) => {
+
+    const removeElement = (evt) => {
+      document.querySelector('body').classList.remove('hide-overflow');
+      document.removeEventListener('keydown', onPopupEscKeydown);
+      evt.target.removeEventListener('click', onCloseBtnClick);
+      element.closest('.film-details').remove();
+    };
+
+    function onCloseBtnClick(evt) {
+      removeElement(evt);
+    }
+
+    function onPopupEscKeydown(evt) {
+      if (evt.key === 'Escape') {
+        removeElement(evt);
+      }
+    }
+
+    element.addEventListener('click', onCloseBtnClick);
+    document.addEventListener('keydown', onPopupEscKeydown);
+  };
+
   init = (contentContainer, movie, commentsModel) => {
     this.#contentContainer = contentContainer;
     this.#movie = movie;
     this.#comments = getCommentsByIds(this.#movie.comments, [...commentsModel.comments]);
 
     this.#initialiseData();
+
+    const closeButton = this.#popupTopContainer.element.querySelector('.film-details__close-btn');
+    this.#setEventListeners(closeButton);
+    document.querySelector('body').classList.add('hide-overflow');
 
     render(this.#popupMainContainer, this.#contentContainer);
     render(this.#popupTopContainer, this.#popupMainContainer.element);
