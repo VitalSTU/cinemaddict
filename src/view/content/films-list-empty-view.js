@@ -1,19 +1,20 @@
+import * as CONST from '../../const.js';
 import { createElement } from '../../render';
 
 const createFilmsListEmptyTemplate = (filter) => {
   let title;
 
   switch (filter) {
-    case 'All movies':
+    case CONST.movieFilters.allMovies:
       title = 'There are no movies in our database';
       break;
-    case 'Watchlist':
+    case CONST.movieFilters.watchList:
       title = 'There are no movies to watch now';
       break;
-    case 'History':
+    case CONST.movieFilters.history:
       title = 'There are no watched movies now';
       break;
-    case 'Favorites':
+    case CONST.movieFilters.favorites:
       title = 'There are no favorite movies now';
       break;
     default:
@@ -28,10 +29,15 @@ const createFilmsListEmptyTemplate = (filter) => {
 };
 
 export default class FilmsListEmptyView {
+  #filter = null;
   #element = null;
 
+  constructor(filter) {
+    this.#filter = filter;
+  }
+
   get template() {
-    return createFilmsListEmptyTemplate();
+    return createFilmsListEmptyTemplate(this.#filter);
   }
 
   get element() {

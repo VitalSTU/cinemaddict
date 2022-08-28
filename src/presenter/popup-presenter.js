@@ -28,20 +28,20 @@ export default class PopupPresenter {
 
   #setEventListeners = (element) => {
 
-    const removeElement = (evt) => {
+    const removeElement = () => {
       document.querySelector('body').classList.remove('hide-overflow');
       document.removeEventListener('keydown', onPopupEscKeydown);
-      evt.target.removeEventListener('click', onCloseBtnClick);
+      element.removeEventListener('click', onCloseBtnClick);
       element.closest('.film-details').remove();
     };
 
-    function onCloseBtnClick(evt) {
-      removeElement(evt);
+    function onCloseBtnClick() {
+      removeElement();
     }
 
     function onPopupEscKeydown(evt) {
       if (evt.key === 'Escape') {
-        removeElement(evt);
+        removeElement();
       }
     }
 
