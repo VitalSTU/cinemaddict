@@ -12,6 +12,7 @@ export default class NavigationView extends AbstractView {
   #movies = null;
 
   constructor(movies) {
+    super();
     this.#movies = movies;
   }
 

@@ -26,6 +26,7 @@ export default class FilmCardView extends AbstractView {
   #movie = null;
 
   constructor(movie) {
+    super();
     this.#movie = movie;
   }
 

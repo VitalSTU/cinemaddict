@@ -32,6 +32,7 @@ export default class FilmsListEmptyView extends AbstractView {
   #filter = null;
 
   constructor(filter) {
+    super();
     this.#filter = filter;
   }
 

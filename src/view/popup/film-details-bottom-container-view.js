@@ -14,6 +14,7 @@ export default class FilmDetailsBottomContainerView extends AbstractView {
   #comments = null;
 
   constructor(comments) {
+    super();
     this.#comments = comments;
   }
 

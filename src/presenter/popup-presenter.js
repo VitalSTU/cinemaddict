@@ -5,7 +5,7 @@ import FilmDetailsCommentsContainerView from '../view/popup/film-details-comment
 import FilmDetailsCommentView from '../view/popup/film-details-comment-view.js';
 import FilmDetailsAddCommentView from '../view/popup/film-details-add-comment-view.js';
 
-import { render } from '../render.js';
+import { render } from '../framework/render.js';
 import { getCommentsByIds } from '../utils.js';
 
 export default class PopupPresenter {

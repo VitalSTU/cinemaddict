@@ -8,7 +8,9 @@ const createFilmDetailsMainContainerTemplate = () => `
 
 export default class FilmDetailsMainContainerView extends AbstractView {
 
-  constructor() {}
+  constructor() {
+    super();
+  }
 
   get template() {
     return createFilmDetailsMainContainerTemplate();

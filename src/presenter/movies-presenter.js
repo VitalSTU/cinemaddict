@@ -12,7 +12,7 @@ import PopupPresenter from '../presenter/popup-presenter.js';
 import CommentsModel from '../model/comments-model.js';
 
 import * as CONST from '../const.js';
-import { render } from '../render.js';
+import { render } from '../framework/render.js';
 
 const FILM_CARDS_QUANTITY_TO_SHOW_PER_STEP = 5;
 const FILM_EXTRA_TEST_CARDS_QUANTITY = 2;

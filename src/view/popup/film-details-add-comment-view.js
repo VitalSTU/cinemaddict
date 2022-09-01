@@ -37,6 +37,7 @@ export default class FilmDetailsAddCommentView extends AbstractView {
   #comments = null;
 
   constructor(movie, comments) {
+    super();
     this.#movie = movie;
     this.#comments = comments;
   }

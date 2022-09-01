@@ -72,6 +72,7 @@ export default class FilmDetailsTopContainerView extends AbstractView {
   #movie = null;
 
   constructor(movie) {
+    super();
     this.#movie = movie;
   }
 
