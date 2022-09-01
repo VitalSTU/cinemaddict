@@ -1,6 +1,5 @@
 import * as utils from '../view-utils.js';
-
-import { createElement } from '../../render';
+import AbstractView from '../../framework/view/abstract-view.js';
 
 const createFilmDetailsTopContainerTemplate = ({filmInfo: movie, userDetails}) => `
     <div class="film-details__top-container">
@@ -69,9 +68,8 @@ const createFilmDetailsTopContainerTemplate = ({filmInfo: movie, userDetails}) =
       </section>
     </div>`;
 
-export default class FilmDetailsTopContainerView {
+export default class FilmDetailsTopContainerView extends AbstractView {
   #movie = null;
-  #element = null;
 
   constructor(movie) {
     this.#movie = movie;
@@ -79,17 +77,5 @@ export default class FilmDetailsTopContainerView {
 
   get template() {
     return createFilmDetailsTopContainerTemplate(this.#movie);
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }
