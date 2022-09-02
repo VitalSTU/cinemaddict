@@ -2,6 +2,10 @@ import * as CONST from './const.js';
 import { getRandomInteger, getRandomElementOrNull } from './mock-utils.js';
 
 const BOOLEAN_MAX_INTEGER_EQUIVALENT = 1;
+const MAX_RATING = 10;
+const MAX_AGE = 18;
+const MIN_RUNTIME = 60;
+const MAX_RUNTIME = 180;
 
 export const generateMovie = () => {
   const comments = Array.from(
@@ -18,9 +22,9 @@ export const generateMovie = () => {
     filmInfo: {
       title: `${getRandomElementOrNull(CONST.movies)}`,
       alternativeTitle: `${getRandomElementOrNull(CONST.movies)}`,
-      totalRating: 5.3,
+      totalRating: getRandomInteger(MAX_RATING * MAX_RATING) / MAX_RATING,
       poster: `images/posters/${getRandomElementOrNull(CONST.posters)}`,
-      ageRating: 0,
+      ageRating: getRandomInteger(MAX_AGE),
       director: `${getRandomElementOrNull(CONST.names)}`,
       writers: [
         `${getRandomElementOrNull(CONST.names)}`, `${getRandomElementOrNull(CONST.names)}`,
@@ -32,7 +36,7 @@ export const generateMovie = () => {
         date: '2019-05-08T00:00:00.000Z',
         releaseCountry: 'Finland'
       },
-      runtime: 77,
+      runtime: getRandomInteger(MIN_RUNTIME, MAX_RUNTIME),
       genre: [
         'Comedy'
       ],

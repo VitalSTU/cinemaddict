@@ -12,7 +12,7 @@ import PopupPresenter from '../presenter/popup-presenter.js';
 import CommentsModel from '../model/comments-model.js';
 
 import * as CONST from '../const.js';
-import { render } from '../framework/render.js';
+import { render, remove } from '../framework/render.js';
 
 const FILM_CARDS_QUANTITY_TO_SHOW_PER_STEP = 5;
 const FILM_EXTRA_TEST_CARDS_QUANTITY = 2;
@@ -36,11 +36,39 @@ export default class MoviesPresenter {
 
   #navigationView;
   #contentContainer;
+  #popupContainer;
+  #existedPopupComponent;
   #movies;
 
   #initialiseData = () => {
     this.#contentContainer.innerHTML = '';
     this.#navigationView = new NavigationView(this.#movies);
+  };
+
+  #onShowMoreButtonClick = () => {
+    this.#movies
+      .slice(this.#renderedMovieCardsQuantity, this.#renderedMovieCardsQuantity + FILM_CARDS_QUANTITY_TO_SHOW_PER_STEP)
+      .forEach((movie) => {
+        const movieView = new FilmCardView(movie);
+        this.#renderFilmCard(movieView, this.#filmsListContainerAllView.element);
+      });
+    this.#renderedMovieCardsQuantity += FILM_CARDS_QUANTITY_TO_SHOW_PER_STEP;
+
+    if (this.#renderedMovieCardsQuantity >= this.#movies.length) {
+      this.#showMoreButtonAllView.element.remove();
+      this.#showMoreButtonAllView.removeElement();
+    }
+  };
+
+  #onFilmCardClick = ({movie}) => {
+    const popupPresenter = new PopupPresenter();
+    const commentsModel = new CommentsModel();
+
+    if (this.#existedPopupComponent) {
+      remove(this.#existedPopupComponent);
+    }
+
+    this.#existedPopupComponent = popupPresenter.init(movie, commentsModel, this.#popupContainer);
   };
 
   #renderFirstFilms = (parentComponent, componentView, viewContainer, movies, quantity) => {
@@ -53,45 +81,14 @@ export default class MoviesPresenter {
   };
 
   #renderFilmCard = (elementToRender, parentElement) => {
-    const commentsModel = new CommentsModel();
-    const element = elementToRender.element;
-    const popupAnchor = element.querySelector('.film-card__link');
-
-    popupAnchor.addEventListener('click', () => {
-      const popupPresenter = new PopupPresenter();
-      const siteBodyElement = document.querySelector('body');
-      const oldPopup = siteBodyElement.querySelector('.film-details');
-
-      if (oldPopup) {
-        oldPopup.remove();
-      }
-
-      popupPresenter.init(siteBodyElement, elementToRender.movie, commentsModel);
-    });
-
+    elementToRender.setClickHandler( () => this.#onFilmCardClick(elementToRender) );
     render(elementToRender, parentElement);
   };
 
-  #onShowMoreButtonClick = (evt) => {
-    evt.preventDefault();
-
-    this.#movies
-      .slice(this.#renderedMovieCardsQuantity, this.#renderedMovieCardsQuantity + FILM_CARDS_QUANTITY_TO_SHOW_PER_STEP)
-      .forEach((movie) => {
-        const movieView = new FilmCardView(movie);
-        this.#renderFilmCard(movieView, this.#filmsListContainerAllView.element);
-      });
-    this.#renderedMovieCardsQuantity += FILM_CARDS_QUANTITY_TO_SHOW_PER_STEP;
-
-    if (this.#renderedMovieCardsQuantity >= this.#movies.length) {
-      evt.target.remove();
-      this.#showMoreButtonAllView.removeElement();
-    }
-  };
-
-  init = (contentContainer, moviesModel) => {
+  init = (contentContainer, moviesModel, popupContainer) => {
     this.#contentContainer = contentContainer;
     this.#movies = [...moviesModel.movies];
+    this.#popupContainer = popupContainer;
 
     this.#initialiseData();
 
@@ -107,7 +104,7 @@ export default class MoviesPresenter {
         this.#filmsListContainerAllView, this.#movies, Math.min(this.#movies.length, FILM_CARDS_QUANTITY_TO_SHOW_PER_STEP));
 
       if (this.#movies.length > FILM_CARDS_QUANTITY_TO_SHOW_PER_STEP) {
-        this.#showMoreButtonAllView.element.addEventListener('click', this.#onShowMoreButtonClick);
+        this.#showMoreButtonAllView.setClickHandler(this.#onShowMoreButtonClick);
         render(this.#showMoreButtonAllView, this.#filmsListAllUpcomingView.element);
       }
 

@@ -70,13 +70,43 @@ const createFilmDetailsTopContainerTemplate = ({filmInfo: movie, userDetails}) =
 
 export default class FilmDetailsTopContainerView extends AbstractView {
   #movie = null;
+  #closeButton = null;
 
   constructor(movie) {
     super();
     this.#movie = movie;
+    this.#closeButton = this.element.querySelector('.film-details__close-btn');
   }
 
   get template() {
     return createFilmDetailsTopContainerTemplate(this.#movie);
   }
+
+  get closeButton() {
+    return this.#closeButton;
+  }
+
+  setCloseBtnClickHandler = (callback) => {
+    this._callback.click = callback;
+    this.closeButton.addEventListener('click', this.#onCloseBtnClick);
+    document.addEventListener('keydown', this.#onPopupEscKeydown);
+  };
+
+  #onCloseBtnClick = (evt) => {
+    evt.preventDefault();
+    this.#clearListeners();
+    this._callback.click();
+  };
+
+  #onPopupEscKeydown = (evt) => {
+    if (evt.key === 'Escape') {
+      this.#clearListeners();
+      this._callback.click();
+    }
+  };
+
+  #clearListeners = () => {
+    this.closeButton.removeEventListener('click', this.#onCloseBtnClick);
+    document.removeEventListener('keydown', this.#onPopupEscKeydown);
+  };
 }

@@ -37,4 +37,15 @@ export default class FilmCardView extends AbstractView {
   get movie() {
     return this.#movie;
   }
+
+  setClickHandler = (callback) => {
+    this._callback.click = callback;
+    const popupAnchor = this.element.querySelector('.film-card__link');
+    popupAnchor.addEventListener('click', this.#onClick);
+  };
+
+  #onClick = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+  };
 }
