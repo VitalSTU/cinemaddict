@@ -1,6 +1,5 @@
 import * as utils from '../view-utils.js';
-
-import { createElement } from '../../render.js';
+import AbstractView from '../../framework/view/abstract-view.js';
 
 const createFilmCardTemplate = ({comments, filmInfo: movie, userDetails}) => `
         <article class="film-card">
@@ -23,11 +22,11 @@ const createFilmCardTemplate = ({comments, filmInfo: movie, userDetails}) => `
           </div>
         </article>`;
 
-export default class FilmCardView {
+export default class FilmCardView extends AbstractView {
   #movie = null;
-  #element = null;
 
   constructor(movie) {
+    super();
     this.#movie = movie;
   }
 
@@ -35,19 +34,18 @@ export default class FilmCardView {
     return createFilmCardTemplate(this.#movie);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
   get movie() {
     return this.#movie;
   }
 
-  removeElement() {
-    this.#element = null;
-  }
+  setClickHandler = (callback) => {
+    this._callback.click = callback;
+    const popupAnchor = this.element.querySelector('.film-card__link');
+    popupAnchor.addEventListener('click', this.#onClick);
+  };
+
+  #onClick = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+  };
 }

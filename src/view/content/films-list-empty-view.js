@@ -1,5 +1,5 @@
 import * as CONST from '../../const.js';
-import { createElement } from '../../render';
+import AbstractView from '../../framework/view/abstract-view.js';
 
 const createFilmsListEmptyTemplate = (filter) => {
   let title;
@@ -28,27 +28,15 @@ const createFilmsListEmptyTemplate = (filter) => {
     </section>`;
 };
 
-export default class FilmsListEmptyView {
+export default class FilmsListEmptyView extends AbstractView {
   #filter = null;
-  #element = null;
 
   constructor(filter) {
+    super();
     this.#filter = filter;
   }
 
   get template() {
     return createFilmsListEmptyTemplate(this.#filter);
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }

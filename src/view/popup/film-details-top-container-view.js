@@ -1,6 +1,5 @@
 import * as utils from '../view-utils.js';
-
-import { createElement } from '../../render';
+import AbstractView from '../../framework/view/abstract-view.js';
 
 const createFilmDetailsTopContainerTemplate = ({filmInfo: movie, userDetails}) => `
     <div class="film-details__top-container">
@@ -69,27 +68,45 @@ const createFilmDetailsTopContainerTemplate = ({filmInfo: movie, userDetails}) =
       </section>
     </div>`;
 
-export default class FilmDetailsTopContainerView {
+export default class FilmDetailsTopContainerView extends AbstractView {
   #movie = null;
-  #element = null;
+  #closeButton = null;
 
   constructor(movie) {
+    super();
     this.#movie = movie;
+    this.#closeButton = this.element.querySelector('.film-details__close-btn');
   }
 
   get template() {
     return createFilmDetailsTopContainerTemplate(this.#movie);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
+  get closeButton() {
+    return this.#closeButton;
+  }
+
+  setCloseBtnClickHandler = (callback) => {
+    this._callback.click = callback;
+    this.closeButton.addEventListener('click', this.#onCloseBtnClick);
+    document.addEventListener('keydown', this.#onPopupEscKeydown);
+  };
+
+  #onCloseBtnClick = (evt) => {
+    evt.preventDefault();
+    this.#clearListeners();
+    this._callback.click();
+  };
+
+  #onPopupEscKeydown = (evt) => {
+    if (evt.key === 'Escape') {
+      this.#clearListeners();
+      this._callback.click();
     }
+  };
 
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
-  }
+  #clearListeners = () => {
+    this.closeButton.removeEventListener('click', this.#onCloseBtnClick);
+    document.removeEventListener('keydown', this.#onPopupEscKeydown);
+  };
 }

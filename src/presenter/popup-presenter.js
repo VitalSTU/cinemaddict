@@ -5,7 +5,7 @@ import FilmDetailsCommentsContainerView from '../view/popup/film-details-comment
 import FilmDetailsCommentView from '../view/popup/film-details-comment-view.js';
 import FilmDetailsAddCommentView from '../view/popup/film-details-add-comment-view.js';
 
-import { render } from '../render.js';
+import { render, remove } from '../framework/render.js';
 import { getCommentsByIds } from '../utils.js';
 
 export default class PopupPresenter {
@@ -26,39 +26,29 @@ export default class PopupPresenter {
     this.#filmDetailsAddCommentView = new FilmDetailsAddCommentView(this.#movie, this.#comments);
   };
 
-  #setEventListeners = (element) => {
-
-    const removeElement = () => {
-      document.querySelector('body').classList.remove('hide-overflow');
-      document.removeEventListener('keydown', onPopupEscKeydown);
-      element.removeEventListener('click', onCloseBtnClick);
-      element.closest('.film-details').remove();
-    };
-
-    function onCloseBtnClick() {
-      removeElement();
-    }
-
-    function onPopupEscKeydown(evt) {
-      if (evt.key === 'Escape') {
-        removeElement();
-      }
-    }
-
-    element.addEventListener('click', onCloseBtnClick);
-    document.addEventListener('keydown', onPopupEscKeydown);
+  #onCloseButtonClick = () => {
+    remove(this.#popupMainContainer);
+    this.#contentContainer.classList.remove('hide-overflow');
   };
 
-  init = (contentContainer, movie, commentsModel) => {
-    this.#contentContainer = contentContainer;
+  /**
+   * Popup presenter initialization function
+   *
+   * @param {*} movie           movie object
+   * @param {*} commentsModel   all comments collection
+   * @param {*} popupContainer  container to render popup in
+   * @returns {FilmDetailsMainContainerView} Created popup component
+   * @memberof PopupPresenter
+   */
+  init = (movie, commentsModel, popupContainer) => {
+    this.#contentContainer = popupContainer;
     this.#movie = movie;
     this.#comments = getCommentsByIds(this.#movie.comments, [...commentsModel.comments]);
 
     this.#initialiseData();
 
-    const closeButton = this.#popupTopContainer.element.querySelector('.film-details__close-btn');
-    this.#setEventListeners(closeButton);
-    document.querySelector('body').classList.add('hide-overflow');
+    this.#popupTopContainer.setCloseBtnClickHandler(this.#onCloseButtonClick);
+    this.#contentContainer.classList.add('hide-overflow');
 
     render(this.#popupMainContainer, this.#contentContainer);
     render(this.#popupTopContainer, this.#popupMainContainer.element);
@@ -68,5 +58,7 @@ export default class PopupPresenter {
       render(new FilmDetailsCommentView(this.#comments[i]), this.#commentsContainerView.element);
     }
     render(this.#filmDetailsAddCommentView, this.#popupBottomContainer.element);
+
+    return this.#popupMainContainer;
   };
 }
