@@ -13,6 +13,7 @@ import CommentsModel from '../model/comments-model.js';
 
 import { MovieFilterType } from '../const.js';
 import { render, remove } from '../framework/render.js';
+import { generateFilter } from '../mock/filter.js';
 
 const FILM_CARDS_QUANTITY_TO_SHOW_PER_STEP = 5;
 const FILM_EXTRA_TEST_CARDS_QUANTITY = 2;
@@ -42,7 +43,7 @@ export default class MoviesPresenter {
 
   #initialiseData = () => {
     this.#contentContainer.innerHTML = '';
-    this.#navigationView = new NavigationView(this.#movies);
+    this.#navigationView = new NavigationView(generateFilter(this.#movies));
   };
 
   #onShowMoreButtonClick = () => {
