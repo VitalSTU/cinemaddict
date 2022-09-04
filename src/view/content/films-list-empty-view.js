@@ -1,20 +1,20 @@
-import * as CONST from '../../const.js';
+import { MovieFilterType } from '../../const.js';
 import AbstractView from '../../framework/view/abstract-view.js';
 
 const createFilmsListEmptyTemplate = (filter) => {
   let title;
 
   switch (filter) {
-    case CONST.movieFilters.allMovies:
+    case MovieFilterType.ALL:
       title = 'There are no movies in our database';
       break;
-    case CONST.movieFilters.watchList:
+    case MovieFilterType.WATCH_LIST:
       title = 'There are no movies to watch now';
       break;
-    case CONST.movieFilters.history:
+    case MovieFilterType.HISTORY:
       title = 'There are no watched movies now';
       break;
-    case CONST.movieFilters.favorites:
+    case MovieFilterType.FAVORITES:
       title = 'There are no favorite movies now';
       break;
     default:
