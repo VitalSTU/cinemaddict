@@ -1,13 +1,7 @@
 import dayjs from 'dayjs';
+import { DESCRIPTION_MAX_LENGTH, EmojiUri } from '../const.js';
 
 const MINUTES_IN_ONE_HOUR = 60;
-const DESCRIPTION_MAX_LENGTH = 140;
-const emojiesUri = {
-  angry: './images/emoji/angry.png',
-  puke: './images/emoji/puke.png',
-  sleeping: './images/emoji/sleeping.png',
-  smile: './images/emoji/smile.png',
-};
 
 const isNotExist = (parameter) => (parameter === null || parameter === undefined);
 
@@ -55,6 +49,6 @@ export const getAgeRating = ({ageRating}) => isNotExist(ageRating) ? '' : `${age
 export const getDirector = ({director}) => isNotExist(director) ? '' : director;
 export const getWriters = ({writers}) => (isNotExist(writers) || writers.length === 0) ? '' : writers.join(', ');
 export const getActors = ({actors}) => (isNotExist(actors) || actors.length === 0) ? '' : actors.join(', ');
-export const getEmojieUri = (emotion) => emojiesUri[emotion];
+export const getEmojieUri = (emotion) => EmojiUri[emotion.toUpperCase()];
 
 export const humanizeMinutes = (minutes) => `${Math.floor(minutes / MINUTES_IN_ONE_HOUR)}h ${Math.floor(minutes % MINUTES_IN_ONE_HOUR)}m`;

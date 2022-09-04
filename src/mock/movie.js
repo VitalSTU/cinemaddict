@@ -43,7 +43,7 @@ export const generateMovie = () => {
       description: `${getRandomElementOrNull(CONST.longReads)}`,
     },
     userDetails: {
-      watchlist: Boolean(getRandomInteger(BOOLEAN_MAX_INTEGER_EQUIVALENT)),
+      watchlist: getRandomInteger(BOOLEAN_MAX_INTEGER_EQUIVALENT),
       alreadyWatched: getRandomInteger(BOOLEAN_MAX_INTEGER_EQUIVALENT),
       watchingDate: '2019-04-12T16:12:32.554Z',
       favorite: getRandomInteger(BOOLEAN_MAX_INTEGER_EQUIVALENT),

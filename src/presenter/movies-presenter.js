@@ -11,8 +11,9 @@ import ShowMoreButtonView from '../view/content/show-more-button-view.js';
 import PopupPresenter from '../presenter/popup-presenter.js';
 import CommentsModel from '../model/comments-model.js';
 
-import * as CONST from '../const.js';
+import { MovieFilterType } from '../const.js';
 import { render, remove } from '../framework/render.js';
+import { generateFilter } from '../mock/filter.js';
 
 const FILM_CARDS_QUANTITY_TO_SHOW_PER_STEP = 5;
 const FILM_EXTRA_TEST_CARDS_QUANTITY = 2;
@@ -20,7 +21,7 @@ const FILM_EXTRA_TEST_CARDS_QUANTITY = 2;
 export default class MoviesPresenter {
   #sortView = new SortView();
   #filmsMainSectionComponent = new FilmsMainSectionView();
-  #filmsListEmptyComponent = new FilmsListEmptyView(CONST.movieFilters.allMovies);
+  #filmsListEmptyComponent = new FilmsListEmptyView(MovieFilterType.ALL);
 
   #filmsListAllUpcomingView = new FilmsListAllUpcomingView();
   #filmsListContainerAllView = new FilmsListContainerView();
@@ -42,7 +43,7 @@ export default class MoviesPresenter {
 
   #initialiseData = () => {
     this.#contentContainer.innerHTML = '';
-    this.#navigationView = new NavigationView(this.#movies);
+    this.#navigationView = new NavigationView(generateFilter(this.#movies));
   };
 
   #onShowMoreButtonClick = () => {
@@ -55,8 +56,7 @@ export default class MoviesPresenter {
     this.#renderedMovieCardsQuantity += FILM_CARDS_QUANTITY_TO_SHOW_PER_STEP;
 
     if (this.#renderedMovieCardsQuantity >= this.#movies.length) {
-      this.#showMoreButtonAllView.element.remove();
-      this.#showMoreButtonAllView.removeElement();
+      remove(this.#showMoreButtonAllView);
     }
   };
 

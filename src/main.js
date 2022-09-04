@@ -14,5 +14,5 @@ const moviesModel = new MoviesModel();
 const moviesPresenter = new MoviesPresenter();
 
 render(new UserProfileView(), siteHeaderElement);
-render(new StatisticsView(), siteFooterElement);
+render(new StatisticsView(moviesModel.movies.length), siteFooterElement);
 moviesPresenter.init(siteMainElement, moviesModel, popupContainerElement);
