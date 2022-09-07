@@ -9,16 +9,20 @@ import { render, remove } from '../framework/render.js';
 import { getCommentsByIds } from '../utils.js';
 
 export default class PopupPresenter {
-  #popupMainContainer;
-  #popupTopContainer;
-  #popupBottomContainer;
-  #commentsContainerView;
-  #filmDetailsAddCommentView;
-  #contentContainer;
-  #movie;
-  #comments;
+  #movie = null;
+  #popupMainContainer = null;
+  #popupTopContainer = null;
+  #popupBottomContainer = null;
+  #commentsContainerView = null;
+  #filmDetailsAddCommentView = null;
+  #contentContainer = null;
+  #comments = null;
 
-  #initialiseData = () => {
+  #initialiseData = (movie, commentsModel, popupContainer) => {
+    this.#movie = movie;
+    this.#comments = getCommentsByIds(this.#movie.comments, [...commentsModel.comments]);
+    this.#contentContainer = popupContainer;
+
     this.#popupMainContainer = new FilmDetailsMainContainerView();
     this.#popupTopContainer = new FilmDetailsTopContainerView(this.#movie);
     this.#popupBottomContainer = new FilmDetailsBottomContainerView(this.#comments);
@@ -27,8 +31,61 @@ export default class PopupPresenter {
   };
 
   #onCloseButtonClick = () => {
-    remove(this.#popupMainContainer);
+    this.#removePopupComponent();
+    this.#activateMainPageScrollbar();
+  };
+
+  #activateMainPageScrollbar = () => {
     this.#contentContainer.classList.remove('hide-overflow');
+  };
+
+  #deactivateMainPageScrollbar = () => {
+    this.#contentContainer.classList.add('hide-overflow');
+  };
+
+  #removePopupComponent = () => {
+    remove(this.#popupMainContainer);
+  };
+
+  #setCloseBtnClickHandler = () => {
+    this.#popupTopContainer.setCloseBtnClickHandler(this.#onCloseButtonClick);
+  };
+
+  #renderPopupMainContainerComponent = () => {
+    render(this.#popupMainContainer, this.#contentContainer);
+  };
+
+  #renderMovieInfoComponent = () => {
+    render(this.#popupTopContainer, this.#popupMainContainer.element);
+  };
+
+  #renderPopupCommentsSectionContainerComponent = () => {
+    render(this.#popupBottomContainer, this.#popupMainContainer.element);
+  };
+
+  #renderPopupCommentsContainerComponent = () => {
+    render(this.#commentsContainerView, this.#popupBottomContainer.element);
+  };
+
+  #renderCommentComponent = (comment) => {
+    render(new FilmDetailsCommentView(comment), this.#commentsContainerView.element);
+  };
+
+  #renderComments = () => {
+    this.#comments.forEach((comment) => {
+      this.#renderCommentComponent(comment);
+    });
+  };
+
+  #renderPopupNewCommentComponent = () => {
+    render(this.#filmDetailsAddCommentView, this.#popupBottomContainer.element);
+  };
+
+  #renderCommentsSectionComponent = () => {
+    this.#renderPopupCommentsSectionContainerComponent();
+    this.#renderPopupCommentsContainerComponent();
+    this.#renderComments();
+    this.#renderPopupNewCommentComponent();
   };
 
   /**
@@ -41,23 +98,14 @@ export default class PopupPresenter {
    * @memberof PopupPresenter
    */
   init = (movie, commentsModel, popupContainer) => {
-    this.#contentContainer = popupContainer;
-    this.#movie = movie;
-    this.#comments = getCommentsByIds(this.#movie.comments, [...commentsModel.comments]);
+    this.#initialiseData(movie, commentsModel, popupContainer);
 
-    this.#initialiseData();
+    this.#setCloseBtnClickHandler();
+    this.#deactivateMainPageScrollbar();
 
-    this.#popupTopContainer.setCloseBtnClickHandler(this.#onCloseButtonClick);
-    this.#contentContainer.classList.add('hide-overflow');
-
-    render(this.#popupMainContainer, this.#contentContainer);
-    render(this.#popupTopContainer, this.#popupMainContainer.element);
-    render(this.#popupBottomContainer, this.#popupMainContainer.element);
-    render(this.#commentsContainerView, this.#popupBottomContainer.element);
-    for (let i = 0; i < this.#comments.length; i++) {
-      render(new FilmDetailsCommentView(this.#comments[i]), this.#commentsContainerView.element);
-    }
-    render(this.#filmDetailsAddCommentView, this.#popupBottomContainer.element);
+    this.#renderPopupMainContainerComponent();
+    this.#renderMovieInfoComponent();
+    this.#renderCommentsSectionComponent();
 
     return this.#popupMainContainer;
   };
