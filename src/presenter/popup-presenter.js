@@ -10,24 +10,24 @@ import { getCommentsByIds } from '../utils.js';
 
 export default class PopupPresenter {
   #movie = null;
-  #popupMainContainer = null;
-  #popupTopContainer = null;
-  #popupBottomContainer = null;
-  #commentsContainerView = null;
-  #filmDetailsAddCommentView = null;
+  #popupMainContainerComponent = null;
+  #popupTopContainerComponent = null;
+  #popupBottomContainerComponent = null;
+  #commentsContainerComponent = null;
+  #filmDetailsAddCommentComponent = null;
   #contentContainer = null;
   #comments = null;
 
-  #initialiseData = (movie, commentsModel, popupContainer) => {
+  #initialiseData = (movie, commentsModel) => {
     this.#movie = movie;
     this.#comments = getCommentsByIds(this.#movie.comments, [...commentsModel.comments]);
-    this.#contentContainer = popupContainer;
 
-    this.#popupMainContainer = new FilmDetailsMainContainerView();
-    this.#popupTopContainer = new FilmDetailsTopContainerView(this.#movie);
-    this.#popupBottomContainer = new FilmDetailsBottomContainerView(this.#comments);
-    this.#commentsContainerView = new FilmDetailsCommentsContainerView();
-    this.#filmDetailsAddCommentView = new FilmDetailsAddCommentView(this.#movie, this.#comments);
+    this.#popupMainContainerComponent = new FilmDetailsMainContainerView();
+    this.#contentContainer = this.#popupMainContainerComponent.popupContainerElement;
+    this.#popupTopContainerComponent = new FilmDetailsTopContainerView(this.#movie);
+    this.#popupBottomContainerComponent = new FilmDetailsBottomContainerView(this.#comments);
+    this.#commentsContainerComponent = new FilmDetailsCommentsContainerView();
+    this.#filmDetailsAddCommentComponent = new FilmDetailsAddCommentView(this.#movie, this.#comments);
   };
 
   #onCloseButtonClick = () => {
@@ -44,31 +44,31 @@ export default class PopupPresenter {
   };
 
   #removePopupComponent = () => {
-    remove(this.#popupMainContainer);
+    remove(this.#popupMainContainerComponent);
   };
 
   #setCloseBtnClickHandler = () => {
-    this.#popupTopContainer.setCloseBtnClickHandler(this.#onCloseButtonClick);
+    this.#popupTopContainerComponent.setCloseBtnClickHandler(this.#onCloseButtonClick);
   };
 
   #renderPopupMainContainerComponent = () => {
-    render(this.#popupMainContainer, this.#contentContainer);
+    render(this.#popupMainContainerComponent, this.#contentContainer);
   };
 
   #renderMovieInfoComponent = () => {
-    render(this.#popupTopContainer, this.#popupMainContainer.element);
+    render(this.#popupTopContainerComponent, this.#popupMainContainerComponent.element);
   };
 
   #renderPopupCommentsSectionContainerComponent = () => {
-    render(this.#popupBottomContainer, this.#popupMainContainer.element);
+    render(this.#popupBottomContainerComponent, this.#popupMainContainerComponent.element);
   };
 
   #renderPopupCommentsContainerComponent = () => {
-    render(this.#commentsContainerView, this.#popupBottomContainer.element);
+    render(this.#commentsContainerComponent, this.#popupBottomContainerComponent.element);
   };
 
   #renderCommentComponent = (comment) => {
-    render(new FilmDetailsCommentView(comment), this.#commentsContainerView.element);
+    render(new FilmDetailsCommentView(comment), this.#commentsContainerComponent.element);
   };
 
   #renderComments = () => {
@@ -78,7 +78,7 @@ export default class PopupPresenter {
   };
 
   #renderPopupNewCommentComponent = () => {
-    render(this.#filmDetailsAddCommentView, this.#popupBottomContainer.element);
+    render(this.#filmDetailsAddCommentComponent, this.#popupBottomContainerComponent.element);
   };
 
   #renderCommentsSectionComponent = () => {
@@ -97,8 +97,8 @@ export default class PopupPresenter {
    * @returns {FilmDetailsMainContainerView} Created popup component
    * @memberof PopupPresenter
    */
-  init = (movie, commentsModel, popupContainer) => {
-    this.#initialiseData(movie, commentsModel, popupContainer);
+  init = (movie, commentsModel) => {
+    this.#initialiseData(movie, commentsModel);
 
     this.#setCloseBtnClickHandler();
     this.#deactivateMainPageScrollbar();
@@ -107,6 +107,6 @@ export default class PopupPresenter {
     this.#renderMovieInfoComponent();
     this.#renderCommentsSectionComponent();
 
-    return this.#popupMainContainer;
+    return this.#popupMainContainerComponent;
   };
 }

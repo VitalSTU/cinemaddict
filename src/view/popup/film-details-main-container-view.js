@@ -7,6 +7,7 @@ const createFilmDetailsMainContainerTemplate = () => `
 </section>`;
 
 export default class FilmDetailsMainContainerView extends AbstractView {
+  #popupContainerElement = document.querySelector('body');
 
   constructor() {
     super();
@@ -14,5 +15,9 @@ export default class FilmDetailsMainContainerView extends AbstractView {
 
   get template() {
     return createFilmDetailsMainContainerTemplate();
+  }
+
+  get popupContainerElement() {
+    return this.#popupContainerElement;
   }
 }
