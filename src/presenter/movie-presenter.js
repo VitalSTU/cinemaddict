@@ -1,7 +1,7 @@
 import FilmCardView from '../view/content/film-card-view.js';
 import CommentsModel from '../model/comments-model.js';
 
-import { render, remove } from '../framework/render.js';
+import { render } from '../framework/render.js';
 
 export default class MoviePresenter {
   #movie = null;

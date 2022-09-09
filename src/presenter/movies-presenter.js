@@ -35,7 +35,6 @@ export default class MoviesPresenter {
 
   #contentContainer = null;
   #movies = null;
-  // #existedPopupComponent = null;
 
   #initialiseData = (contentContainer, moviesModel) => {
     this.#contentContainer = contentContainer;
@@ -70,7 +69,6 @@ export default class MoviesPresenter {
   };
 
   #renderFilmCard = (movie, {element: parentElement}) => {
-    // const moviePresenter = new MoviePresenter(this.#existedPopupComponent);
     const moviePresenter = new MoviePresenter(this.#popupPresenter);
     moviePresenter.init(movie, parentElement);
   };
