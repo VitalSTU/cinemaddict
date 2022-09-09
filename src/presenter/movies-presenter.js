@@ -9,6 +9,7 @@ import ShowMoreButtonPresenter from './show-more-button-presenter.js';
 import NavigationPresenter from './navigation-presenter.js';
 import SortPresenter from './sort-presenter.js';
 import MoviePresenter from './movie-presenter.js';
+import PopupPresenter from './popup-presenter.js';
 
 import { FILM_CARDS_QUANTITY_TO_SHOW_PER_STEP, MovieFilterType } from '../const.js';
 import { render } from '../framework/render.js';
@@ -30,8 +31,11 @@ export default class MoviesPresenter {
   #filmsListMostCommentedComponent = new FilmsListMostCommentedView();
   #filmsListContainerMostCommentedComponent = new FilmsListContainerView();
 
+  #popupPresenter = new PopupPresenter();
+
   #contentContainer = null;
   #movies = null;
+  // #existedPopupComponent = null;
 
   #initialiseData = (contentContainer, moviesModel) => {
     this.#contentContainer = contentContainer;
@@ -66,7 +70,8 @@ export default class MoviesPresenter {
   };
 
   #renderFilmCard = (movie, {element: parentElement}) => {
-    const moviePresenter = new MoviePresenter();
+    // const moviePresenter = new MoviePresenter(this.#existedPopupComponent);
+    const moviePresenter = new MoviePresenter(this.#popupPresenter);
     moviePresenter.init(movie, parentElement);
   };
 

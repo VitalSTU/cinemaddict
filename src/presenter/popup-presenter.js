@@ -5,7 +5,7 @@ import FilmDetailsCommentsContainerView from '../view/popup/film-details-comment
 import FilmDetailsCommentView from '../view/popup/film-details-comment-view.js';
 import FilmDetailsAddCommentView from '../view/popup/film-details-add-comment-view.js';
 
-import { render, remove } from '../framework/render.js';
+import { render, remove, replace } from '../framework/render.js';
 import { getCommentsByIds } from '../utils.js';
 
 export default class PopupPresenter {
@@ -45,6 +45,12 @@ export default class PopupPresenter {
 
   #removePopupComponent = () => {
     remove(this.#popupMainContainerComponent);
+  };
+
+  #removeOldPopup = () => {
+    if (this.#popupMainContainerComponent) {
+      this.#removePopupComponent();
+    }
   };
 
   #setCloseBtnClickHandler = () => {
@@ -98,6 +104,8 @@ export default class PopupPresenter {
    * @memberof PopupPresenter
    */
   init = (movie, commentsModel) => {
+    this.#removeOldPopup();
+
     this.#initialiseData(movie, commentsModel);
 
     this.#setCloseBtnClickHandler();
