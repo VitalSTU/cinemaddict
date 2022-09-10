@@ -7,9 +7,11 @@ export default class MoviePresenter {
   #movie = null;
   #movieComponent = null;
   #popupPresenter = null;
+  #parentElement = null;
 
-  constructor(popupPresenter) {
+  constructor(popupPresenter, parentElement) {
     this.#popupPresenter = popupPresenter;
+    this.#parentElement = parentElement;
   }
 
   #initialiseData = (movie) => {
@@ -25,11 +27,11 @@ export default class MoviePresenter {
     this.#popupPresenter.init(movie, commentsModel);
   };
 
-  init = (movie, parentElement) => {
+  init = (movie) => {
     this.#initialiseData(movie);
 
     this.#movieComponent = new FilmCardView(this.#movie);
     this.#movieComponent.setClickHandler( () => this.#onFilmCardClick(this.#movieComponent) );
-    render(this.#movieComponent, parentElement);
+    render(this.#movieComponent, this.#parentElement);
   };
 }

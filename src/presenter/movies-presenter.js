@@ -60,17 +60,9 @@ export default class MoviesPresenter {
     render(this.#filmsMainSectionComponent, this.#contentContainer);
   };
 
-  #renderFilmsMainComponent = (component) => {
-    render(component, this.#filmsMainSectionComponent.element);
-  };
-
-  #renderFilmsContainerComponent = (container, parentComponent) => {
-    render(container, parentComponent.element);
-  };
-
   #renderFilmCard = (movie, {element: parentElement}) => {
-    const moviePresenter = new MoviePresenter(this.#popupPresenter);
-    moviePresenter.init(movie, parentElement);
+    const moviePresenter = new MoviePresenter(this.#popupPresenter, parentElement);
+    moviePresenter.init(movie);
   };
 
   #renderFilmsListPortion = (parentComponent, allMovies, first, quantity) => {
@@ -82,8 +74,8 @@ export default class MoviesPresenter {
   };
 
   #renderFilmsComponent = (filmsMainComponent, filmsContainerComponent, movies, first, quantity) => {
-    this.#renderFilmsMainComponent(filmsMainComponent);
-    this.#renderFilmsContainerComponent(filmsContainerComponent, filmsMainComponent);
+    render(filmsMainComponent, this.#filmsMainSectionComponent.element);
+    render(filmsContainerComponent, filmsMainComponent.element);
     this.#renderFilmsListPortion(filmsContainerComponent, movies, first, quantity);
   };
 
