@@ -6,7 +6,7 @@ import FilmDetailsCommentView from '../view/popup/film-details-comment-view.js';
 import FilmDetailsAddCommentView from '../view/popup/film-details-add-comment-view.js';
 
 import { render, remove } from '../framework/render.js';
-import { getCommentsByIds } from '../utils.js';
+import { getCommentsByIds, getNow } from '../utils.js';
 
 export default class PopupPresenter {
   #movie = null;
@@ -16,11 +16,18 @@ export default class PopupPresenter {
   #commentsContainerComponent = null;
   #filmDetailsAddCommentComponent = null;
   #contentContainer = null;
+  #commentsModel = null;
   #comments = null;
+  #changeData = null;
 
-  #initialiseData = (movie, commentsModel) => {
+  constructor(changeData, commentsModel) {
+    this.#changeData = changeData;
+    this.#commentsModel = commentsModel;
+  }
+
+  #initialiseData = (movie) => {
     this.#movie = movie;
-    this.#comments = getCommentsByIds(this.#movie.comments, [...commentsModel.comments]);
+    this.#comments = getCommentsByIds(this.#movie.comments, [...this.#commentsModel.comments]);
 
     this.#popupMainContainerComponent = new FilmDetailsMainContainerView();
     this.#contentContainer = this.#popupMainContainerComponent.popupContainerElement;
@@ -33,6 +40,23 @@ export default class PopupPresenter {
   #onCloseButtonClick = () => {
     this.#removePopupComponent();
     this.#activateMainPageScrollbar();
+  };
+
+  #onWatchlistClick = () => {
+    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails, watchlist: !this.#movie.userDetails.watchlist}});
+  };
+
+  #onHistoryClick = () => {
+    const alreadyWatched = this.#movie.userDetails.alreadyWatched;
+
+    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails,
+      alreadyWatched: !alreadyWatched,
+      watchingDate: alreadyWatched ? '' : getNow(),
+    }});
+  };
+
+  #onFavoriteClick = () => {
+    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails, favorite: !this.#movie.userDetails.favorite}});
   };
 
   #activateMainPageScrollbar = () => {
@@ -55,6 +79,12 @@ export default class PopupPresenter {
 
   #setCloseBtnClickHandler = () => {
     this.#popupTopContainerComponent.setCloseBtnClickHandler(this.#onCloseButtonClick);
+  };
+
+  #setChangeDataClickHandlers = () => {
+    this.#popupTopContainerComponent.setWatchlistClickHandler(this.#onWatchlistClick);
+    this.#popupTopContainerComponent.setHistoryClickHandler(this.#onHistoryClick);
+    this.#popupTopContainerComponent.setFavoriteClickHandler(this.#onFavoriteClick);
   };
 
   #renderPopupMainContainerComponent = () => {
@@ -103,14 +133,15 @@ export default class PopupPresenter {
    * @returns {FilmDetailsMainContainerView} Created popup component
    * @memberof PopupPresenter
    */
-  init = (movie, commentsModel) => {
+  init = (movie) => {
     this.#removeOldPopup();
 
-    this.#initialiseData(movie, commentsModel);
+    this.#initialiseData(movie);
 
     this.#setCloseBtnClickHandler();
     this.#deactivateMainPageScrollbar();
 
+    this.#setChangeDataClickHandlers();
     this.#renderPopupMainContainerComponent();
     this.#renderMovieInfoComponent();
     this.#renderCommentsSectionComponent();

@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { MovieFilterType } from './const.js';
 
 const filter = {
@@ -10,7 +11,7 @@ const filter = {
 const getCommentsByIds = (ids, comments) => comments.filter((c) => ids.includes(c.id));
 
 const updateItem = (items, update) => {
-  updateIndex = items.find((item) => item.id === update.id);
+  const updateIndex = items.find((item) => item.id === update.id);
 
   if (updateIndex === -1) {
     return items;
@@ -23,4 +24,6 @@ const updateItem = (items, update) => {
   ];
 };
 
-export { filter, getCommentsByIds, updateItem };
+const getNow = () => dayjs().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
+
+export { filter, getCommentsByIds, updateItem, getNow };

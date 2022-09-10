@@ -3,7 +3,7 @@ import ShowMoreButtonView from '../view/content/show-more-button-view.js';
 import { FILM_CARDS_QUANTITY_TO_SHOW_PER_STEP } from '../const.js';
 import { render, remove } from '../framework/render.js';
 
-export default class showMoreButtonPresenter {
+export default class ShowMoreButtonPresenter {
   #showMoreButtonComponent = new ShowMoreButtonView();
   #renderedMovieCardsQuantity = FILM_CARDS_QUANTITY_TO_SHOW_PER_STEP;
 

@@ -5,6 +5,8 @@ import FilmsListTopRatedView from '../view/content/films-list-top-rated-view';
 import FilmsListMostCommentedView from '../view/content/films-list-most-commented-view';
 import FilmsListContainerView from '../view/content/films-list-container-view.js';
 
+import CommentsModel from '../model/comments-model.js';
+
 import ShowMoreButtonPresenter from './show-more-button-presenter.js';
 import NavigationPresenter from './navigation-presenter.js';
 import SortPresenter from './sort-presenter.js';
@@ -33,7 +35,7 @@ export default class MoviesPresenter {
   #filmsListContainerMostCommentedComponent = new FilmsListContainerView();
 
   #moviePresenters = new Map();
-  #popupPresenter = new PopupPresenter();
+  #popupPresenter = null;
   #showMoreButtonPresenter = null;
 
   #contentContainer = null;
@@ -43,6 +45,9 @@ export default class MoviesPresenter {
     this.#contentContainer = contentContainer;
     this.#contentContainer.innerHTML = '';
     this.#movies = [...moviesModel.movies];
+
+    const commentsModel = new CommentsModel();
+    this.#popupPresenter = new PopupPresenter(this.#onMovieChange, commentsModel);
   };
 
   #renderNavigationComponent = () => {
@@ -64,9 +69,11 @@ export default class MoviesPresenter {
   };
 
   #renderFilmCard = (movie, {element: parentElement}) => {
-    const moviePresenter = new MoviePresenter(this.#popupPresenter, parentElement);
+    const moviePresenter = new MoviePresenter(this.#popupPresenter, parentElement, this.#onMovieChange);
+    const presenters = !(this.#moviePresenters.has(movie.id)) ? [] : this.#moviePresenters.get(movie.id);
+
     moviePresenter.init(movie);
-    this.#moviePresenters.set(movie.id, moviePresenter);
+    this.#moviePresenters.set(movie.id, [...presenters, moviePresenter]);
   };
 
   #renderFilmsListPortion = (parentComponent, allMovies, first, quantity) => {
@@ -109,14 +116,21 @@ export default class MoviesPresenter {
   };
 
   #clearMovieList = () => {
-    this.#moviePresenters.forEach((presenter) => presenter.destroy());
+    this.#moviePresenters.forEach((presenters) => {
+      presenters.forEach((presenter) => {
+        presenter.destroy();
+      });
+    });
     this.#moviePresenters.clear();
     this.destroyShowMoreButtonComponent();
   };
 
   #onMovieChange = (updatedMovie) => {
     this.#movies = updateItem(this.#movies, updatedMovie);
-    this.#moviePresenters.get(updatedMovie.id).init(updatedMovie);
+    this.#moviePresenters.get(updatedMovie.id).forEach((presenter) => {
+      presenter.init(updatedMovie);
+    });
+    this.#popupPresenter.init(updatedMovie);
   };
 
   destroyShowMoreButtonComponent = () => {
