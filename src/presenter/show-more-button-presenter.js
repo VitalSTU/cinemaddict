@@ -11,6 +11,11 @@ export default class showMoreButtonPresenter {
   #filmsListContainer = null;
   #movies = null;
   #renderFilmsListPortion = null;
+  #moviesPresenter = null;
+
+  constructor(moviesPresenter) {
+    this.#moviesPresenter = moviesPresenter;
+  }
 
   #initialiseData = (buttonContainer, moviesContainer, moviesModel, renderFilmsListPortion) => {
     this.#showMoreButtonContainer = buttonContainer;
@@ -26,7 +31,7 @@ export default class showMoreButtonPresenter {
     this.#renderedMovieCardsQuantity += FILM_CARDS_QUANTITY_TO_SHOW_PER_STEP;
 
     if (this.#renderedMovieCardsQuantity >= this.#movies.length) {
-      remove(this.#showMoreButtonComponent);
+      this.#moviesPresenter.destroyShowMoreButtonComponent();
     }
   };
 
@@ -35,5 +40,9 @@ export default class showMoreButtonPresenter {
 
     this.#showMoreButtonComponent.setClickHandler(this.#onShowMoreButtonClick);
     render(this.#showMoreButtonComponent, this.#showMoreButtonContainer.element);
+  };
+
+  destroy = () => {
+    remove(this.#showMoreButtonComponent);
   };
 }

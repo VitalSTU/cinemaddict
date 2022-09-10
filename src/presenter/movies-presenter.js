@@ -31,7 +31,9 @@ export default class MoviesPresenter {
   #filmsListMostCommentedComponent = new FilmsListMostCommentedView();
   #filmsListContainerMostCommentedComponent = new FilmsListContainerView();
 
+  #moviePresenters = new Map();
   #popupPresenter = new PopupPresenter();
+  #showMoreButtonPresenter = null;
 
   #contentContainer = null;
   #movies = null;
@@ -63,6 +65,7 @@ export default class MoviesPresenter {
   #renderFilmCard = (movie, {element: parentElement}) => {
     const moviePresenter = new MoviePresenter(this.#popupPresenter, parentElement);
     moviePresenter.init(movie);
+    this.#moviePresenters.set(movie.id, moviePresenter);
   };
 
   #renderFilmsListPortion = (parentComponent, allMovies, first, quantity) => {
@@ -80,8 +83,9 @@ export default class MoviesPresenter {
   };
 
   #renderShowMoreButtonComponent = () => {
-    const showMoreButtonPresenter = new ShowMoreButtonPresenter();
-    showMoreButtonPresenter.init(this.#filmsListAllUpcomingComponent, this.#filmsListContainerAllComponent, this.#movies, this.#renderFilmsListPortion);
+    this.#showMoreButtonPresenter = new ShowMoreButtonPresenter(this);
+    this.#showMoreButtonPresenter.init(this.#filmsListAllUpcomingComponent,
+      this.#filmsListContainerAllComponent, this.#movies, this.#renderFilmsListPortion);
   };
 
   #renderFilmsListAllUpcomingComponent = () => {
@@ -101,6 +105,17 @@ export default class MoviesPresenter {
   #renderFilmsListMostCommentedComponent = () => {
     this.#renderFilmsComponent(this.#filmsListMostCommentedComponent, this.#filmsListContainerMostCommentedComponent, this.#movies,
       FIRST_FILM_CARD_NUMBER, Math.min(this.#movies.length, FILM_EXTRA_TEST_CARDS_QUANTITY - FIRST_FILM_CARD_NUMBER));
+  };
+
+  #clearMovieList = () => {
+    this.#moviePresenters.forEach((presenter) => presenter.destroy());
+    this.#moviePresenters.clear();
+    this.destroyShowMoreButtonComponent();
+  };
+
+  destroyShowMoreButtonComponent = () => {
+    this.#showMoreButtonPresenter.destroy();
+    this.#showMoreButtonPresenter = null;
   };
 
   init = (contentContainer, moviesModel) => {
