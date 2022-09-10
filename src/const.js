@@ -1,4 +1,5 @@
 export const DESCRIPTION_MAX_LENGTH = 140;
+export const FILM_CARDS_QUANTITY_TO_SHOW_PER_STEP = 5;
 
 export const EmojiUri = {
   ANGRY: './images/emoji/angry.png',

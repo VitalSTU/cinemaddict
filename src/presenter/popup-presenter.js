@@ -6,29 +6,122 @@ import FilmDetailsCommentView from '../view/popup/film-details-comment-view.js';
 import FilmDetailsAddCommentView from '../view/popup/film-details-add-comment-view.js';
 
 import { render, remove } from '../framework/render.js';
-import { getCommentsByIds } from '../utils.js';
+import { getCommentsByIds, getNow } from '../utils.js';
 
 export default class PopupPresenter {
-  #popupMainContainer;
-  #popupTopContainer;
-  #popupBottomContainer;
-  #commentsContainerView;
-  #filmDetailsAddCommentView;
-  #contentContainer;
-  #movie;
-  #comments;
+  #movie = null;
+  #popupMainContainerComponent = null;
+  #popupTopContainerComponent = null;
+  #popupBottomContainerComponent = null;
+  #commentsContainerComponent = null;
+  #filmDetailsAddCommentComponent = null;
+  #contentContainer = null;
+  #commentsModel = null;
+  #comments = null;
+  #changeData = null;
 
-  #initialiseData = () => {
-    this.#popupMainContainer = new FilmDetailsMainContainerView();
-    this.#popupTopContainer = new FilmDetailsTopContainerView(this.#movie);
-    this.#popupBottomContainer = new FilmDetailsBottomContainerView(this.#comments);
-    this.#commentsContainerView = new FilmDetailsCommentsContainerView();
-    this.#filmDetailsAddCommentView = new FilmDetailsAddCommentView(this.#movie, this.#comments);
+  constructor(changeData, commentsModel) {
+    this.#changeData = changeData;
+    this.#commentsModel = commentsModel;
+  }
+
+  #initialiseData = (movie) => {
+    this.#movie = movie;
+    this.#comments = getCommentsByIds(this.#movie.comments, [...this.#commentsModel.comments]);
+
+    this.#popupMainContainerComponent = new FilmDetailsMainContainerView();
+    this.#contentContainer = this.#popupMainContainerComponent.popupContainerElement;
+    this.#popupTopContainerComponent = new FilmDetailsTopContainerView(this.#movie);
+    this.#popupBottomContainerComponent = new FilmDetailsBottomContainerView(this.#comments);
+    this.#commentsContainerComponent = new FilmDetailsCommentsContainerView();
+    this.#filmDetailsAddCommentComponent = new FilmDetailsAddCommentView(this.#movie, this.#comments);
   };
 
   #onCloseButtonClick = () => {
-    remove(this.#popupMainContainer);
+    this.#removePopupComponent();
+    this.#activateMainPageScrollbar();
+  };
+
+  #onWatchlistClick = () => {
+    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails, watchlist: !this.#movie.userDetails.watchlist}});
+  };
+
+  #onHistoryClick = () => {
+    const alreadyWatched = this.#movie.userDetails.alreadyWatched;
+
+    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails,
+      alreadyWatched: !alreadyWatched,
+      watchingDate: alreadyWatched ? '' : getNow(),
+    }});
+  };
+
+  #onFavoriteClick = () => {
+    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails, favorite: !this.#movie.userDetails.favorite}});
+  };
+
+  #activateMainPageScrollbar = () => {
     this.#contentContainer.classList.remove('hide-overflow');
+  };
+
+  #deactivateMainPageScrollbar = () => {
+    this.#contentContainer.classList.add('hide-overflow');
+  };
+
+  #removePopupComponent = () => {
+    remove(this.#popupMainContainerComponent);
+  };
+
+  #removeOldPopup = () => {
+    if (this.#popupMainContainerComponent) {
+      this.#removePopupComponent();
+    }
+  };
+
+  #setCloseBtnClickHandler = () => {
+    this.#popupTopContainerComponent.setCloseBtnClickHandler(this.#onCloseButtonClick);
+  };
+
+  #setChangeDataClickHandlers = () => {
+    this.#popupTopContainerComponent.setWatchlistClickHandler(this.#onWatchlistClick);
+    this.#popupTopContainerComponent.setHistoryClickHandler(this.#onHistoryClick);
+    this.#popupTopContainerComponent.setFavoriteClickHandler(this.#onFavoriteClick);
+  };
+
+  #renderPopupMainContainerComponent = () => {
+    render(this.#popupMainContainerComponent, this.#contentContainer);
+  };
+
+  #renderMovieInfoComponent = () => {
+    render(this.#popupTopContainerComponent, this.#popupMainContainerComponent.element);
+  };
+
+  #renderPopupCommentsSectionContainerComponent = () => {
+    render(this.#popupBottomContainerComponent, this.#popupMainContainerComponent.element);
+  };
+
+  #renderPopupCommentsContainerComponent = () => {
+    render(this.#commentsContainerComponent, this.#popupBottomContainerComponent.element);
+  };
+
+  #renderCommentComponent = (comment) => {
+    render(new FilmDetailsCommentView(comment), this.#commentsContainerComponent.element);
+  };
+
+  #renderComments = () => {
+    this.#comments.forEach((comment) => {
+      this.#renderCommentComponent(comment);
+    });
+  };
+
+  #renderPopupNewCommentComponent = () => {
+    render(this.#filmDetailsAddCommentComponent, this.#popupBottomContainerComponent.element);
+  };
+
+  #renderCommentsSectionComponent = () => {
+    this.#renderPopupCommentsSectionContainerComponent();
+    this.#renderPopupCommentsContainerComponent();
+    this.#renderComments();
+    this.#renderPopupNewCommentComponent();
   };
 
   /**
@@ -40,25 +133,19 @@ export default class PopupPresenter {
    * @returns {FilmDetailsMainContainerView} Created popup component
    * @memberof PopupPresenter
    */
-  init = (movie, commentsModel, popupContainer) => {
-    this.#contentContainer = popupContainer;
-    this.#movie = movie;
-    this.#comments = getCommentsByIds(this.#movie.comments, [...commentsModel.comments]);
+  init = (movie) => {
+    this.#removeOldPopup();
 
-    this.#initialiseData();
+    this.#initialiseData(movie);
 
-    this.#popupTopContainer.setCloseBtnClickHandler(this.#onCloseButtonClick);
-    this.#contentContainer.classList.add('hide-overflow');
+    this.#setCloseBtnClickHandler();
+    this.#deactivateMainPageScrollbar();
 
-    render(this.#popupMainContainer, this.#contentContainer);
-    render(this.#popupTopContainer, this.#popupMainContainer.element);
-    render(this.#popupBottomContainer, this.#popupMainContainer.element);
-    render(this.#commentsContainerView, this.#popupBottomContainer.element);
-    for (let i = 0; i < this.#comments.length; i++) {
-      render(new FilmDetailsCommentView(this.#comments[i]), this.#commentsContainerView.element);
-    }
-    render(this.#filmDetailsAddCommentView, this.#popupBottomContainer.element);
+    this.#setChangeDataClickHandlers();
+    this.#renderPopupMainContainerComponent();
+    this.#renderMovieInfoComponent();
+    this.#renderCommentsSectionComponent();
 
-    return this.#popupMainContainer;
+    return this.#popupMainContainerComponent;
   };
 }

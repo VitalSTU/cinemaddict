@@ -8,11 +8,10 @@ import { render } from './framework/render.js';
 const siteHeaderElement = document.querySelector('.header');
 const siteMainElement = document.querySelector('.main');
 const siteFooterElement = document.querySelector('.footer');
-const popupContainerElement = document.querySelector('body');
 
 const moviesModel = new MoviesModel();
 const moviesPresenter = new MoviesPresenter();
 
 render(new UserProfileView(), siteHeaderElement);
 render(new StatisticsView(moviesModel.movies.length), siteFooterElement);
-moviesPresenter.init(siteMainElement, moviesModel, popupContainerElement);
+moviesPresenter.init(siteMainElement, moviesModel);

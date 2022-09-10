@@ -1,5 +1,6 @@
 import * as CONST from './const.js';
 import { getRandomInteger, getRandomElementOrNull } from './mock-utils.js';
+import { nanoid } from 'nanoid';
 
 const BOOLEAN_MAX_INTEGER_EQUIVALENT = 1;
 const MAX_RATING = 10;
@@ -17,7 +18,7 @@ export const generateMovie = () => {
   );
 
   return {
-    id: 0,
+    id: nanoid(),
     comments,
     filmInfo: {
       title: `${getRandomElementOrNull(CONST.movies)}`,

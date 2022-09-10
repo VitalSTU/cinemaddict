@@ -71,11 +71,17 @@ const createFilmDetailsTopContainerTemplate = ({filmInfo: movie, userDetails}) =
 export default class FilmDetailsTopContainerView extends AbstractView {
   #movie = null;
   #closeButton = null;
+  #watchlistButton = null;
+  #watchedButton = null;
+  #favoriteButton = null;
 
   constructor(movie) {
     super();
     this.#movie = movie;
     this.#closeButton = this.element.querySelector('.film-details__close-btn');
+    this.#watchlistButton = this.element.querySelector('.film-details__control-button--watchlist');
+    this.#watchedButton = this.element.querySelector('.film-details__control-button--watched');
+    this.#favoriteButton = this.element.querySelector('.film-details__control-button--favorite');
   }
 
   get template() {
@@ -89,7 +95,22 @@ export default class FilmDetailsTopContainerView extends AbstractView {
   setCloseBtnClickHandler = (callback) => {
     this._callback.click = callback;
     this.closeButton.addEventListener('click', this.#onCloseBtnClick);
-    document.addEventListener('keydown', this.#onPopupEscKeydown);
+    document.addEventListener('keydown', this.#onKeydown);
+  };
+
+  setWatchlistClickHandler = (callback) => {
+    this._callback.watchlistClick = callback;
+    this.#watchlistButton.addEventListener('click', this.#onWatchlistClick);
+  };
+
+  setHistoryClickHandler = (callback) => {
+    this._callback.historyClick = callback;
+    this.#watchedButton.addEventListener('click', this.#onHistoryClick);
+  };
+
+  setFavoriteClickHandler = (callback) => {
+    this._callback.favoriteClick = callback;
+    this.#favoriteButton.addEventListener('click', this.#onFavoriteClick);
   };
 
   #onCloseBtnClick = (evt) => {
@@ -98,15 +119,33 @@ export default class FilmDetailsTopContainerView extends AbstractView {
     this._callback.click();
   };
 
-  #onPopupEscKeydown = (evt) => {
+  #onKeydown = (evt) => {
     if (evt.key === 'Escape') {
       this.#clearListeners();
       this._callback.click();
     }
   };
 
+  #onWatchlistClick = (evt) => {
+    evt.preventDefault();
+    this._callback.watchlistClick();
+  };
+
+  #onHistoryClick = (evt) => {
+    evt.preventDefault();
+    this._callback.historyClick();
+  };
+
+  #onFavoriteClick = (evt) => {
+    evt.preventDefault();
+    this._callback.favoriteClick();
+  };
+
   #clearListeners = () => {
     this.closeButton.removeEventListener('click', this.#onCloseBtnClick);
-    document.removeEventListener('keydown', this.#onPopupEscKeydown);
+    document.removeEventListener('keydown', this.#onKeydown);
+    this.#watchlistButton.removeEventListener('click', this.#onWatchlistClick);
+    this.#watchedButton.removeEventListener('click', this.#onHistoryClick);
+    this.#favoriteButton.removeEventListener('click', this.#onFavoriteClick);
   };
 }

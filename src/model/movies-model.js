@@ -3,12 +3,10 @@ import { generateMovie } from '../mock/movie.js';
 const FILM_TEST_CARDS_QUANTITY = 42;
 
 export default class MoviesModel {
-  #movies = Array.from({length: FILM_TEST_CARDS_QUANTITY}, generateMovie);
+  #movies = null;
 
   constructor() {
-    for (let i = 0; i < this.#movies.length; i++) {
-      this.#movies[i].id = i;
-    }
+    this.#movies = Array.from({length: FILM_TEST_CARDS_QUANTITY}, generateMovie);
   }
 
   get movies() {
