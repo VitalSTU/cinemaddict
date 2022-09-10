@@ -14,6 +14,7 @@ import PopupPresenter from './popup-presenter.js';
 import { FILM_CARDS_QUANTITY_TO_SHOW_PER_STEP, MovieFilterType } from '../const.js';
 import { render } from '../framework/render.js';
 import { generateFilter } from '../mock/filter.js';
+import { updateItem } from '../utils.js';
 
 const FIRST_FILM_CARD_NUMBER = 0;
 const FILM_EXTRA_TEST_CARDS_QUANTITY = 2;
@@ -111,6 +112,11 @@ export default class MoviesPresenter {
     this.#moviePresenters.forEach((presenter) => presenter.destroy());
     this.#moviePresenters.clear();
     this.destroyShowMoreButtonComponent();
+  };
+
+  #onMovieChange = (updatedMovie) => {
+    this.#movies = updateItem(this.#movies, updatedMovie);
+    this.#moviePresenters.get(updatedMovie.id).init(updatedMovie);
   };
 
   destroyShowMoreButtonComponent = () => {
