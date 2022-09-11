@@ -1,5 +1,5 @@
 import * as CONST from './const.js';
-import { getRandomInteger, getRandomElementOrNull } from './mock-utils.js';
+import { getRandomInteger, getRandomElementOrNull, getRandomDate } from './mock-utils.js';
 import { nanoid } from 'nanoid';
 
 const BOOLEAN_MAX_INTEGER_EQUIVALENT = 1;
@@ -34,7 +34,7 @@ export const generateMovie = () => {
         `${getRandomElementOrNull(CONST.names)}`, `${getRandomElementOrNull(CONST.names)}`, `${getRandomElementOrNull(CONST.names)}`,
       ],
       release: {
-        date: '2019-05-08T00:00:00.000Z',
+        date: `${getRandomDate()}`,
         releaseCountry: 'Finland'
       },
       runtime: getRandomInteger(MIN_RUNTIME, MAX_RUNTIME),
