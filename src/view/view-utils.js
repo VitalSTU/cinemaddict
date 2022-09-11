@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { DESCRIPTION_MAX_LENGTH, EmojiUri } from '../const.js';
+import { DESCRIPTION_MAX_LENGTH, MOVIE_CARD_ACTIVE, MOVIE_DETAILS_ACTIVE, EmojiUri } from '../const.js';
 
 const MINUTES_IN_ONE_HOUR = 60;
 
@@ -43,8 +43,8 @@ export const getShortDescription = ({description}) => {
 };
 
 export const getCommentsQuantity = (comments) => isNotExist(comments) ? 0 : comments.length;
-export const getFlagIfActive = (flag) => flag ? ' film-card__controls-item--active' : '';
-export const getPopupFlagIfActive = (flag) => flag ? ' film-details__control-button--active' : '';
+export const getFlagIfActive = (flag) => flag ? ` ${MOVIE_CARD_ACTIVE}` : '';
+export const getPopupFlagIfActive = (flag) => flag ? ` ${MOVIE_DETAILS_ACTIVE}` : '';
 export const getAgeRating = ({ageRating}) => isNotExist(ageRating) ? '' : `${ageRating}+`;
 export const getDirector = ({director}) => isNotExist(director) ? '' : director;
 export const getWriters = ({writers}) => (isNotExist(writers) || writers.length === 0) ? '' : writers.join(', ');
