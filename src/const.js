@@ -14,3 +14,9 @@ export const MovieFilterType = {
   HISTORY: 'History',
   FAVORITES: 'Favorites',
 };
+
+export const SortType = {
+  DEFAULT: 'default',
+  DATE: 'date',
+  RATING: 'rating',
+};
