@@ -10,14 +10,17 @@ import { getCommentsByIds, getNow } from '../utils.js';
 
 export default class PopupPresenter {
   #movie = null;
+
   #popupMainContainerComponent = null;
   #popupTopContainerComponent = null;
   #popupBottomContainerComponent = null;
   #commentsContainerComponent = null;
   #filmDetailsAddCommentComponent = null;
   #contentContainer = null;
+
   #commentsModel = null;
   #comments = null;
+
   #changeData = null;
 
   constructor(changeData, commentsModel) {
@@ -43,7 +46,7 @@ export default class PopupPresenter {
   };
 
   #onWatchlistClick = () => {
-    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails, watchlist: !this.#movie.userDetails.watchlist}});
+    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails, watchlist: !this.#movie.userDetails.watchlist}}, true);
   };
 
   #onHistoryClick = () => {
@@ -52,11 +55,11 @@ export default class PopupPresenter {
     this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails,
       alreadyWatched: !alreadyWatched,
       watchingDate: alreadyWatched ? '' : getNow(),
-    }});
+    }}, true);
   };
 
   #onFavoriteClick = () => {
-    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails, favorite: !this.#movie.userDetails.favorite}});
+    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails, favorite: !this.#movie.userDetails.favorite}}, true);
   };
 
   #activateMainPageScrollbar = () => {

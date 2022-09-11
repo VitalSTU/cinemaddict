@@ -5,9 +5,12 @@ import { getNow } from '../utils.js';
 
 export default class MoviePresenter {
   #movie = null;
+
   #movieComponent = null;
-  #popupPresenter = null;
   #parentElement = null;
+
+  #popupPresenter = null;
+
   #changeData = null;
 
   constructor(popupPresenter, parentElement, changeData) {

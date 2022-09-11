@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 const getRandomInteger = (a, b) => {
   let min = a;
   let max = b;
@@ -20,7 +22,16 @@ const getRandomElementOrNull = (array) => (!array || !array.length)
   ? null
   : array[getRandomInteger(array.length - 1)];
 
+const getRandomDate = () => {
+  const from = 1;
+  const to = 15000;
+  const daysGap = -getRandomInteger(from, to);
+
+  return dayjs().add(daysGap, 'day').format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
+};
+
 export {
   getRandomInteger,
   getRandomElementOrNull,
+  getRandomDate,
 };
