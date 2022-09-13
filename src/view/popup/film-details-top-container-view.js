@@ -111,6 +111,11 @@ export default class FilmDetailsTopContainerView extends AbstractStatefulView {
     this.#watchlistButton = this.element.querySelector('.film-details__control-button--watchlist');
     this.#watchedButton = this.element.querySelector('.film-details__control-button--watched');
     this.#favoriteButton = this.element.querySelector('.film-details__control-button--favorite');
+
+    // this.#closeButton.addEventListener('click', this.#closeButtonHandler);
+    this.#watchlistButton.addEventListener('click', this.#watchlistToggleHandler);
+    this.#watchedButton.addEventListener('click', this.#watchedToggleHandler);
+    this.#favoriteButton.addEventListener('click', this.#favoriteToggleHandler);
   }
 
   get template() {
@@ -120,6 +125,29 @@ export default class FilmDetailsTopContainerView extends AbstractStatefulView {
   get closeButton() {
     return this.#closeButton;
   }
+
+  #watchlistToggleHandler = (evt) => {
+    evt.preventDefault();
+    this.updateElement({
+      userDetails: {...this._state.userDetails, watchlist: !this._state.userDetails.watchlist},
+    });
+  };
+
+  #watchedToggleHandler = (evt) => {
+    evt.preventDefault();
+    const update = {
+      userDetails: {...this._state.userDetails, alreadyWatched: !this._state.userDetails.alreadyWatched},
+    };
+    update.userDetails.watchingDate = FilmDetailsTopContainerView.updateMovieUserDetailsDate(update);
+    this.updateElement(update);
+  };
+
+  #favoriteToggleHandler = (evt) => {
+    evt.preventDefault();
+    this.updateElement({
+      userDetails: {...this._state.userDetails, favorite: !this._state.userDetails.favorite},
+    });
+  };
 
   setCloseBtnClickHandler = (callback) => {
     this._callback.click = callback;
@@ -142,7 +170,9 @@ export default class FilmDetailsTopContainerView extends AbstractStatefulView {
     this.#favoriteButton.addEventListener('click', this.#onFavoriteClick);
   };
 
-  _restoreHandlers = () => {};
+  _restoreHandlers = () => {
+    this.setCloseBtnClickHandler(this._callback.click);
+  };
 
   #clearListeners = () => {
     this.closeButton.removeEventListener('click', this.#onCloseBtnClick);
@@ -180,22 +210,29 @@ export default class FilmDetailsTopContainerView extends AbstractStatefulView {
     this._callback.favoriteClick();
   };
 
+  static updateMovieUserDetailsDate = (movie) => {
+    let watchingDate = movie.userDetails.watchingDate;
+
+    if (!movie.userDetails.alreadyWatched) {
+      watchingDate = null;
+    } else if (!watchingDate) {
+      watchingDate = mainUtils.getNow();
+    }
+
+    return watchingDate;
+  };
+
   static parseMovieToState = (movie) => ({...movie,
-    filmInfo: {...filmInfo, release: {...release}},
-    userDetails: {...userDetails},
+    filmInfo: {...movie.filmInfo, release: {...movie.filmInfo.release}},
+    userDetails: {...movie.userDetails},
   });
 
   static parseStateToTask = (state) => {
     const movie = {...state,
-      filmInfo: {...filmInfo, release: {...release}},
-      userDetails: {...userDetails},
+      filmInfo: {...state.filmInfo, release: {...state.filmInfo.release}},
+      userDetails: {...state.userDetails},
     };
-
-    if (!movie.userDetails.alreadyWatched) {
-      movie.userDetails.watchingDate = null;
-    } else if (!movie.userDetails.watchingDate) {
-      movie.userDetails.watchingDate = mainUtils.getNow();
-    }
+    movie.userDetails.watchingDate = FilmDetailsTopContainerView.updateMovieUserDetailsDate(movie);
 
     return movie;
   };
