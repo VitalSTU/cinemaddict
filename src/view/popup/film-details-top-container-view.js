@@ -106,13 +106,12 @@ export default class FilmDetailsTopContainerView extends AbstractStatefulView {
 
   constructor(movie = BLANK_MOVIE) {
     super();
+    this._state = FilmDetailsTopContainerView.parseMovieToState(movie);
 
     this.#closeButton = this.element.querySelector('.film-details__close-btn');
     this.#watchlistButton = this.element.querySelector('.film-details__control-button--watchlist');
     this.#watchedButton = this.element.querySelector('.film-details__control-button--watched');
     this.#favoriteButton = this.element.querySelector('.film-details__control-button--favorite');
-
-    this._state = FilmDetailsTopContainerView.parseMovieToState(movie);
     this.#setInnerHandlers();
   }
 
