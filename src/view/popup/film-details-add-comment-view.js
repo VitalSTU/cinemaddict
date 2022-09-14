@@ -1,4 +1,4 @@
-import AbstractView from '../../framework/view/abstract-view.js';
+import AbstractStatefulView from '../../framework/view/abstract-stateful-view';
 
 const BLANK_COMMENT = {
   id: null,
@@ -45,17 +45,12 @@ const createFilmDetailsAddCommentTemplate = () => `
         </div>
       </form>`;
 
-export default class FilmDetailsAddCommentView extends AbstractView {
+export default class FilmDetailsAddCommentView extends AbstractStatefulView {
   _state = null;
-  #addEmojiContainer = null;
-  #emojiContainer = null;
 
   constructor() {
     super();
     this._state = BLANK_LOCAL_COMMENT;
-
-    this.#addEmojiContainer = this.element.querySelector('.film-details__add-emoji-label');
-    this.#emojiContainer = this.element.querySelector('.film-details__emoji-list');
     this.#setInnerHandlers();
   }
 
@@ -63,18 +58,36 @@ export default class FilmDetailsAddCommentView extends AbstractView {
     return createFilmDetailsAddCommentTemplate();
   }
 
+  get addEmojiContainer() {
+    return this.element.querySelector('.film-details__add-emoji-label');
+  }
+
+  get emojiContainer() {
+    return this.element.querySelector('.film-details__emoji-list');
+  }
+
+  get commentInput() {
+    return this.element.querySelector('.film-details__comment-input');
+  }
+
   _restoreHandlers = () => {
     this.#setInnerHandlers();
   };
 
   #updateRadioButtons = (evt) => {
-    const emojieRadiobuttons = this.#emojiContainer.querySelectorAll('.film-details__emoji-item');
+    const emojieRadiobuttons = this.emojiContainer.querySelectorAll('.film-details__emoji-item');
     const thisImg = evt.target.closest('.film-details__emoji-label');
-    [...emojieRadiobuttons].find((e) => [...e.labels].includes(thisImg)).checked = true;
+    const clickedRadioButton = [...emojieRadiobuttons].find((e) => [...e.labels].includes(thisImg));
+    const emotion = clickedRadioButton.value;
+
+    clickedRadioButton.checked = true;
+
+    return emotion;
   };
 
   #setInnerHandlers = () => {
-    this.#emojiContainer.addEventListener('click', this.#emojiClickHandler);
+    this.emojiContainer.addEventListener('click', this.#emojiClickHandler);
+    this.commentInput.addEventListener('input', this.#commentInputHandler);
   };
 
   #emojiClickHandler = (evt) => {
@@ -85,11 +98,21 @@ export default class FilmDetailsAddCommentView extends AbstractView {
       newEmoji.width="55";
       newEmoji.height="55";
 
-      this.#addEmojiContainer.innerHTML = '';
-      this.#addEmojiContainer.append(newEmoji);
+      this.addEmojiContainer.innerHTML = '';
+      this.addEmojiContainer.append(newEmoji);
 
-      this.#updateRadioButtons(evt);
+      const emotion = this.#updateRadioButtons(evt);
+      this._setState({
+        emotion,
+      });
     }
+  };
+
+  #commentInputHandler = (evt) => {
+    evt.preventDefault();
+    this._setState({
+      comment: evt.target.value,
+    });
   };
 
   static parseCommentToState = (comment) => {
