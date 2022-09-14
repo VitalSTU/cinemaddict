@@ -93,10 +93,10 @@ export default class FilmDetailsAddCommentView extends AbstractStatefulView {
   #emojiClickHandler = (evt) => {
     evt.preventDefault();
 
-    if (evt.target.tagName == 'IMG') {
+    if (evt.target.tagName === 'IMG') {
       const newEmoji = evt.target.cloneNode(true);
-      newEmoji.width="55";
-      newEmoji.height="55";
+      newEmoji.width = '55';
+      newEmoji.height = '55';
 
       this.addEmojiContainer.innerHTML = '';
       this.addEmojiContainer.append(newEmoji);

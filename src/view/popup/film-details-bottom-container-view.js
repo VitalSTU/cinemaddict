@@ -1,4 +1,3 @@
-import * as utils from '../view-utils.js';
 import AbstractView from '../../framework/view/abstract-view.js';
 
 const createFilmDetailsBottomContainerTemplate = (commentsQuantity) => `
