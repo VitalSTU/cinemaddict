@@ -7,6 +7,7 @@ import FilmDetailsAddCommentView from '../view/popup/film-details-add-comment-vi
 
 import { render, remove } from '../framework/render.js';
 import { getCommentsByIds, getNow } from '../utils.js';
+import { getCommentsQuantity } from '../view/view-utils.js';
 
 export default class PopupPresenter {
   #movie = null;
@@ -35,9 +36,9 @@ export default class PopupPresenter {
     this.#popupMainContainerComponent = new FilmDetailsMainContainerView();
     this.#contentContainer = this.#popupMainContainerComponent.popupContainerElement;
     this.#popupTopContainerComponent = new FilmDetailsTopContainerView(this.#movie);
-    this.#popupBottomContainerComponent = new FilmDetailsBottomContainerView(this.#comments);
+    this.#popupBottomContainerComponent = new FilmDetailsBottomContainerView(getCommentsQuantity(this.#comments));
     this.#commentsContainerComponent = new FilmDetailsCommentsContainerView();
-    this.#filmDetailsAddCommentComponent = new FilmDetailsAddCommentView(this.#movie, this.#comments);
+    this.#filmDetailsAddCommentComponent = new FilmDetailsAddCommentView();
   };
 
   #onCloseButtonClick = () => {

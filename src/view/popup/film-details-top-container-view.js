@@ -99,19 +99,10 @@ const createFilmDetailsTopContainerTemplate = ({filmInfo: movie, userDetails}) =
 
 export default class FilmDetailsTopContainerView extends AbstractStatefulView {
   _state = null;
-  #closeButton = null;
-  #watchlistButton = null;
-  #watchedButton = null;
-  #favoriteButton = null;
 
   constructor(movie = BLANK_MOVIE) {
     super();
     this._state = FilmDetailsTopContainerView.parseMovieToState(movie);
-
-    this.#closeButton = this.element.querySelector('.film-details__close-btn');
-    this.#watchlistButton = this.element.querySelector('.film-details__control-button--watchlist');
-    this.#watchedButton = this.element.querySelector('.film-details__control-button--watched');
-    this.#favoriteButton = this.element.querySelector('.film-details__control-button--favorite');
     this.#setInnerHandlers();
   }
 
@@ -120,7 +111,19 @@ export default class FilmDetailsTopContainerView extends AbstractStatefulView {
   }
 
   get closeButton() {
-    return this.#closeButton;
+    return this.element.querySelector('.film-details__close-btn');
+  }
+
+  get watchlistButton() {
+    return this.element.querySelector('.film-details__control-button--watchlist');
+  }
+
+  get watchedButton() {
+    return this.element.querySelector('.film-details__control-button--watched');
+  }
+
+  get favoriteButton() {
+    return this.element.querySelector('.film-details__control-button--favorite');
   }
 
   setCloseBtnClickHandler = (callback) => {
@@ -131,17 +134,17 @@ export default class FilmDetailsTopContainerView extends AbstractStatefulView {
 
   setWatchlistClickHandler = (callback) => {
     this._callback.watchlistClick = callback;
-    this.#watchlistButton.addEventListener('click', this.#onWatchlistClick);
+    this.watchlistButton.addEventListener('click', this.#onWatchlistClick);
   };
 
   setHistoryClickHandler = (callback) => {
     this._callback.historyClick = callback;
-    this.#watchedButton.addEventListener('click', this.#onHistoryClick);
+    this.watchedButton.addEventListener('click', this.#onHistoryClick);
   };
 
   setFavoriteClickHandler = (callback) => {
     this._callback.favoriteClick = callback;
-    this.#favoriteButton.addEventListener('click', this.#onFavoriteClick);
+    this.favoriteButton.addEventListener('click', this.#onFavoriteClick);
   };
 
   _restoreHandlers = () => {
@@ -153,17 +156,17 @@ export default class FilmDetailsTopContainerView extends AbstractStatefulView {
   };
 
   #setInnerHandlers = () => {
-    this.#watchlistButton.addEventListener('click', this.#watchlistToggleHandler);
-    this.#watchedButton.addEventListener('click', this.#watchedToggleHandler);
-    this.#favoriteButton.addEventListener('click', this.#favoriteToggleHandler);
+    this.watchlistButton.addEventListener('click', this.#watchlistToggleHandler);
+    this.watchedButton.addEventListener('click', this.#watchedToggleHandler);
+    this.favoriteButton.addEventListener('click', this.#favoriteToggleHandler);
   };
 
   #clearListeners = () => {
     this.closeButton.removeEventListener('click', this.#onCloseBtnClick);
     document.removeEventListener('keydown', this.#onKeydown);
-    this.#watchlistButton.removeEventListener('click', this.#onWatchlistClick);
-    this.#watchedButton.removeEventListener('click', this.#onHistoryClick);
-    this.#favoriteButton.removeEventListener('click', this.#onFavoriteClick);
+    this.watchlistButton.removeEventListener('click', this.#onWatchlistClick);
+    this.watchedButton.removeEventListener('click', this.#onHistoryClick);
+    this.favoriteButton.removeEventListener('click', this.#onFavoriteClick);
   };
 
   #onCloseBtnClick = (evt) => {

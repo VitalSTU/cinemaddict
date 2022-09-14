@@ -56,19 +56,25 @@ export default class FilmDetailsAddCommentView extends AbstractView {
 
     this.#addEmojiContainer = this.element.querySelector('.film-details__add-emoji-label');
     this.#emojiContainer = this.element.querySelector('.film-details__emoji-list');
-    this.#emojiContainer.addEventListener('click', this.#emojiClickHandler);
+    this.#setInnerHandlers();
   }
 
   get template() {
     return createFilmDetailsAddCommentTemplate();
   }
 
-  _restoreHandlers = () => {};
+  _restoreHandlers = () => {
+    this.#setInnerHandlers();
+  };
 
   #updateRadioButtons = (evt) => {
     const emojieRadiobuttons = this.#emojiContainer.querySelectorAll('.film-details__emoji-item');
     const thisImg = evt.target.closest('.film-details__emoji-label');
     [...emojieRadiobuttons].find((e) => [...e.labels].includes(thisImg)).checked = true;
+  };
+
+  #setInnerHandlers = () => {
+    this.#emojiContainer.addEventListener('click', this.#emojiClickHandler);
   };
 
   #emojiClickHandler = (evt) => {

@@ -28,25 +28,33 @@ const createFilmDetailsCommentTemplate = ({author, comment, date, emotion}) => `
 
 export default class FilmDetailsCommentView extends AbstractStatefulView {
   _state = null;
-  #deleteButton = null;
 
   constructor(comment = BLANK_COMMENT) {
     super();
     this._state = FilmDetailsCommentView.parseCommentToState(comment);
-
-    this.#deleteButton = this.element.querySelector('.film-details__comment-delete');
-    this.#deleteButton.addEventListener('click', this.#deleteButtonClickHandler);
+    this.#setInnerHandlers();
   }
 
   get template() {
     return createFilmDetailsCommentTemplate(this._state);
   }
 
-  _restoreHandlers = () => {};
+  get deleteButton() {
+    return this.element.querySelector('.film-details__comment-delete');
+  }
+
+  _restoreHandlers = () => {
+    this.#setInnerHandlers();
+  };
 
   #deleteButtonClickHandler = (evt) => {
     evt.preventDefault();
+    this._state = null;
     this.updateElement(null);
+  };
+
+  #setInnerHandlers = () => {
+    this.deleteButton.addEventListener('click', this.#deleteButtonClickHandler);
   };
 
   static parseCommentToState = (comment) => ({...comment});

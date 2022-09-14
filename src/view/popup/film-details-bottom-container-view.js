@@ -1,24 +1,24 @@
 import * as utils from '../view-utils.js';
 import AbstractView from '../../framework/view/abstract-view.js';
 
-const createFilmDetailsBottomContainerTemplate = (comments) => `
+const createFilmDetailsBottomContainerTemplate = (commentsQuantity) => `
 
     <div class="film-details__bottom-container">
       <section class="film-details__comments-wrap">
-        <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${utils.getCommentsQuantity(comments)}</span></h3>
+        <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${commentsQuantity}</span></h3>
 
       </section>
     </div>`;
 
 export default class FilmDetailsBottomContainerView extends AbstractView {
-  #comments = null;
+  #commentsQuantity = null;
 
-  constructor(comments) {
+  constructor(commentsQuantity) {
     super();
-    this.#comments = comments;
+    this.#commentsQuantity = commentsQuantity;
   }
 
   get template() {
-    return createFilmDetailsBottomContainerTemplate(this.#comments);
+    return createFilmDetailsBottomContainerTemplate(this.#commentsQuantity);
   }
 }
