@@ -1,5 +1,13 @@
 import * as utils from '../view-utils.js';
-import AbstractView from '../../framework/view/abstract-view.js';
+import AbstractStatefulView from '../../framework/view/abstract-stateful-view';
+
+const BLANK_COMMENT = {
+  id: null,
+  author: null,
+  comment: null,
+  date: null,
+  emotion: null,
+};
 
 const createFilmDetailsCommentTemplate = ({author, comment, date, emotion}) => `
 
@@ -18,15 +26,24 @@ const createFilmDetailsCommentTemplate = ({author, comment, date, emotion}) => `
           </li>
 `;
 
-export default class FilmDetailsCommentView extends AbstractView {
-  #comment = null;
+export default class FilmDetailsCommentView extends AbstractStatefulView {
+  _state = null;
+  #deleteButton = null;
 
-  constructor(comment) {
+  constructor(comment = BLANK_COMMENT) {
     super();
-    this.#comment = comment;
+    this._state = FilmDetailsCommentView.parseCommentToState(comment);
+
+    this.#deleteButton = this.element.querySelector('.film-details__comment-delete');
   }
 
   get template() {
-    return createFilmDetailsCommentTemplate(this.#comment);
+    return createFilmDetailsCommentTemplate(this._state);
   }
+
+  _restoreHandlers = () => {};
+
+  static parseCommentToState = (comment) => ({...comment});
+
+  static parseStateToMovie = (state) => ({...state});
 }

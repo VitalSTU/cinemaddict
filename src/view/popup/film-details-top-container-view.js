@@ -153,7 +153,6 @@ export default class FilmDetailsTopContainerView extends AbstractStatefulView {
   };
 
   #setInnerHandlers = () => {
-    // this.#closeButton.addEventListener('click', this.#closeButtonHandler);
     this.#watchlistButton.addEventListener('click', this.#watchlistToggleHandler);
     this.#watchedButton.addEventListener('click', this.#watchedToggleHandler);
     this.#favoriteButton.addEventListener('click', this.#favoriteToggleHandler);
@@ -235,7 +234,7 @@ export default class FilmDetailsTopContainerView extends AbstractStatefulView {
     userDetails: {...movie.userDetails},
   });
 
-  static parseStateToTask = (state) => {
+  static parseStateToMovie = (state) => {
     const movie = {...state,
       filmInfo: {...state.filmInfo, release: {...state.filmInfo.release}},
       userDetails: {...state.userDetails},
