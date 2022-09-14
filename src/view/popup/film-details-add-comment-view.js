@@ -42,13 +42,16 @@ const createFilmDetailsAddCommentTemplate = () => `
 
 export default class FilmDetailsAddCommentView extends AbstractView {
   _state = null;
+  #addEmojiContainer = null;
   #emojiContainer = null;
 
   constructor() {
     super();
     this._state = BLANK_COMMENT;
 
+    this.#addEmojiContainer = this.element.querySelector('.film-details__add-emoji-label');
     this.#emojiContainer = this.element.querySelector('.film-details__emoji-list');
+    this.#emojiContainer.addEventListener('click', this.#emojiClickHandler);
   }
 
   get template() {
@@ -56,6 +59,19 @@ export default class FilmDetailsAddCommentView extends AbstractView {
   }
 
   _restoreHandlers = () => {};
+
+  #emojiClickHandler = (evt) => {
+    evt.preventDefault();
+
+    if (evt.target.tagName == 'IMG') {
+      const newEmoji = evt.target.cloneNode(true);
+      newEmoji.width="55";
+      newEmoji.height="55";
+
+      this.#addEmojiContainer.innerHTML = '';
+      this.#addEmojiContainer.append(newEmoji);
+    }
+  };
 
   static parseCommentToState = (comment) => ({...comment});
 

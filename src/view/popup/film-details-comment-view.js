@@ -35,6 +35,7 @@ export default class FilmDetailsCommentView extends AbstractStatefulView {
     this._state = FilmDetailsCommentView.parseCommentToState(comment);
 
     this.#deleteButton = this.element.querySelector('.film-details__comment-delete');
+    this.#deleteButton.addEventListener('click', this.#deleteButtonClickHandler);
   }
 
   get template() {
@@ -42,6 +43,11 @@ export default class FilmDetailsCommentView extends AbstractStatefulView {
   }
 
   _restoreHandlers = () => {};
+
+  #deleteButtonClickHandler = (evt) => {
+    evt.preventDefault();
+    this.updateElement(null);
+  };
 
   static parseCommentToState = (comment) => ({...comment});
 
