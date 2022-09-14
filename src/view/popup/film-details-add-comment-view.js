@@ -8,6 +8,11 @@ const BLANK_COMMENT = {
   emotion: null,
 };
 
+const BLANK_LOCAL_COMMENT = {
+  comment: null,
+  emotion: null,
+};
+
 const createFilmDetailsAddCommentTemplate = () => `
 
       <form class="film-details__new-comment" action="" method="get">
@@ -47,7 +52,7 @@ export default class FilmDetailsAddCommentView extends AbstractView {
 
   constructor() {
     super();
-    this._state = BLANK_COMMENT;
+    this._state = BLANK_LOCAL_COMMENT;
 
     this.#addEmojiContainer = this.element.querySelector('.film-details__add-emoji-label');
     this.#emojiContainer = this.element.querySelector('.film-details__emoji-list');
@@ -60,6 +65,12 @@ export default class FilmDetailsAddCommentView extends AbstractView {
 
   _restoreHandlers = () => {};
 
+  #updateRadioButtons = (evt) => {
+    const emojieRadiobuttons = this.#emojiContainer.querySelectorAll('.film-details__emoji-item');
+    const thisImg = evt.target.closest('.film-details__emoji-label');
+    [...emojieRadiobuttons].find((e) => [...e.labels].includes(thisImg)).checked = true;
+  };
+
   #emojiClickHandler = (evt) => {
     evt.preventDefault();
 
@@ -70,10 +81,20 @@ export default class FilmDetailsAddCommentView extends AbstractView {
 
       this.#addEmojiContainer.innerHTML = '';
       this.#addEmojiContainer.append(newEmoji);
+
+      this.#updateRadioButtons(evt);
     }
   };
 
-  static parseCommentToState = (comment) => ({...comment});
+  static parseCommentToState = (comment) => {
+    const localComment = {...comment};
 
-  static parseStateToMovie = (state) => ({...state});
+    delete localComment.id;
+    delete localComment.author;
+    delete localComment.date;
+
+    return localComment;
+  };
+
+  static parseStateToMovie = (state) => ({...BLANK_COMMENT, ...state});
 }
