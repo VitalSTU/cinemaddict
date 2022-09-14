@@ -1,5 +1,13 @@
 import AbstractView from '../../framework/view/abstract-view.js';
 
+const BLANK_COMMENT = {
+  id: null,
+  author: null,
+  comment: null,
+  date: null,
+  emotion: null,
+};
+
 const createFilmDetailsAddCommentTemplate = () => `
 
       <form class="film-details__new-comment" action="" method="get">
@@ -33,16 +41,23 @@ const createFilmDetailsAddCommentTemplate = () => `
       </form>`;
 
 export default class FilmDetailsAddCommentView extends AbstractView {
-  #movie = null;
-  #comments = null;
+  _state = null;
+  #emojiContainer = null;
 
-  constructor(movie, comments) {
+  constructor() {
     super();
-    this.#movie = movie;
-    this.#comments = comments;
+    this._state = BLANK_COMMENT;
+
+    this.#emojiContainer = this.element.querySelector('.film-details__emoji-list');
   }
 
   get template() {
     return createFilmDetailsAddCommentTemplate();
   }
+
+  _restoreHandlers = () => {};
+
+  static parseCommentToState = (comment) => ({...comment});
+
+  static parseStateToMovie = (state) => ({...state});
 }
