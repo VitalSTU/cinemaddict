@@ -31,6 +31,7 @@ const BLANK_MOVIE = {
 };
 
 const createFilmDetailsTopContainerTemplate = ({filmInfo: movie, userDetails}) => `
+  <div class="film-details__inner">
     <div class="film-details__top-container">
       <div class="film-details__close">
         <button class="film-details__close-btn" type="button">close</button>
@@ -95,7 +96,8 @@ const createFilmDetailsTopContainerTemplate = ({filmInfo: movie, userDetails}) =
         <button type="button" class="film-details__control-button${viewUtils.getPopupFlagIfActive(userDetails.alreadyWatched)} film-details__control-button--watched" id="watched" name="watched">Already watched</button>
         <button type="button" class="film-details__control-button${viewUtils.getPopupFlagIfActive(userDetails.favorite)} film-details__control-button--favorite" id="favorite" name="favorite">Add to favorites</button>
       </section>
-    </div>`;
+    </div>
+  </div>`;
 
 export default class FilmDetailsTopContainerView extends AbstractStatefulView {
   _state = null;
