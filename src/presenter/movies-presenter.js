@@ -162,7 +162,7 @@ export default class MoviesPresenter {
       presenter.init(updatedMovie);
     });
     if (fromPopup) {
-      // this.#popupPresenter.init(updatedMovie);
+      // this.#popupPresenter.init(updatedMovie); //TODO will be deleted after data binding fully completed
     }
   };
 

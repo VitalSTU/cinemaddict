@@ -14,9 +14,7 @@ const BLANK_LOCAL_COMMENT = {
   emotion: null,
 };
 
-
 const createFilmDetailsCommentTemplate = ({author, comment, date, emotion}) => `
-
         <li class="film-details__comment">
           <span class="film-details__comment-emoji">
             <img src="${viewUtils.getEmojieUri(emotion)}" width="55" height="55" alt="emoji-${emotion}">
@@ -33,7 +31,6 @@ const createFilmDetailsCommentTemplate = ({author, comment, date, emotion}) => `
 `;
 
 const createFilmDetailsAddCommentTemplate = () => `
-
       <form class="film-details__new-comment" action="" method="get">
         <div class="film-details__add-emoji-label"></div>
 
@@ -70,7 +67,6 @@ const createFilmDetailsCommentsContainerTemplate = (comments) => {
     .join('');
 
   return `
-
         <ul class="film-details__comments-list">
         ${commentsTemplate}
         ${createFilmDetailsAddCommentTemplate()}
@@ -78,7 +74,6 @@ const createFilmDetailsCommentsContainerTemplate = (comments) => {
 };
 
 const createFilmDetailsBottomContainerTemplate = (comments) => `
-
     <div class="film-details__bottom-container">
       <section class="film-details__comments-wrap">
         <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${viewUtils.getCommentsQuantity(comments)}</span></h3>
@@ -174,6 +169,4 @@ export default class FilmDetailsCommentsContainerView extends AbstractStatefulVi
     localComment: BLANK_LOCAL_COMMENT,
     emotion: null,
   });
-
-  static parseStateToComments = (state) => ({...state.comments});
 }
