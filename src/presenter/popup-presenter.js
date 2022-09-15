@@ -1,9 +1,6 @@
 import FilmDetailsMainContainerView from '../view/popup/film-details-main-container-view.js';
 import FilmDetailsTopContainerView from '../view/popup/film-details-top-container-view.js';
-import FilmDetailsBottomContainerView from '../view/popup/film-details-bottom-container-view.js';
 import FilmDetailsCommentsContainerView from '../view/popup/film-details-comments-container-view.js';
-import FilmDetailsCommentView from '../view/popup/film-details-comment-view.js';
-import FilmDetailsAddCommentView from '../view/popup/film-details-add-comment-view.js';
 
 import { render, remove } from '../framework/render.js';
 import { getCommentsByIds, getNow } from '../utils.js';
@@ -13,9 +10,7 @@ export default class PopupPresenter {
 
   #popupMainContainerComponent = null;
   #popupTopContainerComponent = null;
-  #popupBottomContainerComponent = null;
   #commentsContainerComponent = null;
-  #filmDetailsAddCommentComponent = null;
   #contentContainer = null;
 
   #commentsModel = null;
@@ -35,9 +30,7 @@ export default class PopupPresenter {
     this.#popupMainContainerComponent = new FilmDetailsMainContainerView();
     this.#contentContainer = this.#popupMainContainerComponent.popupContainerElement;
     this.#popupTopContainerComponent = new FilmDetailsTopContainerView(this.#movie);
-    this.#popupBottomContainerComponent = new FilmDetailsBottomContainerView(this.#comments);
-    this.#commentsContainerComponent = new FilmDetailsCommentsContainerView();
-    this.#filmDetailsAddCommentComponent = new FilmDetailsAddCommentView(this.#movie, this.#comments);
+    this.#commentsContainerComponent = new FilmDetailsCommentsContainerView(this.#comments);
   };
 
   #onCloseButtonClick = () => {
@@ -98,33 +91,8 @@ export default class PopupPresenter {
     render(this.#popupTopContainerComponent, this.#popupMainContainerComponent.element);
   };
 
-  #renderPopupCommentsSectionContainerComponent = () => {
-    render(this.#popupBottomContainerComponent, this.#popupMainContainerComponent.element);
-  };
-
   #renderPopupCommentsContainerComponent = () => {
-    render(this.#commentsContainerComponent, this.#popupBottomContainerComponent.element);
-  };
-
-  #renderCommentComponent = (comment) => {
-    render(new FilmDetailsCommentView(comment), this.#commentsContainerComponent.element);
-  };
-
-  #renderComments = () => {
-    this.#comments.forEach((comment) => {
-      this.#renderCommentComponent(comment);
-    });
-  };
-
-  #renderPopupNewCommentComponent = () => {
-    render(this.#filmDetailsAddCommentComponent, this.#popupBottomContainerComponent.element);
-  };
-
-  #renderCommentsSectionComponent = () => {
-    this.#renderPopupCommentsSectionContainerComponent();
-    this.#renderPopupCommentsContainerComponent();
-    this.#renderComments();
-    this.#renderPopupNewCommentComponent();
+    render(this.#commentsContainerComponent, this.#popupTopContainerComponent.element);
   };
 
   /**
@@ -147,7 +115,7 @@ export default class PopupPresenter {
     this.#setChangeDataClickHandlers();
     this.#renderPopupMainContainerComponent();
     this.#renderMovieInfoComponent();
-    this.#renderCommentsSectionComponent();
+    this.#renderPopupCommentsContainerComponent();
 
     return this.#popupMainContainerComponent;
   };

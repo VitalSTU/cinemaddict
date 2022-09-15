@@ -58,7 +58,7 @@ export default class MoviesPresenter {
 
     this.#moviesTopRated.sort(sortMovieByRatingDown);
     this.#moviesTopRated = this.#moviesTopRated.slice(FIRST_FILM_CARD_NUMBER, FILM_EXTRA_TEST_CARDS_QUANTITY);
-    this.#moviesTopCommented.sort(sortMovieByCommentsQuantityDown).slice(FIRST_FILM_CARD_NUMBER, FILM_EXTRA_TEST_CARDS_QUANTITY);
+    this.#moviesTopCommented.sort(sortMovieByCommentsQuantityDown);
     this.#moviesTopCommented = this.#moviesTopCommented.slice(FIRST_FILM_CARD_NUMBER, FILM_EXTRA_TEST_CARDS_QUANTITY);
 
     const commentsModel = new CommentsModel();
@@ -162,7 +162,7 @@ export default class MoviesPresenter {
       presenter.init(updatedMovie);
     });
     if (fromPopup) {
-      this.#popupPresenter.init(updatedMovie);
+      // this.#popupPresenter.init(updatedMovie); //TODO will be deleted after data binding fully completed
     }
   };
 
