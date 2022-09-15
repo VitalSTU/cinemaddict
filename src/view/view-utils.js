@@ -1,7 +1,18 @@
 import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
 import { DESCRIPTION_MAX_LENGTH, MOVIE_CARD_ACTIVE, MOVIE_DETAILS_ACTIVE, EmojiUri } from '../const.js';
 
 const MINUTES_IN_ONE_HOUR = 60;
+const BLANK_DAYJS_DURATION = {
+  seconds: 0,
+  minutes: 0,
+  hours: 0,
+  days: 0,
+  months: 0,
+  years: 0,
+};
+
+dayjs.extend(duration);
 
 const isNotExist = (parameter) => (parameter === null || parameter === undefined);
 
@@ -47,4 +58,8 @@ export const getShortDescription = ({description}) => {
 export const getTitle = ({title}) => isNotExist(title) ? '' : title;
 export const getWriters = ({writers}) => (isNotExist(writers) || writers.length === 0) ? '' : writers.join(', ');
 export const getYearOfTDate = (tDate) => isNotExist(tDate) ? '' : dayjs(tDate).format('YYYY');
-export const humanizeMinutes = (minutes) => `${Math.floor(minutes / MINUTES_IN_ONE_HOUR)}h ${Math.floor(minutes % MINUTES_IN_ONE_HOUR)}m`;
+export const humanizeMinutes = (minutes) => dayjs.duration({
+  ...BLANK_DAYJS_DURATION,
+  hours: Math.floor(minutes / MINUTES_IN_ONE_HOUR),
+  minutes: Math.floor(minutes % MINUTES_IN_ONE_HOUR),
+}).format('H[h] m[m]');
