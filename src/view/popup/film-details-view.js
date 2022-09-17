@@ -284,6 +284,7 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
     });
     this.emojiContainer.addEventListener('click', this.#emojiClickHandler);
     this.commentInput.addEventListener('input', this.#commentInputHandler);
+    this.element.addEventListener('scroll', this.#elementScrollHandler);
 
     this.setScrollPosition();
   };
@@ -448,6 +449,16 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
       },
       scrollTop: this.element.scrollTop,
     });
+
+    this.#updateLocalData({
+      localComment: {...this._state.comments.localComment},
+      scrollTop: this._state.scrollTop
+    });
+  };
+
+  #elementScrollHandler = () => {
+    console.log(this.element.scrollTop);
+    this._state.scrollTop = this.element.scrollTop;
 
     this.#updateLocalData({
       localComment: {...this._state.comments.localComment},
