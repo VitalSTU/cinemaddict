@@ -27,8 +27,9 @@ export default class PopupPresenter {
     this.#commentsModel = commentsModel;
   }
 
-  #initialiseData = (movie) => {
+  #initialiseData = (movie, localData) => {
     this.#movie = movie;
+    this.#localData = (localData) ? localData : this.#localData;
     this.#comments = getCommentsByIds(this.#movie.comments, [...this.#commentsModel.comments]);
 
     this.#popupComponent = new FilmDetailsView(
@@ -41,7 +42,10 @@ export default class PopupPresenter {
   };
 
   #updateLocalData = (localData) => {
-    this.#localData = {...localData, localComment: {...localData.localComment}};
+    this.#localData = null;
+    if (localData) {
+      this.#localData = {...localData, localComment: {...localData.localComment}};
+    }
   };
 
   #onCloseButtonClick = () => {
@@ -50,36 +54,45 @@ export default class PopupPresenter {
   };
 
   #onWatchlistClick = () => {
-    this.#changeData({
-      ...this.#movie,
-      userDetails: {
-        ...this.#movie.userDetails,
-        watchlist: !this.#movie.userDetails.watchlist
-      }
-    });
+    this.#changeData(
+      {
+        ...this.#movie,
+        userDetails: {
+          ...this.#movie.userDetails,
+          watchlist: !this.#movie.userDetails.watchlist
+        }
+      },
+      {...this.#localData}
+    );
   };
 
   #onHistoryClick = () => {
     const alreadyWatched = this.#movie.userDetails.alreadyWatched;
 
-    this.#changeData({
-      ...this.#movie,
-      userDetails: {
-        ...this.#movie.userDetails,
-        alreadyWatched: !alreadyWatched,
-        watchingDate: alreadyWatched ? '' : getNow(),
-      }
-    });
+    this.#changeData(
+      {
+        ...this.#movie,
+        userDetails: {
+          ...this.#movie.userDetails,
+          alreadyWatched: !alreadyWatched,
+          watchingDate: alreadyWatched ? '' : getNow(),
+        }
+      },
+      {...this.#localData}
+    );
   };
 
   #onFavoriteClick = () => {
-    this.#changeData({
-      ...this.#movie,
-      userDetails: {
-        ...this.#movie.userDetails,
-        favorite: !this.#movie.userDetails.favorite
-      }
-    });
+    this.#changeData(
+      {
+        ...this.#movie,
+        userDetails: {
+          ...this.#movie.userDetails,
+          favorite: !this.#movie.userDetails.favorite
+        }
+      },
+      {...this.#localData}
+    );
   };
 
   #activateMainPageScrollbar = () => {
@@ -123,15 +136,16 @@ export default class PopupPresenter {
    * @returns {FilmDetailsView} Created popup component
    * @memberof PopupPresenter
    */
-  init = (movie) => {
+  init = (movie, localData) => {
     this.#removeOldPopup();
 
-    this.#initialiseData(movie);
+    this.#initialiseData(movie, localData);
 
     this.#setCloseBtnClickHandler();
     this.#deactivateMainPageScrollbar();
 
     this.#setChangeDataClickHandlers();
     this.#renderPopupMainContainerComponent();
+    this.#popupComponent.setScrollPosition();
   };
 }

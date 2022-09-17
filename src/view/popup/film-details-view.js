@@ -263,16 +263,16 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
     this.favoriteButton.addEventListener('click', this.#onFavoriteClick);
   };
 
+  setScrollPosition = () => {
+    this.element.scrollTop = this._state.scrollTop;
+  };
+
   _restoreHandlers = () => {
     this.#setInnerHandlers();
     this.setCloseBtnClickHandler(this._callback.closeClick);
     this.setWatchlistClickHandler(this._callback.watchlistClick);
     this.setHistoryClickHandler(this._callback.historyClick);
     this.setFavoriteClickHandler(this._callback.favoriteClick);
-  };
-
-  #setScrollPosition = () => {
-    this.element.scrollTop = this._state.scrollTop;
   };
 
   #setInnerHandlers = () => {
@@ -285,7 +285,7 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
     this.emojiContainer.addEventListener('click', this.#emojiClickHandler);
     this.commentInput.addEventListener('input', this.#commentInputHandler);
 
-    this.#setScrollPosition();
+    this.setScrollPosition();
   };
 
   #clearExternalListeners = () => {
@@ -347,6 +347,11 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
       },
       scrollTop: this.element.scrollTop,
     });
+
+    this.#updateLocalData({
+      localComment: {...this._state.comments.localComment},
+      scrollTop: this._state.scrollTop
+    });
   };
 
   #watchedToggleHandler = (evt) => {
@@ -364,6 +369,11 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
     update.movie.userDetails.watchingDate = FilmDetailsMainContainerView
       .updateMovieUserDetailsDate(update);
     this.updateElement(update);
+
+    this.#updateLocalData({
+      localComment: {...this._state.comments.localComment},
+      scrollTop: this._state.scrollTop
+    });
   };
 
   #favoriteToggleHandler = (evt) => {
@@ -375,6 +385,11 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
         },
       },
       scrollTop: this.element.scrollTop,
+    });
+
+    this.#updateLocalData({
+      localComment: {...this._state.comments.localComment},
+      scrollTop: this._state.scrollTop
     });
   };
 
