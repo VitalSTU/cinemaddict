@@ -6,8 +6,6 @@ import FilmsListMostCommentedView from '../view/content/films-list-most-commente
 import FilmsListContainerView from '../view/content/films-list-container-view.js';
 import SortView from '../view/main/sort-view.js';
 
-import CommentsModel from '../model/comments-model.js';
-
 import ShowMoreButtonPresenter from './show-more-button-presenter.js';
 import NavigationPresenter from './navigation-presenter.js';
 import MoviePresenter from './movie-presenter.js';
@@ -48,7 +46,7 @@ export default class MoviesPresenter {
   #moviesTopCommented = null;
   #movies = null;
 
-  #initialiseData = (contentContainer, moviesModel) => {
+  #initialiseData = (contentContainer, moviesModel, commentsModel) => {
     this.#contentContainerElement = contentContainer;
     this.#contentContainerElement.innerHTML = '';
     this.#moviesOriginal = [...moviesModel.movies];
@@ -61,7 +59,6 @@ export default class MoviesPresenter {
     this.#moviesTopCommented.sort(sortMovieByCommentsQuantityDown);
     this.#moviesTopCommented = this.#moviesTopCommented.slice(FIRST_FILM_CARD_NUMBER, FILM_EXTRA_TEST_CARDS_QUANTITY);
 
-    const commentsModel = new CommentsModel();
     this.#popupPresenter = new PopupPresenter(this.#handleMovieChange, commentsModel);
   };
 
@@ -185,8 +182,8 @@ export default class MoviesPresenter {
     this.#showMoreButtonPresenter = null;
   };
 
-  init = (contentContainer, moviesModel) => {
-    this.#initialiseData(contentContainer, moviesModel);
+  init = (contentContainer, moviesModel, commentsModel) => {
+    this.#initialiseData(contentContainer, moviesModel, commentsModel);
 
     this.#renderNavigationComponent();
     if (this.#movies.length < 1) {
