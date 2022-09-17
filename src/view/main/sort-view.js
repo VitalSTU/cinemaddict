@@ -25,6 +25,12 @@ export default class SortView extends AbstractView {
     this.element.addEventListener('click', this.#sortTypeChangeHandler);
   };
 
+  #setActiveLink = (sortType) => {
+    this.#activeLink.classList.remove(SORT_BUTTON_ACTIVE);
+    this.#activeLink = this.element.querySelector(`[data-sort-type="${sortType}"]`);
+    this.#activeLink.classList.add(SORT_BUTTON_ACTIVE);
+  };
+
   #sortTypeChangeHandler = (evt) => {
     if (evt.target.tagName !== 'A') {
       return;
@@ -33,11 +39,5 @@ export default class SortView extends AbstractView {
     evt.preventDefault();
     this._callback.sortTypeChange(evt.target.dataset.sortType);
     this.#setActiveLink(evt.target.dataset.sortType);
-  };
-
-  #setActiveLink = (sortType) => {
-    this.#activeLink.classList.remove(SORT_BUTTON_ACTIVE);
-    this.#activeLink = this.element.querySelector(`[data-sort-type="${sortType}"]`);
-    this.#activeLink.classList.add(SORT_BUTTON_ACTIVE);
   };
 }

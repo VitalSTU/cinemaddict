@@ -27,6 +27,28 @@ export default class PopupPresenter {
     this.#commentsModel = commentsModel;
   }
 
+  /**
+   * Popup presenter initialization function
+   *
+   * @param {*} movie           movie object
+   * @param {*} commentsModel   all comments collection
+   * @param {*} popupContainer  container to render popup in
+   * @returns {FilmDetailsView} Created popup component
+   * @memberof PopupPresenter
+   */
+  init = (movie, localData) => {
+    this.#removeOldPopup();
+
+    this.#initialiseData(movie, localData);
+
+    this.#setCloseBtnClickHandler();
+    this.#deactivateMainPageScrollbar();
+
+    this.#setChangeDataClickHandlers();
+    this.#renderPopupMainContainerComponent();
+    this.#popupComponent.setScrollPosition();
+  };
+
   #initialiseData = (movie, localData) => {
     this.#movie = movie;
     this.#localData = (localData) ? localData : this.#localData;
@@ -48,53 +70,6 @@ export default class PopupPresenter {
     }
   };
 
-  #onCloseButtonClick = () => {
-    this.#removePopupComponent();
-    this.#activateMainPageScrollbar();
-  };
-
-  #onWatchlistClick = () => {
-    this.#changeData(
-      {
-        ...this.#movie,
-        userDetails: {
-          ...this.#movie.userDetails,
-          watchlist: !this.#movie.userDetails.watchlist
-        }
-      },
-      {...this.#localData}
-    );
-  };
-
-  #onHistoryClick = () => {
-    const alreadyWatched = this.#movie.userDetails.alreadyWatched;
-
-    this.#changeData(
-      {
-        ...this.#movie,
-        userDetails: {
-          ...this.#movie.userDetails,
-          alreadyWatched: !alreadyWatched,
-          watchingDate: alreadyWatched ? '' : getNow(),
-        }
-      },
-      {...this.#localData}
-    );
-  };
-
-  #onFavoriteClick = () => {
-    this.#changeData(
-      {
-        ...this.#movie,
-        userDetails: {
-          ...this.#movie.userDetails,
-          favorite: !this.#movie.userDetails.favorite
-        }
-      },
-      {...this.#localData}
-    );
-  };
-
   #activateMainPageScrollbar = () => {
     this.#contentContainer.classList.remove('hide-overflow');
   };
@@ -113,39 +88,64 @@ export default class PopupPresenter {
     }
   };
 
-  #setCloseBtnClickHandler = () => {
-    this.#popupComponent.setCloseBtnClickHandler(this.#onCloseButtonClick);
-  };
-
-  #setChangeDataClickHandlers = () => {
-    this.#popupComponent.setWatchlistClickHandler(this.#onWatchlistClick);
-    this.#popupComponent.setHistoryClickHandler(this.#onHistoryClick);
-    this.#popupComponent.setFavoriteClickHandler(this.#onFavoriteClick);
-  };
-
   #renderPopupMainContainerComponent = () => {
     render(this.#popupComponent, this.#contentContainer);
   };
 
-  /**
-   * Popup presenter initialization function
-   *
-   * @param {*} movie           movie object
-   * @param {*} commentsModel   all comments collection
-   * @param {*} popupContainer  container to render popup in
-   * @returns {FilmDetailsView} Created popup component
-   * @memberof PopupPresenter
-   */
-  init = (movie, localData) => {
-    this.#removeOldPopup();
+  #setCloseBtnClickHandler = () => {
+    this.#popupComponent.setCloseBtnClickHandler(this.#closeBtnClickHandler);
+  };
 
-    this.#initialiseData(movie, localData);
+  #setChangeDataClickHandlers = () => {
+    this.#popupComponent.setWatchlistClickHandler(this.#watchlistClickHandler);
+    this.#popupComponent.setHistoryClickHandler(this.#historyClickHandler);
+    this.#popupComponent.setFavoriteClickHandler(this.#favoriteClickHandler);
+  };
 
-    this.#setCloseBtnClickHandler();
-    this.#deactivateMainPageScrollbar();
+  #closeBtnClickHandler = () => {
+    this.#removePopupComponent();
+    this.#activateMainPageScrollbar();
+  };
 
-    this.#setChangeDataClickHandlers();
-    this.#renderPopupMainContainerComponent();
-    this.#popupComponent.setScrollPosition();
+  #watchlistClickHandler = () => {
+    this.#changeData(
+      {
+        ...this.#movie,
+        userDetails: {
+          ...this.#movie.userDetails,
+          watchlist: !this.#movie.userDetails.watchlist
+        }
+      },
+      {...this.#localData}
+    );
+  };
+
+  #historyClickHandler = () => {
+    const alreadyWatched = this.#movie.userDetails.alreadyWatched;
+
+    this.#changeData(
+      {
+        ...this.#movie,
+        userDetails: {
+          ...this.#movie.userDetails,
+          alreadyWatched: !alreadyWatched,
+          watchingDate: alreadyWatched ? '' : getNow(),
+        }
+      },
+      {...this.#localData}
+    );
+  };
+
+  #favoriteClickHandler = () => {
+    this.#changeData(
+      {
+        ...this.#movie,
+        userDetails: {
+          ...this.#movie.userDetails,
+          favorite: !this.#movie.userDetails.favorite
+        }
+      },
+      {...this.#localData}
+    );
   };
 }

@@ -17,6 +17,17 @@ export default class ShowMoreButtonPresenter {
     this.#moviesPresenter = moviesPresenter;
   }
 
+  init = (buttonContainer, moviesContainer, moviesModel, renderFilmsListPortion) => {
+    this.#initialiseData(buttonContainer, moviesContainer, moviesModel, renderFilmsListPortion);
+
+    this.#showMoreButtonComponent.setClickHandler(this.#showMoreButtonClickHandler);
+    render(this.#showMoreButtonComponent, this.#showMoreButtonContainer.element);
+  };
+
+  destroy = () => {
+    remove(this.#showMoreButtonComponent);
+  };
+
   #initialiseData = (buttonContainer, moviesContainer, moviesModel, renderFilmsListPortion) => {
     this.#showMoreButtonContainer = buttonContainer;
     this.#filmsListContainer = moviesContainer;
@@ -24,7 +35,7 @@ export default class ShowMoreButtonPresenter {
     this.#renderFilmsListPortion = renderFilmsListPortion;
   };
 
-  #onShowMoreButtonClick = () => {
+  #showMoreButtonClickHandler = () => {
     this.#renderFilmsListPortion(this.#filmsListContainer, this.#movies,
       this.#renderedMovieCardsQuantity, this.#renderedMovieCardsQuantity + FILM_CARDS_QUANTITY_TO_SHOW_PER_STEP);
 
@@ -33,16 +44,5 @@ export default class ShowMoreButtonPresenter {
     if (this.#renderedMovieCardsQuantity >= this.#movies.length) {
       this.#moviesPresenter.destroyShowMoreButtonComponent();
     }
-  };
-
-  init = (buttonContainer, moviesContainer, moviesModel, renderFilmsListPortion) => {
-    this.#initialiseData(buttonContainer, moviesContainer, moviesModel, renderFilmsListPortion);
-
-    this.#showMoreButtonComponent.setClickHandler(this.#onShowMoreButtonClick);
-    render(this.#showMoreButtonComponent, this.#showMoreButtonContainer.element);
-  };
-
-  destroy = () => {
-    remove(this.#showMoreButtonComponent);
   };
 }

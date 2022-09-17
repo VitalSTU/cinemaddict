@@ -23,16 +23,12 @@ export default class MoviesPresenter {
   #contentContainerElement = null;
 
   #sortComponent = new SortView();
-
   #filmsMainSectionComponent = new FilmsMainSectionView();
   #filmsListEmptyComponent = new FilmsListEmptyView(MovieFilterType.ALL);
-
   #filmsListAllUpcomingComponent = new FilmsListAllUpcomingView();
   #filmsListContainerAllComponent = new FilmsListContainerView();
-
   #filmsListTopRatedComponent = new FilmsListTopRatedView();
   #filmsListContainerTopRatedComponent = new FilmsListContainerView();
-
   #filmsListMostCommentedComponent = new FilmsListMostCommentedView();
   #filmsListContainerMostCommentedComponent = new FilmsListContainerView();
 
@@ -45,6 +41,26 @@ export default class MoviesPresenter {
   #moviesTopRated = null;
   #moviesTopCommented = null;
   #movies = null;
+
+  init = (contentContainer, moviesModel, commentsModel) => {
+    this.#initialiseData(contentContainer, moviesModel, commentsModel);
+
+    this.#renderNavigationComponent();
+    if (this.#movies.length < 1) {
+      this.#renderFilmsListEmptyComponent();
+    } else {
+      this.#renderSortComponent();
+      this.#renderFilmsMainSectionComponent();
+      this.#renderFilmsListAllUpcomingComponent();
+      this.#renderFilmsListTopRatedComponent();
+      this.#renderFilmsListMostCommentedComponent();
+    }
+  };
+
+  destroyShowMoreButtonComponent = () => {
+    this.#showMoreButtonPresenter.destroy();
+    this.#showMoreButtonPresenter = null;
+  };
 
   #initialiseData = (contentContainer, moviesModel, commentsModel) => {
     this.#contentContainerElement = contentContainer;
@@ -158,11 +174,7 @@ export default class MoviesPresenter {
     this.#movieMainPresenters.get(updatedMovie.id).forEach((presenter) => {
       presenter.init(updatedMovie);
     });
-    if (localData) {
-      this.#popupPresenter.init(updatedMovie, localData);
-    } else {
-      this.#popupPresenter.init(updatedMovie);
-    }
+    this.#popupPresenter.init(updatedMovie, localData);
   };
 
   #handleSortTypeChange = (sortType) => {
@@ -175,25 +187,5 @@ export default class MoviesPresenter {
     this.#renderFilmsListAllUpcomingComponent();
     this.#renderFilmsListTopRatedComponent();
     this.#renderFilmsListMostCommentedComponent();
-  };
-
-  destroyShowMoreButtonComponent = () => {
-    this.#showMoreButtonPresenter.destroy();
-    this.#showMoreButtonPresenter = null;
-  };
-
-  init = (contentContainer, moviesModel, commentsModel) => {
-    this.#initialiseData(contentContainer, moviesModel, commentsModel);
-
-    this.#renderNavigationComponent();
-    if (this.#movies.length < 1) {
-      this.#renderFilmsListEmptyComponent();
-    } else {
-      this.#renderSortComponent();
-      this.#renderFilmsMainSectionComponent();
-      this.#renderFilmsListAllUpcomingComponent();
-      this.#renderFilmsListTopRatedComponent();
-      this.#renderFilmsListMostCommentedComponent();
-    }
   };
 }

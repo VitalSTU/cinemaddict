@@ -19,58 +19,6 @@ export default class MoviePresenter {
     this.#changeData = changeData;
   }
 
-  #initialiseData = (movie) => {
-    this.#movie = movie;
-  };
-
-  #renderNewPopupComponent = (movie) => {
-    this.#popupPresenter.init(movie);
-  };
-
-  #setEventHandlers = () => {
-    this.#movieComponent.setClickHandler( () => this.#onFilmCardClick(this.#movieComponent) );
-    this.#movieComponent.setWatchlistClickHandler(this.#onWatchlistClick);
-    this.#movieComponent.setHistoryClickHandler(this.#onHistoryClick);
-    this.#movieComponent.setFavoriteClickHandler(this.#onFavoriteClick);
-  };
-
-  #onFilmCardClick = ({movie}) => {
-    this.#renderNewPopupComponent(movie);
-  };
-
-  #onWatchlistClick = () => {
-    this.#changeData({
-      ...this.#movie,
-      userDetails: {
-        ...this.#movie.userDetails,
-        watchlist: !this.#movie.userDetails.watchlist
-      }
-    });
-  };
-
-  #onHistoryClick = () => {
-    const alreadyWatched = this.#movie.userDetails.alreadyWatched;
-
-    this.#changeData({
-      ...this.#movie,
-      userDetails: {
-        ...this.#movie.userDetails,
-        alreadyWatched: !alreadyWatched,
-        watchingDate: alreadyWatched ? '' : getNow(),
-      }
-    });
-  };
-
-  #onFavoriteClick = () => {
-    this.#changeData({
-      ...this.#movie,
-      userDetails: {
-        ...this.#movie.userDetails,
-        favorite: !this.#movie.userDetails.favorite
-      }
-    });
-  };
-
   init = (movie) => {
     this.#initialiseData(movie);
 
@@ -93,5 +41,57 @@ export default class MoviePresenter {
 
   destroy = () => {
     remove(this.#movieComponent);
+  };
+
+  #initialiseData = (movie) => {
+    this.#movie = movie;
+  };
+
+  #renderNewPopupComponent = (movie) => {
+    this.#popupPresenter.init(movie);
+  };
+
+  #setEventHandlers = () => {
+    this.#movieComponent.setClickHandler( () => this.#filmCardClickHandler(this.#movieComponent) );
+    this.#movieComponent.setWatchlistClickHandler(this.#watchlistClickHandler);
+    this.#movieComponent.setHistoryClickHandler(this.#historyClickHandler);
+    this.#movieComponent.setFavoriteClickHandler(this.#favoriteClickHandler);
+  };
+
+  #filmCardClickHandler = ({movie}) => {
+    this.#renderNewPopupComponent(movie);
+  };
+
+  #watchlistClickHandler = () => {
+    this.#changeData({
+      ...this.#movie,
+      userDetails: {
+        ...this.#movie.userDetails,
+        watchlist: !this.#movie.userDetails.watchlist
+      }
+    });
+  };
+
+  #historyClickHandler = () => {
+    const alreadyWatched = this.#movie.userDetails.alreadyWatched;
+
+    this.#changeData({
+      ...this.#movie,
+      userDetails: {
+        ...this.#movie.userDetails,
+        alreadyWatched: !alreadyWatched,
+        watchingDate: alreadyWatched ? '' : getNow(),
+      }
+    });
+  };
+
+  #favoriteClickHandler = () => {
+    this.#changeData({
+      ...this.#movie,
+      userDetails: {
+        ...this.#movie.userDetails,
+        favorite: !this.#movie.userDetails.favorite
+      }
+    });
   };
 }
