@@ -263,6 +263,10 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
     this.setFavoriteClickHandler(this._callback.favoriteClick);
   };
 
+  #setScrollPosition = () => {
+    this.element.scrollTop = this._state.scrollTop;
+  };
+
   #setInnerHandlers = () => {
     this.watchlistButton.addEventListener('click', this.#watchlistToggleHandler);
     this.watchedButton.addEventListener('click', this.#watchedToggleHandler);
@@ -273,7 +277,7 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
     this.emojiContainer.addEventListener('click', this.#emojiClickHandler);
     this.commentInput.addEventListener('input', this.#commentInputHandler);
 
-    this.element.scrollTop = this._state.scrollTop;
+    this.#setScrollPosition();
   };
 
   #clearExternalListeners = () => {
