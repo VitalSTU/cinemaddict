@@ -2,8 +2,6 @@ import * as viewUtils from '../view-utils.js';
 import * as mainUtils from '../../utils.js';
 import AbstractStatefulView from '../../framework/view/abstract-stateful-view';
 
-const INITIAL_SCROLL_TO_TOP = 0;
-
 const BLANK_MOVIE = {
   id: null,
   comments: null,
@@ -29,7 +27,7 @@ const BLANK_MOVIE = {
     alreadyWatched: false,
     watchingDate: null,
     favorite: false,
-  }
+  },
 };
 
 const BLANK_COMMENT = {
@@ -40,9 +38,12 @@ const BLANK_COMMENT = {
   emotion: null,
 };
 
-const BLANK_LOCAL_COMMENT = {
-  comment: null,
-  emotion: null,
+const BLANK_LOCAL_DATA = {
+  localComment: {
+    comment: null,
+    emotion: null,
+  },
+  scrollTop: 0,
 };
 
 const createFilmDetailsTopContainerTemplate = ({filmInfo: movie, userDetails}) => `
@@ -130,12 +131,16 @@ const createFilmDetailsCommentTemplate = ({id, author, comment, date, emotion}) 
           </li>
 `;
 
-const createFilmDetailsAddCommentTemplate = () => `
+const createEmotionTemplate = (emotion) => (!emotion) ? '' : `
+<img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji">
+`;
+
+const createFilmDetailsAddCommentTemplate = ({comment, emotion}) => `
           <form class="film-details__new-comment" action="" method="get">
-            <div class="film-details__add-emoji-label"></div>
+            <div class="film-details__add-emoji-label">${createEmotionTemplate(emotion)}</div>
 
             <label class="film-details__comment-label">
-              <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
+              <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${(comment) ? comment : ''}</textarea>
             </label>
 
             <div class="film-details__emoji-list">
@@ -161,7 +166,7 @@ const createFilmDetailsAddCommentTemplate = () => `
             </div>
           </form>`;
 
-const createFilmDetailsCommentsContainerTemplate = (comments) => {
+const createFilmDetailsCommentsContainerTemplate = ({comments, localComment}) => {
   const commentsTemplate = [...comments]
     .map((comment) => createFilmDetailsCommentTemplate(comment))
     .join('');
@@ -169,11 +174,11 @@ const createFilmDetailsCommentsContainerTemplate = (comments) => {
   return `
         <ul class="film-details__comments-list">
           ${commentsTemplate}
-          ${createFilmDetailsAddCommentTemplate()}
+          ${createFilmDetailsAddCommentTemplate(localComment)}
         </ul>`;
 };
 
-const createFilmDetailsBottomContainerTemplate = ({comments}) => `
+const createFilmDetailsBottomContainerTemplate = (comments) => `
     <div class="film-details__bottom-container">
       <section class="film-details__comments-wrap">
         <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${viewUtils.getCommentsQuantity(comments)}</span></h3>
@@ -188,9 +193,9 @@ const createFilmDetailsMainContainerTemplate = ({movie, comments}) => `
   </section>`;
 
 export default class FilmDetailsMainContainerView extends AbstractStatefulView {
-  constructor(movie = BLANK_MOVIE, comments = [BLANK_COMMENT], scrollTop = INITIAL_SCROLL_TO_TOP) {
+  constructor(movie = BLANK_MOVIE, comments = [BLANK_COMMENT], localData = BLANK_LOCAL_DATA) {
     super();
-    this._state = FilmDetailsMainContainerView.parseMovieToState(movie, comments, scrollTop);
+    this._state = FilmDetailsMainContainerView.parseMovieToState(movie, comments, localData);
     this.#setInnerHandlers();
   }
 
@@ -395,17 +400,29 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
       this.addEmojiContainer.append(newEmoji);
 
       const emotion = this.#updateRadioButtons(evt);
-      this._setState({comments: {...this._state.comments,
-        localComment: {...this._state.comments.localComment, emotion},
-      }});
+      this._setState({
+        comments: {...this._state.comments,
+          localComment: {
+            ...this._state.comments.localComment,
+            emotion
+          },
+        },
+        scrollTop: this.element.scrollTop,
+      });
     }
   };
 
   #commentInputHandler = (evt) => {
     evt.preventDefault();
-    this._setState({comments: {...this._state.comments,
-      localComment: {...this._state.comments.localComment, comment: evt.target.value},
-    }});
+    this._setState({
+      comments: {...this._state.comments,
+        localComment: {
+          ...this._state.comments.localComment,
+          comment: evt.target.value
+        },
+      },
+      scrollTop: this.element.scrollTop,
+    });
   };
 
   static updateMovieUserDetailsDate = ({movie}) => {
@@ -420,15 +437,15 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
     return watchingDate;
   };
 
-  static parseMovieToState = (movie, comments, scrollTop) => ({
+  static parseMovieToState = (movie, comments, localData) => ({
     movie: {...movie,
       filmInfo: {...movie.filmInfo, release: {...movie.filmInfo.release}},
       userDetails: {...movie.userDetails},
     },
     comments: {
       comments: [...comments],
-      localComment: BLANK_LOCAL_COMMENT,
+      localComment: localData.localComment,
     },
-    scrollTop,
+    scrollTop: localData.scrollTop,
   });
 }
