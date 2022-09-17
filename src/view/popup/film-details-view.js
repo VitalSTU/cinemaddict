@@ -193,9 +193,12 @@ const createFilmDetailsMainContainerTemplate = ({movie, comments}) => `
   </section>`;
 
 export default class FilmDetailsMainContainerView extends AbstractStatefulView {
-  constructor(movie = BLANK_MOVIE, comments = [BLANK_COMMENT], localData = BLANK_LOCAL_DATA) {
+  #updateLocalData = null;
+
+  constructor(movie = BLANK_MOVIE, comments = [BLANK_COMMENT], localData = BLANK_LOCAL_DATA, updateLocalData) {
     super();
     this._state = FilmDetailsMainContainerView.parseMovieToState(movie, comments, localData);
+    this.#updateLocalData = updateLocalData;
     this.#setInnerHandlers();
   }
 
@@ -291,6 +294,8 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
     this.watchlistButton.removeEventListener('click', this.#onWatchlistClick);
     this.watchedButton.removeEventListener('click', this.#onHistoryClick);
     this.favoriteButton.removeEventListener('click', this.#onFavoriteClick);
+
+    this.#updateLocalData(BLANK_LOCAL_DATA);
   };
 
   #updateRadioButtons = (evt) => {
@@ -409,6 +414,11 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
         },
         scrollTop: this.element.scrollTop,
       });
+
+      this.#updateLocalData({
+        localComment: {...this._state.comments.localComment},
+        scrollTop: this._state.scrollTop
+      });
     }
   };
 
@@ -422,6 +432,11 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
         },
       },
       scrollTop: this.element.scrollTop,
+    });
+
+    this.#updateLocalData({
+      localComment: {...this._state.comments.localComment},
+      scrollTop: this._state.scrollTop
     });
   };
 

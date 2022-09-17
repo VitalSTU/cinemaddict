@@ -1,4 +1,4 @@
-import FilmDetailsMainContainerView from '../view/popup/film-details-view.js';
+import FilmDetailsView from '../view/popup/film-details-view.js';
 
 import { render, remove } from '../framework/render.js';
 import { getCommentsByIds, getNow } from '../utils.js';
@@ -14,6 +14,14 @@ export default class PopupPresenter {
 
   #changeData = null;
 
+  #localData = {
+    localComment: {
+      comment: null,
+      emotion: null,
+    },
+    scrollTop: 0,
+  };
+
   constructor(changeData, commentsModel) {
     this.#changeData = changeData;
     this.#commentsModel = commentsModel;
@@ -23,8 +31,17 @@ export default class PopupPresenter {
     this.#movie = movie;
     this.#comments = getCommentsByIds(this.#movie.comments, [...this.#commentsModel.comments]);
 
-    this.#popupComponent = new FilmDetailsMainContainerView(this.#movie, this.#comments);
+    this.#popupComponent = new FilmDetailsView(
+      this.#movie,
+      this.#comments,
+      this.#localData,
+      this.#updateLocalData
+    );
     this.#contentContainer = this.#popupComponent.popupContainerElement;
+  };
+
+  #updateLocalData = (localData) => {
+    this.#localData = {...localData, localComment: {...localData.localComment}};
   };
 
   #onCloseButtonClick = () => {
@@ -33,7 +50,11 @@ export default class PopupPresenter {
   };
 
   #onWatchlistClick = () => {
-    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails, watchlist: !this.#movie.userDetails.watchlist}}, true);
+    this.#changeData({...this.#movie,
+      userDetails: {...this.#movie.userDetails,
+        watchlist: !this.#movie.userDetails.watchlist
+      }
+    }, true);
   };
 
   #onHistoryClick = () => {
@@ -87,7 +108,7 @@ export default class PopupPresenter {
    * @param {*} movie           movie object
    * @param {*} commentsModel   all comments collection
    * @param {*} popupContainer  container to render popup in
-   * @returns {FilmDetailsMainContainerView} Created popup component
+   * @returns {FilmDetailsView} Created popup component
    * @memberof PopupPresenter
    */
   init = (movie) => {
