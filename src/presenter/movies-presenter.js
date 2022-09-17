@@ -155,15 +155,13 @@ export default class MoviesPresenter {
     this.#currentSortType = sortType;
   };
 
-  #handleMovieChange = (updatedMovie, fromPopup) => {
+  #handleMovieChange = (updatedMovie) => {
     this.#movies = updateItem(this.#movies, updatedMovie);
     this.#moviesOriginal = updateItem(this.#moviesOriginal, updatedMovie);
     this.#movieMainPresenters.get(updatedMovie.id).forEach((presenter) => {
       presenter.init(updatedMovie);
     });
-    if (fromPopup) {
-      // this.#popupPresenter.init(updatedMovie); //TODO will be deleted after data binding fully completed
-    }
+    this.#popupPresenter.init(updatedMovie);
   };
 
   #handleSortTypeChange = (sortType) => {

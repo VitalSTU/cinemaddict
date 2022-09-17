@@ -39,20 +39,36 @@ export default class MoviePresenter {
   };
 
   #onWatchlistClick = () => {
-    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails, watchlist: !this.#movie.userDetails.watchlist}});
+    this.#changeData({
+      ...this.#movie,
+      userDetails: {
+        ...this.#movie.userDetails,
+        watchlist: !this.#movie.userDetails.watchlist
+      }
+    });
   };
 
   #onHistoryClick = () => {
     const alreadyWatched = this.#movie.userDetails.alreadyWatched;
 
-    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails,
-      alreadyWatched: !alreadyWatched,
-      watchingDate: alreadyWatched ? '' : getNow(),
-    }});
+    this.#changeData({
+      ...this.#movie,
+      userDetails: {
+        ...this.#movie.userDetails,
+        alreadyWatched: !alreadyWatched,
+        watchingDate: alreadyWatched ? '' : getNow(),
+      }
+    });
   };
 
   #onFavoriteClick = () => {
-    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails, favorite: !this.#movie.userDetails.favorite}});
+    this.#changeData({
+      ...this.#movie,
+      userDetails: {
+        ...this.#movie.userDetails,
+        favorite: !this.#movie.userDetails.favorite
+      }
+    });
   };
 
   init = (movie) => {

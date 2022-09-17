@@ -50,24 +50,36 @@ export default class PopupPresenter {
   };
 
   #onWatchlistClick = () => {
-    this.#changeData({...this.#movie,
-      userDetails: {...this.#movie.userDetails,
+    this.#changeData({
+      ...this.#movie,
+      userDetails: {
+        ...this.#movie.userDetails,
         watchlist: !this.#movie.userDetails.watchlist
       }
-    }, true);
+    });
   };
 
   #onHistoryClick = () => {
     const alreadyWatched = this.#movie.userDetails.alreadyWatched;
 
-    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails,
-      alreadyWatched: !alreadyWatched,
-      watchingDate: alreadyWatched ? '' : getNow(),
-    }}, true);
+    this.#changeData({
+      ...this.#movie,
+      userDetails: {
+        ...this.#movie.userDetails,
+        alreadyWatched: !alreadyWatched,
+        watchingDate: alreadyWatched ? '' : getNow(),
+      }
+    });
   };
 
   #onFavoriteClick = () => {
-    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails, favorite: !this.#movie.userDetails.favorite}}, true);
+    this.#changeData({
+      ...this.#movie,
+      userDetails: {
+        ...this.#movie.userDetails,
+        favorite: !this.#movie.userDetails.favorite
+      }
+    });
   };
 
   #activateMainPageScrollbar = () => {
@@ -121,7 +133,5 @@ export default class PopupPresenter {
 
     this.#setChangeDataClickHandlers();
     this.#renderPopupMainContainerComponent();
-
-    return this.#popupComponent;
   };
 }
