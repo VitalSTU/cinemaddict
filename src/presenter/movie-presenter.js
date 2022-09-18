@@ -10,13 +10,24 @@ export default class MoviePresenter {
   #parentElement = null;
 
   #popupPresenter = null;
+  #popupIsOpened = false;
 
   #changeData = null;
+  #handleMovieOpening = null;
 
-  constructor(popupPresenter, parentElement, changeData) {
+  constructor(popupPresenter, parentElement, changeData, handleMovieOpening) {
     this.#popupPresenter = popupPresenter;
     this.#parentElement = parentElement;
     this.#changeData = changeData;
+    this.#handleMovieOpening = handleMovieOpening;
+  }
+
+  get popupIsOpened() {
+    return this.#popupIsOpened;
+  }
+
+  set popupIsOpened(popupIsOpened) {
+    this.#popupIsOpened = popupIsOpened;
   }
 
   init = (movie) => {
@@ -48,7 +59,13 @@ export default class MoviePresenter {
   };
 
   #renderNewPopupComponent = (movie) => {
-    this.#popupPresenter.init(movie);
+    this.#popupPresenter.init(movie, null, this.#resetOpenedStatusFlag);
+    this.#handleMovieOpening();
+    this.#popupIsOpened = true;
+  };
+
+  #resetOpenedStatusFlag = () => {
+    this.#popupIsOpened = false;
   };
 
   #setEventHandlers = () => {

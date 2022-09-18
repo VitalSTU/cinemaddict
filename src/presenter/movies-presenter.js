@@ -97,7 +97,8 @@ export default class MoviesPresenter {
   };
 
   #renderFilmCard = (movie, {element: parentElement}) => {
-    const moviePresenter = new MoviePresenter(this.#popupPresenter, parentElement, this.#handleMovieChange);
+    const moviePresenter = new MoviePresenter(this.#popupPresenter, parentElement,
+      this.#handleMovieChange, this.#handleMovieOpening);
     const presenters = !(this.#movieMainPresenters.has(movie.id)) ? [] : this.#movieMainPresenters.get(movie.id);
 
     moviePresenter.init(movie);
@@ -173,8 +174,18 @@ export default class MoviesPresenter {
     this.#moviesOriginal = updateItem(this.#moviesOriginal, updatedMovie);
     this.#movieMainPresenters.get(updatedMovie.id).forEach((presenter) => {
       presenter.init(updatedMovie);
+      if (presenter.popupIsOpened) {
+        this.#popupPresenter.init(updatedMovie, localData);
+      }
     });
-    this.#popupPresenter.init(updatedMovie, localData);
+  };
+
+  #handleMovieOpening = () => {
+    this.#movieMainPresenters.forEach((presenters) => {
+      presenters.forEach((presenter) => {
+        presenter.popupIsOpened = false;
+      });
+    });
   };
 
   #handleSortTypeChange = (sortType) => {

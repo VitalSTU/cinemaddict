@@ -13,6 +13,7 @@ export default class PopupPresenter {
   #comments = null;
 
   #changeData = null;
+  #resetOpenedStatusFlag = null;
 
   #localData = {
     localComment: {
@@ -36,22 +37,23 @@ export default class PopupPresenter {
    * @returns {FilmDetailsView} Created popup component
    * @memberof PopupPresenter
    */
-  init = (movie, localData) => {
+  init = (movie, localData, resetOpenedStatusFlag) => {
     this.#removeOldPopup();
 
-    this.#initialiseData(movie, localData);
+    this.#initialiseData(movie, localData, resetOpenedStatusFlag);
 
     this.#setCloseBtnClickHandler();
     this.#deactivateMainPageScrollbar();
 
     this.#setChangeDataClickHandlers();
-    this.#renderPopupMainContainerComponent();
+    this.#renderPopupComponent();
     this.#popupComponent.setScrollPosition();
   };
 
-  #initialiseData = (movie, localData) => {
+  #initialiseData = (movie, localData, resetOpenedStatusFlag) => {
     this.#movie = movie;
     this.#localData = (localData) ? localData : this.#localData;
+    this.#resetOpenedStatusFlag = (resetOpenedStatusFlag) ? resetOpenedStatusFlag : this.#resetOpenedStatusFlag;
     this.#comments = getCommentsByIds(this.#movie.comments, [...this.#commentsModel.comments]);
 
     this.#popupComponent = new FilmDetailsView(
@@ -88,7 +90,7 @@ export default class PopupPresenter {
     }
   };
 
-  #renderPopupMainContainerComponent = () => {
+  #renderPopupComponent = () => {
     render(this.#popupComponent, this.#contentContainer);
   };
 
@@ -103,6 +105,7 @@ export default class PopupPresenter {
   };
 
   #closeBtnClickHandler = () => {
+    this.#resetOpenedStatusFlag();
     this.#removePopupComponent();
     this.#activateMainPageScrollbar();
   };
