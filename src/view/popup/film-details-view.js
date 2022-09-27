@@ -1,50 +1,7 @@
 import * as viewUtils from '../view-utils.js';
 import * as mainUtils from '../../utils.js';
 import AbstractStatefulView from '../../framework/view/abstract-stateful-view';
-
-const BLANK_MOVIE = {
-  id: null,
-  comments: null,
-  filmInfo: {
-    title: null,
-    alternativeTitle: null,
-    totalRating: null,
-    poster: null,
-    ageRating: null,
-    director: null,
-    writers: null,
-    actors: null,
-    release: {
-      date: null,
-      releaseCountry: null,
-    },
-    runtime: null,
-    genre: null,
-    description: null,
-  },
-  userDetails: {
-    watchlist: false,
-    alreadyWatched: false,
-    watchingDate: null,
-    favorite: false,
-  },
-};
-
-const BLANK_COMMENT = {
-  id: null,
-  author: null,
-  comment: null,
-  date: null,
-  emotion: null,
-};
-
-const BLANK_LOCAL_DATA = {
-  localComment: {
-    comment: null,
-    emotion: null,
-  },
-  scrollTop: 0,
-};
+import { BLANK_MOVIE, BLANK_COMMENT, BLANK_LOCAL_DATA } from '../../const.js';
 
 const createFilmDetailsTopContainerTemplate = ({filmInfo: movie, userDetails}) => `
     <div class="film-details__inner">

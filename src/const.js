@@ -5,6 +5,50 @@ export const MOVIE_CARD_ACTIVE = 'film-card__controls-item--active';
 export const MOVIE_DETAILS_ACTIVE = 'film-details__control-button--active';
 export const SORT_BUTTON_ACTIVE = 'sort__button--active';
 
+export const BLANK_MOVIE = {
+  id: null,
+  comments: null,
+  filmInfo: {
+    title: null,
+    alternativeTitle: null,
+    totalRating: null,
+    poster: null,
+    ageRating: null,
+    director: null,
+    writers: null,
+    actors: null,
+    release: {
+      date: null,
+      releaseCountry: null,
+    },
+    runtime: null,
+    genre: null,
+    description: null,
+  },
+  userDetails: {
+    watchlist: false,
+    alreadyWatched: false,
+    watchingDate: null,
+    favorite: false,
+  },
+};
+
+export const BLANK_COMMENT = {
+  id: null,
+  author: null,
+  comment: null,
+  date: null,
+  emotion: null,
+};
+
+export const BLANK_LOCAL_DATA = {
+  localComment: {
+    comment: null,
+    emotion: null,
+  },
+  scrollTop: 0,
+};
+
 export const EmojiUri = {
   ANGRY: './images/emoji/angry.png',
   PUKE: './images/emoji/puke.png',
