@@ -35,6 +35,17 @@ export const compareParameters = (paramA, paramB) => {
 
   return weight ?? paramA.toString().toUpperCase() === paramB.toString().toUpperCase();
 };
+export const duplicateMovie = (movie) => ({
+  ...movie,
+  filmInfo: {
+    ...movie.filmInfo,
+    writers: {...movie.filmInfo.writers},
+    actors: {...movie.filmInfo.actors},
+    release: {...movie.filmInfo.release},
+    genre: {...movie.filmInfo.genre},
+  },
+  userDetails: {...movie.userDetails},
+});
 export const getCommentsByIds = (ids, comments) => comments.filter((c) => ids.includes(c.id));
 export const getNow = () => dayjs().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
 export const sortMovieByCommentsQuantityDown = ({comments: commentsA}, {comments: commentsB}) => {

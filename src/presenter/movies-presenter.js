@@ -37,13 +37,14 @@ export default class MoviesPresenter {
   #showMoreButtonPresenter = null;
 
   #currentSortType = SortType.DEFAULT;
-  #moviesOriginal = null;
-  #moviesTopRated = null;
-  #moviesTopCommented = null;
-  #movies = null;
+  #moviesOriginal = null;//TODO delete
+  #movies = null;//TODO delete
+  #moviesTopRated = null;//TODO delete
+  #moviesTopCommented = null;//TODO delete
+  #moviesModel = null;//TODO added
 
   get movies() {
-    return this.#movies;
+    return this.#getSortedMovies(this.#currentSortType);
   }
 
   init = (contentContainer, moviesModel, commentsModel) => {
@@ -69,17 +70,31 @@ export default class MoviesPresenter {
   #initialiseData = (contentContainer, moviesModel, commentsModel) => {
     this.#contentContainerElement = contentContainer;
     this.#contentContainerElement.innerHTML = '';
-    this.#moviesOriginal = [...moviesModel.movies];
-    this.#movies = [...moviesModel.movies];
-    this.#moviesTopRated = [...this.#movies];
-    this.#moviesTopCommented = [...this.#movies];
 
-    this.#moviesTopRated.sort(sortMovieByRatingDown);
-    this.#moviesTopRated = this.#moviesTopRated.slice(FIRST_FILM_CARD_NUMBER, FILM_EXTRA_TEST_CARDS_QUANTITY);
-    this.#moviesTopCommented.sort(sortMovieByCommentsQuantityDown);
-    this.#moviesTopCommented = this.#moviesTopCommented.slice(FIRST_FILM_CARD_NUMBER, FILM_EXTRA_TEST_CARDS_QUANTITY);
+    this.#moviesOriginal = [...moviesModel.movies];//TODO delete
+    this.#movies = [...moviesModel.movies];//TODO delete
+    this.#moviesTopRated = [...this.#movies];//TODO delete
+    this.#moviesTopCommented = [...this.#movies];//TODO delete
+
+    this.#moviesModel = [...moviesModel.movies];//TODO added
+
+    this.#moviesTopRated.sort(sortMovieByRatingDown);//TODO delete
+    this.#moviesTopRated = this.#moviesTopRated.slice(FIRST_FILM_CARD_NUMBER, FILM_EXTRA_TEST_CARDS_QUANTITY);//TODO delete
+    this.#moviesTopCommented.sort(sortMovieByCommentsQuantityDown);//TODO delete
+    this.#moviesTopCommented = this.#moviesTopCommented.slice(FIRST_FILM_CARD_NUMBER, FILM_EXTRA_TEST_CARDS_QUANTITY);//TODO delete
 
     this.#popupPresenter = new PopupPresenter(this.#handleMovieChange, commentsModel);
+  };
+
+  #getSortedMovies = (sortType = this.#currentSortType) => {
+    switch (sortType) {
+      case SortType.DATE:
+        return [...this.#moviesModel.movies].sort(sortMovieByDateDown);
+      case SortType.RATING:
+        return [...this.#moviesModel.movies].sort(sortMovieByRatingDown);
+    }
+
+    return this.#moviesModel.movies;
   };
 
   #renderNavigationComponent = () => {

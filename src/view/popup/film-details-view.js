@@ -435,10 +435,7 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
   };
 
   static parseMovieToState = (movie, comments, localData) => ({
-    movie: {...movie,
-      filmInfo: {...movie.filmInfo, release: {...movie.filmInfo.release}},
-      userDetails: {...movie.userDetails},
-    },
+    movie: mainUtils.duplicateMovie(movie),
     comments: {
       comments: [...comments],
       localComment: localData.localComment,
