@@ -1,7 +1,7 @@
 import { COMMENT_TEST_CARDS_QUANTITY } from '../mock/const.js';
 import { generateComment } from '../mock/comment.js';
 
-export default class CommentsModel {
+export default class CommentsModel extends Observable {
   #comments = Array.from({length: COMMENT_TEST_CARDS_QUANTITY}, generateComment);
 
   constructor() {

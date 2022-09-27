@@ -23,6 +23,10 @@ export default class PopupPresenter {
     scrollTop: 0,
   };
 
+  get comments() {
+    return this.#commentsModel;
+  }
+
   constructor(changeData, commentsModel) {
     this.#changeData = changeData;
     this.#commentsModel = commentsModel;

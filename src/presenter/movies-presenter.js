@@ -42,6 +42,10 @@ export default class MoviesPresenter {
   #moviesTopCommented = null;
   #movies = null;
 
+  get movies() {
+    return this.#movies;
+  }
+
   init = (contentContainer, moviesModel, commentsModel) => {
     this.#initialiseData(contentContainer, moviesModel, commentsModel);
 

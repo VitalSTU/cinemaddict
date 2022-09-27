@@ -2,7 +2,7 @@ import { generateMovie } from '../mock/movie.js';
 
 const FILM_TEST_CARDS_QUANTITY = 42;
 
-export default class MoviesModel {
+export default class MoviesModel extends Observable {
   #movies = null;
 
   constructor() {
