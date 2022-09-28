@@ -37,12 +37,13 @@ export const compareParameters = (paramA, paramB) => {
 };
 export const duplicateMovie = (movie) => ({
   ...movie,
+  comments: [...movie.comments],
   filmInfo: {
     ...movie.filmInfo,
-    writers: {...movie.filmInfo.writers},
-    actors: {...movie.filmInfo.actors},
+    writers: [...movie.filmInfo.writers],
+    actors: [...movie.filmInfo.actors],
     release: {...movie.filmInfo.release},
-    genre: {...movie.filmInfo.genre},
+    genre: [...movie.filmInfo.genre],
   },
   userDetails: {...movie.userDetails},
 });
