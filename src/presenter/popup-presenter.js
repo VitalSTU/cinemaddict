@@ -2,6 +2,7 @@ import FilmDetailsView from '../view/popup/film-details-view.js';
 
 import { render, remove } from '../framework/render.js';
 import { getCommentsByIds, getNow } from '../utils.js';
+import { UserAction, UpdateType } from '../const.js';
 
 export default class PopupPresenter {
   #movie = null;
@@ -116,6 +117,8 @@ export default class PopupPresenter {
 
   #watchlistClickHandler = () => {
     this.#changeData(
+      UserAction.UPDATE_TASK,
+      UpdateType.MINOR,
       {
         ...this.#movie,
         userDetails: {
@@ -131,6 +134,8 @@ export default class PopupPresenter {
     const alreadyWatched = this.#movie.userDetails.alreadyWatched;
 
     this.#changeData(
+      UserAction.UPDATE_TASK,
+      UpdateType.MINOR,
       {
         ...this.#movie,
         userDetails: {
@@ -145,6 +150,8 @@ export default class PopupPresenter {
 
   #favoriteClickHandler = () => {
     this.#changeData(
+      UserAction.UPDATE_TASK,
+      UpdateType.MINOR,
       {
         ...this.#movie,
         userDetails: {

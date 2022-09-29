@@ -53,7 +53,10 @@ export default class MoviesPresenter {
     this.#contentContainerElement = contentContainer;
     this.#contentContainerElement.innerHTML = '';
     this.#moviesModel = moviesModel;
-    this.#popupPresenter = new PopupPresenter(this.#movieChangeHandler, commentsModel);
+    // this.#popupPresenter = new PopupPresenter(this.#movieChangeHandler, commentsModel);
+    this.#popupPresenter = new PopupPresenter(this.#handleViewAction, commentsModel);
+
+    this.#moviesModel.addObserver(this.#handleModelEvent);
   };
 
   #renderBoard = () => {
@@ -107,7 +110,8 @@ export default class MoviesPresenter {
   };
 
   #renderFilmCard = (movie, {element: parentElement}) => {
-    const moviePresenter = new MoviePresenter(this.#popupPresenter, parentElement, this.#movieChangeHandler, this.#movieOpeningHandler);
+    // const moviePresenter = new MoviePresenter(this.#popupPresenter, parentElement, this.#movieChangeHandler, this.#movieOpeningHandler);
+    const moviePresenter = new MoviePresenter(this.#popupPresenter, parentElement, this.#handleViewAction, this.#movieOpeningHandler);
     const presenters = !(this.#movieMainPresenters.has(movie.id)) ? [] : this.#movieMainPresenters.get(movie.id);
 
     moviePresenter.init(movie);
@@ -164,14 +168,31 @@ export default class MoviesPresenter {
     this.#destroyShowMoreButtonComponent();
   };
 
-  #movieChangeHandler = (updatedMovie, localData) => {
-    // Здесь будем вызывать обновление модели
-    this.#movieMainPresenters.get(updatedMovie.id).forEach((presenter) => {
-      presenter.init(updatedMovie);
-      if (presenter.popupIsOpened) {
-        this.#popupPresenter.init(updatedMovie, localData);
-      }
-    });
+  // #movieChangeHandler = (updatedMovie, localData) => {
+  //   // Здесь будем вызывать обновление модели
+  //   this.#movieMainPresenters.get(updatedMovie.id).forEach((presenter) => {
+  //     presenter.init(updatedMovie);
+  //     if (presenter.popupIsOpened) {
+  //       this.#popupPresenter.init(updatedMovie, localData);
+  //     }
+  //   });
+  // };
+
+  #handleViewAction = (actionType, updateType, update, localData) => {
+    console.log(actionType, updateType, update, localData);
+    // Здесь будем вызывать обновление модели.
+    // actionType - действие пользователя, нужно чтобы понять, какой метод модели вызвать
+    // updateType - тип изменений, нужно чтобы понять, что после нужно обновить
+    // update - обновленные данные
+    // localData - обновленные локальные данные
+  };
+
+  #handleModelEvent = (updateType, data) => {
+    console.log(updateType, data);
+    // В зависимости от типа изменений решаем, что делать:
+    // - обновить часть списка (например, когда поменялось описание)
+    // - обновить список (например, когда задача ушла в архив)
+    // - обновить всю доску (например, при переключении фильтра)
   };
 
   #movieOpeningHandler = () => {

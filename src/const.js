@@ -69,3 +69,15 @@ export const SortType = {
   RATING: 'rating',
   COMMENTS: 'comments',
 };
+
+export const UserAction = {
+  UPDATE_TASK: 'UPDATE_MOVIE',
+  ADD_TASK: 'ADD_COMMENT',
+  DELETE_TASK: 'DELETE_COMMENT',
+};
+
+export const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};

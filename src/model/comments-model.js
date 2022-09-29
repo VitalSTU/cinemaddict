@@ -21,20 +21,33 @@ export default class CommentsModel extends AbstractCommentsObservable {
     this.#comments = comments;
   }
 
-  deleteCommentById = (id) => {
-    if (!id) {
-      throw new Error('Null id value provided');
-    } else {
-      const index = this.#comments.findIndex((c) => compareParameters(c.id, id));
+  addComment = (updateType, update) => {
+    this._checkParameter(updateType, 'updateType');
+    this._checkParameter(update, 'comment');
 
-      if (index < 0) {
-        throw new Error(`Comment with id ${id} not found`);
-      } else {
-        this.#comments = [
-          ...this.#comments.slice(0, index),
-          ...this.#comments.slice(index + 1),
-        ];
-      }
+    this.comments = [
+      ...this.comments,
+      update,
+    ];
+
+    this._notify(updateType, update);
+  };
+
+  deleteComment = (updateType, update) => {
+    this._checkParameter(updateType, 'updateType');
+    this._checkParameter(update, 'comment');
+
+    const id = update.id;
+    const index = this.comments.findIndex((c) => compareParameters(c.id, id));
+    if (index < 0) {
+      throw new Error(`Comment with id ${id} not found`);
     }
+
+    this.comments = [
+      ...this.comments.slice(0, index),
+      ...this.comments.slice(index + 1),
+    ];
+
+    this._notify(updateType, update);
   };
 }

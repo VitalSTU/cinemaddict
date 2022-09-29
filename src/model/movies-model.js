@@ -20,47 +20,69 @@ export default class MoviesModel extends AbstractCommentsObservable {
     this.#movies = movies;
   }
 
-  setMovie = (movie) => {
-    if (!movie) {
-      throw new Error('Null movie value provided');
-    } else {
-      const index = this.#movies.findIndex((m) => compareParameters(m.id, movie.id));
+  updateMovie = (updateType, update) => {
+    this._checkParameter(updateType, 'updateType');
+    this._checkParameter(update, 'update');
 
-      if (index < 0) {
-        throw new Error(`Movie ${movie} not found`);
-      } else {
-        this.#movies = [
-          ...this.#movies.slice(0, index),
-          movie,
-          ...this.#movies.slice(index + 1),
-        ];
-      }
+    const index = this.movies.findIndex((m) => compareParameters(m.id, update.id));
+    if (index < 0) {
+      throw new Error(`Can't update. Movie ${update} not found.`);
     }
+
+    this.movies = [
+      ...this.movies.slice(0, index),
+      update,
+      ...this.movies.slice(index + 1),
+    ];
+
+    this._notify(updateType, update);
   };
 
-  deleteCommentById = (movie, commentId) => {
-    if (!movie || !commentId) {
-      throw new Error(`Null ${movie ? 'id' : 'movie and id'} value${movie ? '' : 's'} provided`);
-    } else {
-      const movieIndex = this.#movies.findIndex((m) => compareParameters(m.id, movie.id));
+  addComment = (updateType, movieToUpdate, comment) => {
+    this._checkParameter(updateType, 'updateType');
+    this._checkParameter(movieToUpdate, 'movie');
+    this._checkParameter(comment, 'comment');
 
-      if (movieIndex < 0) {
-        throw new Error(`Movie ${movie} not found`);
-      } else {
-        const commentIndex = this.#movies[movieIndex].comments.findIndex((id) => compareParameters(id, commentId));
-
-        if (commentIndex < 0) {
-          throw new Error(`Comment with id ${commentId} not found in movie ${movie}`);
-        } else {
-          this.setMovie({
-            ...this.#movies[movieIndex],
-            comments: [
-              ...this.#movies[movieIndex].comments.slice(0, commentIndex),
-              ...this.#movies[movieIndex].comments.slice(commentIndex + 1),
-            ],
-          });
-        }
-      }
+    const commentId = comment.id;
+    const movieId = movieToUpdate.id;
+    const movieIndex = this.movies.findIndex((m) => compareParameters(m.id, movieId));
+    if (movieIndex < 0) {
+      throw new Error(`Movie ${movieToUpdate} not found.`);
     }
+
+    const movie = this.movies[movieIndex];
+    const update = {
+      ...movie,
+      comments: [...movie.comments, commentId],
+    };
+
+    this.updateMovie(updateType, update);
+  };
+
+  deleteComment = (updateType, movieToUpdate, comment) => {
+    this._checkParameter(updateType, 'updateType');
+    this._checkParameter(movieToUpdate, 'movie');
+    this._checkParameter(comment, 'comment');
+
+    const commentId = comment.id;
+    const movieIndex = this.movies.findIndex((m) => compareParameters(m.id, movieToUpdate.id));
+    if (movieIndex < 0) {
+      throw new Error(`Movie ${movieToUpdate} not found.`);
+    }
+
+    const movie = this.movies[movieIndex];
+    const commentIndex = movie.comments.findIndex((id) => compareParameters(id, commentId));
+    if (commentIndex < 0) {
+      throw new Error(`Comment with id ${commentId} not found in movie ${movieToUpdate}.`);
+    }
+
+    const update = {
+      ...movie, comments: [
+        ...movie.comments.slice(0, commentIndex),
+        ...movie.comments.slice(commentIndex + 1),
+      ],
+    };
+
+    this.updateMovie(updateType, update);
   };
 }

@@ -9,4 +9,10 @@ export default class AbstractCommentsObservable extends Observable {
   deleteCommentById = () => {
     throw new Error('Abstract method not implemented: deleteCommentById');
   };
+
+  _checkParameter = (parameter, parameterName) => {
+    if (!parameter) {
+      throw new Error(`Null ${parameterName} value provided`);
+    }
+  };
 }

@@ -2,6 +2,7 @@ import FilmCardView from '../view/content/film-card-view.js';
 
 import { render, remove, replace } from '../framework/render.js';
 import { getNow } from '../utils.js';
+import { UserAction, UpdateType } from '../const.js';
 
 export default class MoviePresenter {
   #movie = null;
@@ -80,35 +81,47 @@ export default class MoviePresenter {
   };
 
   #watchlistClickHandler = () => {
-    this.#changeData({
-      ...this.#movie,
-      userDetails: {
-        ...this.#movie.userDetails,
-        watchlist: !this.#movie.userDetails.watchlist
+    this.#changeData(
+      UserAction.UPDATE_TASK,
+      UpdateType.MINOR,
+      {
+        ...this.#movie,
+        userDetails: {
+          ...this.#movie.userDetails,
+          watchlist: !this.#movie.userDetails.watchlist
+        }
       }
-    });
+    );
   };
 
   #historyClickHandler = () => {
     const alreadyWatched = this.#movie.userDetails.alreadyWatched;
 
-    this.#changeData({
-      ...this.#movie,
-      userDetails: {
-        ...this.#movie.userDetails,
-        alreadyWatched: !alreadyWatched,
-        watchingDate: alreadyWatched ? '' : getNow(),
+    this.#changeData(
+      UserAction.UPDATE_TASK,
+      UpdateType.MINOR,
+      {
+        ...this.#movie,
+        userDetails: {
+          ...this.#movie.userDetails,
+          alreadyWatched: !alreadyWatched,
+          watchingDate: alreadyWatched ? '' : getNow(),
+        }
       }
-    });
+    );
   };
 
   #favoriteClickHandler = () => {
-    this.#changeData({
-      ...this.#movie,
-      userDetails: {
-        ...this.#movie.userDetails,
-        favorite: !this.#movie.userDetails.favorite
+    this.#changeData(
+      UserAction.UPDATE_TASK,
+      UpdateType.MINOR,
+      {
+        ...this.#movie,
+        userDetails: {
+          ...this.#movie.userDetails,
+          favorite: !this.#movie.userDetails.favorite
+        }
       }
-    });
+    );
   };
 }
