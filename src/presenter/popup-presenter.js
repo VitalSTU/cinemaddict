@@ -24,7 +24,7 @@ export default class PopupPresenter {
   };
 
   get comments() {
-    return this.#commentsModel;
+    return this.#commentsModel.comments;
   }
 
   constructor(changeData, commentsModel) {
