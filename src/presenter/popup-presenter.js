@@ -1,7 +1,7 @@
 import FilmDetailsView from '../view/popup/film-details-view.js';
 
 import { render, remove } from '../framework/render.js';
-import { getCommentsByIds, getNow } from '../utils.js';
+import { getCommentsByIds, getNow, compareParameters } from '../utils.js';
 import { UserAction, UpdateType } from '../const.js';
 
 export default class PopupPresenter {
@@ -11,7 +11,6 @@ export default class PopupPresenter {
   #contentContainer = null;
 
   #commentsModel = null;
-  #comments = null;
 
   #changeData = null;
   #resetOpenedStatusFlag = null;
@@ -59,11 +58,10 @@ export default class PopupPresenter {
     this.#movie = movie;
     this.#localData = (localData) ? localData : this.#localData;
     this.#resetOpenedStatusFlag = (resetOpenedStatusFlag) ? resetOpenedStatusFlag : this.#resetOpenedStatusFlag;
-    this.#comments = getCommentsByIds(this.#movie.comments, [...this.#commentsModel.comments]);
 
     this.#popupComponent = new FilmDetailsView(
       this.#movie,
-      this.#comments,
+      getCommentsByIds(this.#movie.comments, [...this.comments]),
       this.#localData,
       this.#updateLocalData
     );
@@ -107,6 +105,8 @@ export default class PopupPresenter {
     this.#popupComponent.setWatchlistClickHandler(this.#watchlistClickHandler);
     this.#popupComponent.setHistoryClickHandler(this.#historyClickHandler);
     this.#popupComponent.setFavoriteClickHandler(this.#favoriteClickHandler);
+    this.#popupComponent.setDeleteButtonsClickHandler(this.#deleteButtonClickHandler);
+    this.#popupComponent.setAddCommentHandler(this.#addCommentHandler);
   };
 
   #closeBtnClickHandler = () => {
@@ -117,16 +117,15 @@ export default class PopupPresenter {
 
   #watchlistClickHandler = () => {
     this.#changeData(
-      UserAction.UPDATE_TASK,
-      UpdateType.MINOR,
+      UserAction.UPDATE_MOVIE,
+      UpdateType.PATCH,
       {
         ...this.#movie,
         userDetails: {
           ...this.#movie.userDetails,
-          watchlist: !this.#movie.userDetails.watchlist
-        }
-      },
-      {...this.#localData}
+          watchlist: !this.#movie.userDetails.watchlist,
+        },
+      }
     );
   };
 
@@ -134,32 +133,52 @@ export default class PopupPresenter {
     const alreadyWatched = this.#movie.userDetails.alreadyWatched;
 
     this.#changeData(
-      UserAction.UPDATE_TASK,
-      UpdateType.MINOR,
+      UserAction.UPDATE_MOVIE,
+      UpdateType.PATCH,
       {
         ...this.#movie,
         userDetails: {
           ...this.#movie.userDetails,
           alreadyWatched: !alreadyWatched,
           watchingDate: alreadyWatched ? '' : getNow(),
-        }
-      },
-      {...this.#localData}
+        },
+      }
     );
   };
 
   #favoriteClickHandler = () => {
     this.#changeData(
-      UserAction.UPDATE_TASK,
-      UpdateType.MINOR,
+      UserAction.UPDATE_MOVIE,
+      UpdateType.PATCH,
       {
         ...this.#movie,
         userDetails: {
           ...this.#movie.userDetails,
-          favorite: !this.#movie.userDetails.favorite
-        }
-      },
-      {...this.#localData}
+          favorite: !this.#movie.userDetails.favorite,
+        },
+      }
+    );
+  };
+
+  #deleteButtonClickHandler = (commentId) => {
+    this.#changeData(
+      UserAction.DELETE_COMMENT,
+      UpdateType.PATCH,
+      {
+        movieToUpdate: this.#movie,
+        comment: this.comments.find((c) => compareParameters(c.id.toString(), commentId)),
+      }
+    );
+  };
+
+  #addCommentHandler = (comment) => {
+    this.#changeData(
+      UserAction.ADD_COMMENT,
+      UpdateType.PATCH,
+      {
+        movieToUpdate: this.#movie,
+        comment,
+      }
     );
   };
 }

@@ -11,7 +11,7 @@ import NavigationPresenter from './navigation-presenter.js';
 import MoviePresenter from './movie-presenter.js';
 import PopupPresenter from './popup-presenter.js';
 
-import { FILM_CARDS_QUANTITY_TO_SHOW_PER_STEP, MovieFilterType, SortType } from '../const.js';
+import { FILM_CARDS_QUANTITY_TO_SHOW_PER_STEP, MovieFilterType, SortType, UpdateType, UserAction } from '../const.js';
 import { render, remove } from '../framework/render.js';
 import { generateFilter } from '../mock/filter.js';
 import { sortMovieByDateDown, sortMovieByRatingDown, sortMovieByCommentsQuantityDown } from '../utils.js';
@@ -39,6 +39,7 @@ export default class MoviesPresenter {
 
   #currentSortType = SortType.DEFAULT;
   #moviesModel = null;
+  #commentsModel = null;
 
   get movies() {
     return this.#getSortedMovies(this.#currentSortType);
@@ -53,8 +54,8 @@ export default class MoviesPresenter {
     this.#contentContainerElement = contentContainer;
     this.#contentContainerElement.innerHTML = '';
     this.#moviesModel = moviesModel;
-    // this.#popupPresenter = new PopupPresenter(this.#movieChangeHandler, commentsModel);
-    this.#popupPresenter = new PopupPresenter(this.#handleViewAction, commentsModel);
+    this.#commentsModel = commentsModel;
+    this.#popupPresenter = new PopupPresenter(this.#handleViewAction, this.#commentsModel);
 
     this.#moviesModel.addObserver(this.#handleModelEvent);
   };
@@ -110,7 +111,6 @@ export default class MoviesPresenter {
   };
 
   #renderFilmCard = (movie, {element: parentElement}) => {
-    // const moviePresenter = new MoviePresenter(this.#popupPresenter, parentElement, this.#movieChangeHandler, this.#movieOpeningHandler);
     const moviePresenter = new MoviePresenter(this.#popupPresenter, parentElement, this.#handleViewAction, this.#movieOpeningHandler);
     const presenters = !(this.#movieMainPresenters.has(movie.id)) ? [] : this.#movieMainPresenters.get(movie.id);
 
@@ -168,31 +168,51 @@ export default class MoviesPresenter {
     this.#destroyShowMoreButtonComponent();
   };
 
-  // #movieChangeHandler = (updatedMovie, localData) => {
-  //   // Здесь будем вызывать обновление модели
-  //   this.#movieMainPresenters.get(updatedMovie.id).forEach((presenter) => {
-  //     presenter.init(updatedMovie);
-  //     if (presenter.popupIsOpened) {
-  //       this.#popupPresenter.init(updatedMovie, localData);
-  //     }
-  //   });
-  // };
+  #handleViewAction = (actionType, updateType, update) => {
 
-  #handleViewAction = (actionType, updateType, update, localData) => {
-    console.log(actionType, updateType, update, localData);
-    // Здесь будем вызывать обновление модели.
-    // actionType - действие пользователя, нужно чтобы понять, какой метод модели вызвать
-    // updateType - тип изменений, нужно чтобы понять, что после нужно обновить
-    // update - обновленные данные
-    // localData - обновленные локальные данные
+    switch (actionType) {
+      case UserAction.UPDATE_MOVIE:
+        this.#moviesModel.updateMovie(updateType, update);
+        break;
+
+      case UserAction.ADD_COMMENT:
+        this.#commentsModel.addComment(updateType, update);
+        this.#moviesModel.addComment(updateType, update);
+        break;
+
+      case UserAction.DELETE_COMMENT:
+        this.#commentsModel.deleteComment(updateType, update);
+        this.#moviesModel.deleteComment(updateType, update);
+        break;
+
+      default:
+        throw new Error(`Action type ${actionType} hasn't recognized.`);
+    }
   };
 
   #handleModelEvent = (updateType, data) => {
-    console.log(updateType, data);
-    // В зависимости от типа изменений решаем, что делать:
-    // - обновить часть списка (например, когда поменялось описание)
-    // - обновить список (например, когда задача ушла в архив)
-    // - обновить всю доску (например, при переключении фильтра)
+
+    switch (updateType) {
+
+      case UpdateType.PATCH:
+        this.#movieMainPresenters.get(data.id).forEach((presenter) => {
+          presenter.init(data);
+          if (presenter.popupIsOpened) {
+            this.#popupPresenter.init(data, null, null);
+          }
+        });
+        break;
+
+      case UpdateType.MINOR:
+        // - обновить список (например, когда задача ушла в архив)
+        break;
+
+      case UpdateType.MAJOR:
+        // - обновить всю доску (например, при переключении фильтра)
+        break;
+      default:
+        throw new Error(`Update type ${updateType} hasn't recognized.`);
+    }
   };
 
   #movieOpeningHandler = () => {

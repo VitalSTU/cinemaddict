@@ -82,14 +82,14 @@ export default class MoviePresenter {
 
   #watchlistClickHandler = () => {
     this.#changeData(
-      UserAction.UPDATE_TASK,
-      UpdateType.MINOR,
+      UserAction.UPDATE_MOVIE,
+      UpdateType.PATCH,
       {
         ...this.#movie,
         userDetails: {
           ...this.#movie.userDetails,
-          watchlist: !this.#movie.userDetails.watchlist
-        }
+          watchlist: !this.#movie.userDetails.watchlist,
+        },
       }
     );
   };
@@ -98,29 +98,29 @@ export default class MoviePresenter {
     const alreadyWatched = this.#movie.userDetails.alreadyWatched;
 
     this.#changeData(
-      UserAction.UPDATE_TASK,
-      UpdateType.MINOR,
+      UserAction.UPDATE_MOVIE,
+      UpdateType.PATCH,
       {
         ...this.#movie,
         userDetails: {
           ...this.#movie.userDetails,
           alreadyWatched: !alreadyWatched,
           watchingDate: alreadyWatched ? '' : getNow(),
-        }
+        },
       }
     );
   };
 
   #favoriteClickHandler = () => {
     this.#changeData(
-      UserAction.UPDATE_TASK,
-      UpdateType.MINOR,
+      UserAction.UPDATE_MOVIE,
+      UpdateType.PATCH,
       {
         ...this.#movie,
         userDetails: {
           ...this.#movie.userDetails,
-          favorite: !this.#movie.userDetails.favorite
-        }
+          favorite: !this.#movie.userDetails.favorite,
+        },
       }
     );
   };

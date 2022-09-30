@@ -30,10 +30,10 @@ export const compareParameters = (paramA, paramB) => {
   const weight = getWeightForNullValue(paramA, paramB) === 0;
 
   if (isNumber(paramA) && isNumber(paramA)) {
-    return weight ?? paramA === paramB;
+    return weight || paramA === paramB;
   }
 
-  return weight ?? paramA.toString().toUpperCase() === paramB.toString().toUpperCase();
+  return weight || paramA.toString().toUpperCase() === paramB.toString().toUpperCase();
 };
 export const duplicateMovie = (movie) => ({
   ...movie,

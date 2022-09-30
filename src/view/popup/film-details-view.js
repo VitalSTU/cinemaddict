@@ -2,6 +2,7 @@ import * as viewUtils from '../view-utils.js';
 import * as mainUtils from '../../utils.js';
 import AbstractStatefulView from '../../framework/view/abstract-stateful-view';
 import { BLANK_MOVIE, BLANK_COMMENT, BLANK_LOCAL_DATA } from '../../const.js';
+import { nanoid } from 'nanoid';
 
 const createFilmDetailsTopContainerTemplate = ({filmInfo: movie, userDetails}) => `
     <div class="film-details__inner">
@@ -151,6 +152,7 @@ const createFilmDetailsMainContainerTemplate = ({movie, comments}) => `
 
 export default class FilmDetailsMainContainerView extends AbstractStatefulView {
   #updateLocalData = null;
+  #metaKey = false;
 
   constructor(movie = BLANK_MOVIE, comments = [BLANK_COMMENT], localData = BLANK_LOCAL_DATA, updateLocalData) {
     super();
@@ -220,6 +222,17 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
     this.favoriteButton.addEventListener('click', this.#favoriteClickExternalHandler);
   };
 
+  setDeleteButtonsClickHandler = (callback) => {
+    this._callback.deleteButtonClick = callback;
+    [...this.deleteButtons].forEach((button) => {
+      button.addEventListener('click', this.#deleteButtonClickExternalHandler);
+    });
+  };
+
+  setAddCommentHandler = (callback) => {
+    this._callback.addCommentClick = callback;
+  };
+
   setScrollPosition = () => {
     this.element.scrollTop = this._state.scrollTop;
   };
@@ -230,6 +243,8 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
     this.setWatchlistClickHandler(this._callback.watchlistClick);
     this.setHistoryClickHandler(this._callback.historyClick);
     this.setFavoriteClickHandler(this._callback.favoriteClick);
+    this.setDeleteButtonsClickHandler(this._callback.deleteButtonClick);
+    this.setAddCommentHandler(this._callback.addCommentClick);
   };
 
   #setInnerHandlers = () => {
@@ -249,9 +264,13 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
   #clearExternalHandlers = () => {
     this.closeButton.removeEventListener('click', this.#closeBtnClickExternalHandler);
     document.removeEventListener('keydown', this.#keydownExternalHandler);
+    document.removeEventListener('keyup', this.#keyupExternalHandler);
     this.watchlistButton.removeEventListener('click', this.#watchlistClickExternalHandler);
     this.watchedButton.removeEventListener('click', this.#historyClickExternalHandler);
     this.favoriteButton.removeEventListener('click', this.#favoriteClickExternalHandler);
+    [...this.deleteButtons].forEach((button) => {
+      button.removeEventListener('click', this.#deleteButtonClickExternalHandler);
+    });
 
     this.#updateLocalData(BLANK_LOCAL_DATA);
   };
@@ -277,6 +296,38 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
     if (evt.key === 'Escape') {
       this.#clearExternalHandlers();
       this._callback.closeClick();
+
+    } else if (evt.key === 'Control') {
+      this.#metaKey = true;
+      document.addEventListener('keyup', this.#keyupExternalHandler);
+
+    } else if ((evt.key === 'Enter') && (evt.metaKey || this.#metaKey) && (evt.target.classList.contains('film-details__comment-input'))) {
+      evt.preventDefault();
+
+      const emotionElement = this.addEmojiContainer.querySelector('img');
+      if (!emotionElement) {
+        this.shake();
+
+      } else {
+        const comment = evt.target.value.trim();
+        const emotion = emotionElement.alt.slice(6);
+        const update = {
+          ...BLANK_COMMENT,
+          comment,
+          emotion,
+          id: nanoid() //TODO delete after connected to server
+        };
+
+        this.#clearExternalHandlers();
+        this._callback.addCommentClick(update);
+      }
+    }
+  };
+
+  #keyupExternalHandler = (evt) => {
+    if (evt.key === 'Control') {
+      this.#metaKey = false;
+      document.removeEventListener('keyup', this.#keyupExternalHandler);
     }
   };
 
@@ -293,6 +344,11 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
   #favoriteClickExternalHandler = (evt) => {
     evt.preventDefault();
     this._callback.favoriteClick();
+  };
+
+  #deleteButtonClickExternalHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.deleteButtonClick(evt.target.dataset.commentId);
   };
 
   #watchlistToggleHandler = (evt) => {
@@ -354,15 +410,9 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
   #deleteButtonClickHandler = (evt) => {
     evt.preventDefault();
 
-    const idToDelete = parseInt(evt.target.dataset.commentId, 10);
-    this.updateElement({
-      movie: {...this._state.movie,
-        comments: [...this._state.movie.comments.filter((c) => c !== idToDelete)],
-      },
-      comments: {...this._state.comments,
-        comments: [...this._state.comments.comments.filter((c) => c.id !== idToDelete)],
-      },
-      scrollTop: this.element.scrollTop,
+    this.#updateLocalData({
+      localComment: {...this._state.comments.localComment},
+      scrollTop: this._state.scrollTop
     });
   };
 
@@ -373,6 +423,7 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
       const newEmoji = evt.target.cloneNode(true);
       newEmoji.width = '55';
       newEmoji.height = '55';
+      newEmoji.alt = evt.target.closest('.film-details__emoji-label').getAttribute('for');
 
       this.addEmojiContainer.innerHTML = '';
       this.addEmojiContainer.append(newEmoji);

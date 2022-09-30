@@ -21,7 +21,7 @@ export default class CommentsModel extends AbstractCommentsObservable {
     this.#comments = comments;
   }
 
-  addComment = (updateType, update) => {
+  addComment = (updateType, {comment: update}) => {
     this._checkParameter(updateType, 'updateType');
     this._checkParameter(update, 'comment');
 
@@ -29,11 +29,9 @@ export default class CommentsModel extends AbstractCommentsObservable {
       ...this.comments,
       update,
     ];
-
-    this._notify(updateType, update);
   };
 
-  deleteComment = (updateType, update) => {
+  deleteComment = (updateType, {comment: update}) => {
     this._checkParameter(updateType, 'updateType');
     this._checkParameter(update, 'comment');
 
@@ -47,7 +45,5 @@ export default class CommentsModel extends AbstractCommentsObservable {
       ...this.comments.slice(0, index),
       ...this.comments.slice(index + 1),
     ];
-
-    this._notify(updateType, update);
   };
 }

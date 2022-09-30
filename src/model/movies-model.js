@@ -38,7 +38,7 @@ export default class MoviesModel extends AbstractCommentsObservable {
     this._notify(updateType, update);
   };
 
-  addComment = (updateType, movieToUpdate, comment) => {
+  addComment = (updateType, {movieToUpdate, comment}) => {
     this._checkParameter(updateType, 'updateType');
     this._checkParameter(movieToUpdate, 'movie');
     this._checkParameter(comment, 'comment');
@@ -59,7 +59,7 @@ export default class MoviesModel extends AbstractCommentsObservable {
     this.updateMovie(updateType, update);
   };
 
-  deleteComment = (updateType, movieToUpdate, comment) => {
+  deleteComment = (updateType, {movieToUpdate, comment}) => {
     this._checkParameter(updateType, 'updateType');
     this._checkParameter(movieToUpdate, 'movie');
     this._checkParameter(comment, 'comment');
