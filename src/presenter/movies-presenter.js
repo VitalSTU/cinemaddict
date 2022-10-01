@@ -24,7 +24,7 @@ export default class MoviesPresenter {
 
   #sortComponent = null;
   #filmsMainSectionComponent = new FilmsMainSectionView();
-  #filmsListEmptyComponent = new FilmsListEmptyView(MovieFilterType.ALL);
+  #filmsListEmptyComponent = null;
   #filmsListAllUpcomingComponent = new FilmsListAllUpcomingView();
   #filmsListContainerAllComponent = new FilmsListContainerView();
   #filmsListTopRatedComponent = new FilmsListTopRatedView();
@@ -40,6 +40,7 @@ export default class MoviesPresenter {
   #navigationPresenter = null;
 
   #currentSortType = SortType.DEFAULT;
+  #movieFilterType = MovieFilterType.ALL;
   #filterModel = new FilterModel();
   #moviesModel = null;
   #commentsModel = null;
@@ -64,10 +65,10 @@ export default class MoviesPresenter {
     this.#filterModel.addObserver(this.#handleModelEvent);
   };
 
-  #getSortedMovies = (sortType = this.#currentSortType, extraList = false) => {
-    const filterType = this.#filterModel.filter;
+  #getSortedMovies = (sortType = this.#currentSortType, noFilter = false) => {
+    this.#movieFilterType = this.#filterModel.filter;
     const movies = this.#moviesModel.movies;
-    const filteredMovies = extraList ? movies : filter[filterType](movies);
+    const filteredMovies = noFilter ? movies : filter[this.#movieFilterType](movies);
 
     switch (sortType) {
       case SortType.DATE:
@@ -102,6 +103,7 @@ export default class MoviesPresenter {
   };
 
   #renderFilmsListEmptyComponent = () => {
+    this.#filmsListEmptyComponent = new FilmsListEmptyView(this.#movieFilterType);
     render(this.#filmsListEmptyComponent, this.#contentContainerElement);
   };
 
@@ -192,7 +194,10 @@ export default class MoviesPresenter {
     remove(this.#filmsListContainerAllComponent);
     remove(this.#filmsListAllUpcomingComponent);
 
-    remove(this.#filmsListEmptyComponent);
+    if (this.#filmsListEmptyComponent) {
+      remove(this.#filmsListEmptyComponent);
+    }
+
     remove(this.#sortComponent);
     remove(this.#filmsMainSectionComponent);
 
