@@ -21,7 +21,7 @@ const FILM_EXTRA_TEST_CARDS_QUANTITY = 2;
 export default class MoviesPresenter {
   #contentContainerElement = null;
 
-  #sortComponent = new SortView();
+  #sortComponent = null;
   #filmsMainSectionComponent = new FilmsMainSectionView();
   #filmsListEmptyComponent = new FilmsListEmptyView(MovieFilterType.ALL);
   #filmsListAllUpcomingComponent = new FilmsListAllUpcomingView();
@@ -30,12 +30,13 @@ export default class MoviesPresenter {
   #filmsListContainerTopRatedComponent = new FilmsListContainerView();
   #filmsListMostCommentedComponent = new FilmsListMostCommentedView();
   #filmsListContainerMostCommentedComponent = new FilmsListContainerView();
-  #showMoreButtonComponent = new ShowMoreButtonView();
+  #showMoreButtonComponent = null;
 
   #renderedMovieCardsQuantity = FILM_CARDS_QUANTITY_TO_SHOW_PER_STEP;
 
   #movieMainPresenters = new Map();
   #popupPresenter = null;
+  #navigationPresenter = null;
 
   #currentSortType = SortType.DEFAULT;
   #moviesModel = null;
@@ -60,6 +61,19 @@ export default class MoviesPresenter {
     this.#moviesModel.addObserver(this.#handleModelEvent);
   };
 
+  #getSortedMovies = (sortType = this.#currentSortType) => {
+    switch (sortType) {
+      case SortType.DATE:
+        return [...this.#moviesModel.movies].sort(sortMovieByDateDown);
+      case SortType.RATING:
+        return [...this.#moviesModel.movies].sort(sortMovieByRatingDown);
+      case SortType.COMMENTS:
+        return [...this.#moviesModel.movies].sort(sortMovieByCommentsQuantityDown);
+    }
+
+    return this.#moviesModel.movies;
+  };
+
   #renderBoard = () => {
     this.#renderNavigationComponent();
 
@@ -75,26 +89,9 @@ export default class MoviesPresenter {
     this.#renderFilmsListMostCommentedComponent();
   };
 
-  #destroyShowMoreButtonComponent = () => {
-    remove(this.#showMoreButtonComponent);
-  };
-
-  #getSortedMovies = (sortType = this.#currentSortType) => {
-    switch (sortType) {
-      case SortType.DATE:
-        return [...this.#moviesModel.movies].sort(sortMovieByDateDown);
-      case SortType.RATING:
-        return [...this.#moviesModel.movies].sort(sortMovieByRatingDown);
-      case SortType.COMMENTS:
-        return [...this.#moviesModel.movies].sort(sortMovieByCommentsQuantityDown);
-    }
-
-    return this.#moviesModel.movies;
-  };
-
   #renderNavigationComponent = () => {
-    const navigationPresenter = new NavigationPresenter(this.#contentContainerElement);
-    navigationPresenter.init(generateFilter(this.movies));
+    this.#navigationPresenter = new NavigationPresenter(this.#contentContainerElement);
+    this.#navigationPresenter.init(generateFilter(this.movies));
   };
 
   #renderFilmsListEmptyComponent = () => {
@@ -102,8 +99,10 @@ export default class MoviesPresenter {
   };
 
   #renderSortComponent = () => {
-    render(this.#sortComponent, this.#contentContainerElement);
+    this.#sortComponent = new SortView(this.#currentSortType);
     this.#sortComponent.setSortTypeChangeHandler(this.#sortTypeChangeHandler);
+
+    render(this.#sortComponent, this.#contentContainerElement);
   };
 
   #renderFilmsMainSectionComponent = () => {
@@ -132,7 +131,9 @@ export default class MoviesPresenter {
   };
 
   #renderShowMoreButtonComponent = () => {
+    this.#showMoreButtonComponent = new ShowMoreButtonView();
     this.#showMoreButtonComponent.setClickHandler(this.#showMoreButtonClickHandler);
+
     render(this.#showMoreButtonComponent, this.#filmsListAllUpcomingComponent.element);
   };
 
@@ -158,7 +159,17 @@ export default class MoviesPresenter {
     this.#renderFilmsComponent(this.#filmsListMostCommentedComponent, this.#filmsListContainerMostCommentedComponent, movies);
   };
 
-  #clearMovieList = () => {
+  #destroyShowMoreButtonComponent = () => {
+    remove(this.#showMoreButtonComponent);
+  };
+
+  #destroyNavigationComponent = () => {
+    this.#navigationPresenter.destroy();
+  };
+
+  #clearBoard = ({resetRenderedMovieCardsQuantity = false, resetSortType = false} = {}) => {
+    const moviesQuantity = this.movies.length;
+
     this.#movieMainPresenters.forEach((presenters) => {
       presenters.forEach((presenter) => {
         presenter.destroy();
@@ -166,6 +177,29 @@ export default class MoviesPresenter {
     });
     this.#movieMainPresenters.clear();
     this.#destroyShowMoreButtonComponent();
+
+    remove(this.#filmsListContainerMostCommentedComponent);
+    remove(this.#filmsListMostCommentedComponent);
+    remove(this.#filmsListContainerTopRatedComponent);
+    remove(this.#filmsListTopRatedComponent);
+    remove(this.#filmsListContainerAllComponent);
+    remove(this.#filmsListAllUpcomingComponent);
+
+    remove(this.#filmsListEmptyComponent);
+    remove(this.#sortComponent);
+    remove(this.#filmsMainSectionComponent);
+
+    this.#destroyNavigationComponent();
+
+    if (resetRenderedMovieCardsQuantity) {
+      this.#renderedMovieCardsQuantity = FILM_CARDS_QUANTITY_TO_SHOW_PER_STEP;
+    } else {
+      this.#renderedMovieCardsQuantity = Math.min(moviesQuantity, this.#renderedMovieCardsQuantity);
+    }
+
+    if (resetSortType) {
+      this.#currentSortType = SortType.DEFAULT;
+    }
   };
 
   #handleViewAction = (actionType, updateType, update) => {
@@ -204,11 +238,13 @@ export default class MoviesPresenter {
         break;
 
       case UpdateType.MINOR:
-        // - обновить список (например, когда задача ушла в архив)
+        this.#clearBoard();
+        this.#renderBoard();
         break;
 
       case UpdateType.MAJOR:
-        // - обновить всю доску (например, при переключении фильтра)
+        this.#clearBoard({resetRenderedMovieCardsQuantity: true, resetSortType: true});
+        this.#renderBoard();
         break;
       default:
         throw new Error(`Update type ${updateType} hasn't recognized.`);
@@ -229,10 +265,8 @@ export default class MoviesPresenter {
     }
 
     this.#currentSortType = sortType;
-    this.#clearMovieList();
-    this.#renderFilmsListAllUpcomingComponent();
-    this.#renderFilmsListTopRatedComponent();
-    this.#renderFilmsListMostCommentedComponent();
+    this.#clearBoard({resetRenderedMovieCardsQuantity: true});
+    this.#renderBoard();
   };
 
   #showMoreButtonClickHandler = () => {
