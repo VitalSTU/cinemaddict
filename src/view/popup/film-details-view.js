@@ -315,7 +315,7 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
           ...BLANK_COMMENT,
           comment,
           emotion,
-          id: nanoid() //TODO delete after connected to server
+          id: nanoid() //TODO replace nanoid() with null after application is connected to server
         };
 
         this.#clearExternalHandlers();

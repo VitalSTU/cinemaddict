@@ -118,7 +118,7 @@ export default class PopupPresenter {
   #watchlistClickHandler = () => {
     this.#changeData(
       UserAction.UPDATE_MOVIE,
-      UpdateType.PATCH,
+      UpdateType.MINOR,
       {
         ...this.#movie,
         userDetails: {
@@ -134,7 +134,7 @@ export default class PopupPresenter {
 
     this.#changeData(
       UserAction.UPDATE_MOVIE,
-      UpdateType.PATCH,
+      UpdateType.MINOR,
       {
         ...this.#movie,
         userDetails: {
@@ -149,7 +149,7 @@ export default class PopupPresenter {
   #favoriteClickHandler = () => {
     this.#changeData(
       UserAction.UPDATE_MOVIE,
-      UpdateType.PATCH,
+      UpdateType.MINOR,
       {
         ...this.#movie,
         userDetails: {

@@ -139,7 +139,7 @@ export default class MoviesPresenter {
 
   #renderFilmsListAllUpcomingComponent = () => {
     const moviesQuqntity = this.movies.length;
-    const movies = this.movies.slice(0, Math.min(moviesQuqntity, FILM_CARDS_QUANTITY_TO_SHOW_PER_STEP));
+    const movies = this.movies.slice(0, Math.min(moviesQuqntity, this.#renderedMovieCardsQuantity));
     this.#renderFilmsComponent(this.#filmsListAllUpcomingComponent, this.#filmsListContainerAllComponent, movies);
 
     if (moviesQuqntity > FILM_CARDS_QUANTITY_TO_SHOW_PER_STEP) {

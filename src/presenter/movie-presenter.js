@@ -83,7 +83,7 @@ export default class MoviePresenter {
   #watchlistClickHandler = () => {
     this.#changeData(
       UserAction.UPDATE_MOVIE,
-      UpdateType.PATCH,
+      UpdateType.MINOR,
       {
         ...this.#movie,
         userDetails: {
@@ -99,7 +99,7 @@ export default class MoviePresenter {
 
     this.#changeData(
       UserAction.UPDATE_MOVIE,
-      UpdateType.PATCH,
+      UpdateType.MINOR,
       {
         ...this.#movie,
         userDetails: {
@@ -114,7 +114,7 @@ export default class MoviePresenter {
   #favoriteClickHandler = () => {
     this.#changeData(
       UserAction.UPDATE_MOVIE,
-      UpdateType.PATCH,
+      UpdateType.MINOR,
       {
         ...this.#movie,
         userDetails: {
