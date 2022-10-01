@@ -2,6 +2,7 @@ import FilmCardView from '../view/content/film-card-view.js';
 
 import { render, remove, replace } from '../framework/render.js';
 import { getNow } from '../utils.js';
+import { UserAction, UpdateType } from '../const.js';
 
 export default class MoviePresenter {
   #movie = null;
@@ -10,50 +11,25 @@ export default class MoviePresenter {
   #parentElement = null;
 
   #popupPresenter = null;
+  #popupIsOpened = false;
 
   #changeData = null;
+  #handleMovieOpening = null;
 
-  constructor(popupPresenter, parentElement, changeData) {
+  constructor(popupPresenter, parentElement, changeData, handleMovieOpening) {
     this.#popupPresenter = popupPresenter;
     this.#parentElement = parentElement;
     this.#changeData = changeData;
+    this.#handleMovieOpening = handleMovieOpening;
   }
 
-  #initialiseData = (movie) => {
-    this.#movie = movie;
-  };
+  get popupIsOpened() {
+    return this.#popupIsOpened;
+  }
 
-  #renderNewPopupComponent = (movie) => {
-    this.#popupPresenter.init(movie);
-  };
-
-  #setEventHandlers = () => {
-    this.#movieComponent.setClickHandler( () => this.#onFilmCardClick(this.#movieComponent) );
-    this.#movieComponent.setWatchlistClickHandler(this.#onWatchlistClick);
-    this.#movieComponent.setHistoryClickHandler(this.#onHistoryClick);
-    this.#movieComponent.setFavoriteClickHandler(this.#onFavoriteClick);
-  };
-
-  #onFilmCardClick = ({movie}) => {
-    this.#renderNewPopupComponent(movie);
-  };
-
-  #onWatchlistClick = () => {
-    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails, watchlist: !this.#movie.userDetails.watchlist}});
-  };
-
-  #onHistoryClick = () => {
-    const alreadyWatched = this.#movie.userDetails.alreadyWatched;
-
-    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails,
-      alreadyWatched: !alreadyWatched,
-      watchingDate: alreadyWatched ? '' : getNow(),
-    }});
-  };
-
-  #onFavoriteClick = () => {
-    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails, favorite: !this.#movie.userDetails.favorite}});
-  };
+  set popupIsOpened(popupIsOpened) {
+    this.#popupIsOpened = popupIsOpened;
+  }
 
   init = (movie) => {
     this.#initialiseData(movie);
@@ -77,5 +53,75 @@ export default class MoviePresenter {
 
   destroy = () => {
     remove(this.#movieComponent);
+  };
+
+  #initialiseData = (movie) => {
+    this.#movie = movie;
+  };
+
+  #renderNewPopupComponent = (movie) => {
+    this.#popupPresenter.init(movie, null, this.#resetOpenedStatusFlag);
+    this.#handleMovieOpening();
+    this.#popupIsOpened = true;
+  };
+
+  #resetOpenedStatusFlag = () => {
+    this.#popupIsOpened = false;
+  };
+
+  #setEventHandlers = () => {
+    this.#movieComponent.setClickHandler( () => this.#filmCardClickHandler(this.#movieComponent) );
+    this.#movieComponent.setWatchlistClickHandler(this.#watchlistClickHandler);
+    this.#movieComponent.setHistoryClickHandler(this.#historyClickHandler);
+    this.#movieComponent.setFavoriteClickHandler(this.#favoriteClickHandler);
+  };
+
+  #filmCardClickHandler = ({movie}) => {
+    this.#renderNewPopupComponent(movie);
+  };
+
+  #watchlistClickHandler = () => {
+    this.#changeData(
+      UserAction.UPDATE_MOVIE,
+      UpdateType.MINOR,
+      {
+        ...this.#movie,
+        userDetails: {
+          ...this.#movie.userDetails,
+          watchlist: !this.#movie.userDetails.watchlist,
+        },
+      }
+    );
+  };
+
+  #historyClickHandler = () => {
+    const alreadyWatched = this.#movie.userDetails.alreadyWatched;
+
+    this.#changeData(
+      UserAction.UPDATE_MOVIE,
+      UpdateType.MINOR,
+      {
+        ...this.#movie,
+        userDetails: {
+          ...this.#movie.userDetails,
+          alreadyWatched: !alreadyWatched,
+          watchingDate: alreadyWatched ? '' : getNow(),
+        },
+      }
+    );
+  };
+
+  #favoriteClickHandler = () => {
+    this.#changeData(
+      UserAction.UPDATE_MOVIE,
+      UpdateType.MINOR,
+      {
+        ...this.#movie,
+        userDetails: {
+          ...this.#movie.userDetails,
+          favorite: !this.#movie.userDetails.favorite,
+        },
+      }
+    );
   };
 }

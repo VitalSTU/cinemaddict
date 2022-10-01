@@ -1,58 +1,78 @@
-import FilmDetailsMainContainerView from '../view/popup/film-details-main-container-view.js';
-import FilmDetailsTopContainerView from '../view/popup/film-details-top-container-view.js';
-import FilmDetailsCommentsContainerView from '../view/popup/film-details-comments-container-view.js';
+import FilmDetailsView from '../view/popup/film-details-view.js';
 
 import { render, remove } from '../framework/render.js';
-import { getCommentsByIds, getNow } from '../utils.js';
+import { getCommentsByIds, getNow, compareParameters } from '../utils.js';
+import { UserAction, UpdateType } from '../const.js';
 
 export default class PopupPresenter {
   #movie = null;
 
-  #popupMainContainerComponent = null;
-  #popupTopContainerComponent = null;
-  #commentsContainerComponent = null;
+  #popupComponent = null;
   #contentContainer = null;
 
   #commentsModel = null;
-  #comments = null;
 
   #changeData = null;
+  #resetOpenedStatusFlag = null;
+
+  #localData = {
+    localComment: {
+      comment: null,
+      emotion: null,
+    },
+    scrollTop: 0,
+  };
+
+  get comments() {
+    return this.#commentsModel.comments;
+  }
 
   constructor(changeData, commentsModel) {
     this.#changeData = changeData;
     this.#commentsModel = commentsModel;
   }
 
-  #initialiseData = (movie) => {
+  /**
+   * Popup presenter initialization function
+   *
+   * @param {*} movie           movie object
+   * @param {*} commentsModel   all comments collection
+   * @param {*} popupContainer  container to render popup in
+   * @returns {FilmDetailsView} Created popup component
+   * @memberof PopupPresenter
+   */
+  init = (movie, localData, resetOpenedStatusFlag) => {
+    this.#removeOldPopup();
+
+    this.#initialiseData(movie, localData, resetOpenedStatusFlag);
+
+    this.#setCloseBtnClickHandler();
+    this.#deactivateMainPageScrollbar();
+
+    this.#setChangeDataClickHandlers();
+    this.#renderPopupComponent();
+    this.#popupComponent.setScrollPosition();
+  };
+
+  #initialiseData = (movie, localData, resetOpenedStatusFlag) => {
     this.#movie = movie;
-    this.#comments = getCommentsByIds(this.#movie.comments, [...this.#commentsModel.comments]);
+    this.#localData = (localData) ? localData : this.#localData;
+    this.#resetOpenedStatusFlag = (resetOpenedStatusFlag) ? resetOpenedStatusFlag : this.#resetOpenedStatusFlag;
 
-    this.#popupMainContainerComponent = new FilmDetailsMainContainerView();
-    this.#contentContainer = this.#popupMainContainerComponent.popupContainerElement;
-    this.#popupTopContainerComponent = new FilmDetailsTopContainerView(this.#movie);
-    this.#commentsContainerComponent = new FilmDetailsCommentsContainerView(this.#comments);
+    this.#popupComponent = new FilmDetailsView(
+      this.#movie,
+      getCommentsByIds(this.#movie.comments, [...this.comments]),
+      this.#localData,
+      this.#updateLocalData
+    );
+    this.#contentContainer = this.#popupComponent.popupContainerElement;
   };
 
-  #onCloseButtonClick = () => {
-    this.#removePopupComponent();
-    this.#activateMainPageScrollbar();
-  };
-
-  #onWatchlistClick = () => {
-    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails, watchlist: !this.#movie.userDetails.watchlist}}, true);
-  };
-
-  #onHistoryClick = () => {
-    const alreadyWatched = this.#movie.userDetails.alreadyWatched;
-
-    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails,
-      alreadyWatched: !alreadyWatched,
-      watchingDate: alreadyWatched ? '' : getNow(),
-    }}, true);
-  };
-
-  #onFavoriteClick = () => {
-    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails, favorite: !this.#movie.userDetails.favorite}}, true);
+  #updateLocalData = (localData) => {
+    this.#localData = null;
+    if (localData) {
+      this.#localData = {...localData, localComment: {...localData.localComment}};
+    }
   };
 
   #activateMainPageScrollbar = () => {
@@ -64,59 +84,101 @@ export default class PopupPresenter {
   };
 
   #removePopupComponent = () => {
-    remove(this.#popupMainContainerComponent);
+    remove(this.#popupComponent);
   };
 
   #removeOldPopup = () => {
-    if (this.#popupMainContainerComponent) {
+    if (this.#popupComponent) {
       this.#removePopupComponent();
     }
   };
 
+  #renderPopupComponent = () => {
+    render(this.#popupComponent, this.#contentContainer);
+  };
+
   #setCloseBtnClickHandler = () => {
-    this.#popupTopContainerComponent.setCloseBtnClickHandler(this.#onCloseButtonClick);
+    this.#popupComponent.setCloseBtnClickHandler(this.#closeBtnClickHandler);
   };
 
   #setChangeDataClickHandlers = () => {
-    this.#popupTopContainerComponent.setWatchlistClickHandler(this.#onWatchlistClick);
-    this.#popupTopContainerComponent.setHistoryClickHandler(this.#onHistoryClick);
-    this.#popupTopContainerComponent.setFavoriteClickHandler(this.#onFavoriteClick);
+    this.#popupComponent.setWatchlistClickHandler(this.#watchlistClickHandler);
+    this.#popupComponent.setHistoryClickHandler(this.#historyClickHandler);
+    this.#popupComponent.setFavoriteClickHandler(this.#favoriteClickHandler);
+    this.#popupComponent.setDeleteButtonsClickHandler(this.#deleteButtonClickHandler);
+    this.#popupComponent.setAddCommentHandler(this.#addCommentHandler);
   };
 
-  #renderPopupMainContainerComponent = () => {
-    render(this.#popupMainContainerComponent, this.#contentContainer);
+  #closeBtnClickHandler = () => {
+    this.#resetOpenedStatusFlag();
+    this.#removePopupComponent();
+    this.#activateMainPageScrollbar();
   };
 
-  #renderMovieInfoComponent = () => {
-    render(this.#popupTopContainerComponent, this.#popupMainContainerComponent.element);
+  #watchlistClickHandler = () => {
+    this.#changeData(
+      UserAction.UPDATE_MOVIE,
+      UpdateType.MINOR,
+      {
+        ...this.#movie,
+        userDetails: {
+          ...this.#movie.userDetails,
+          watchlist: !this.#movie.userDetails.watchlist,
+        },
+      }
+    );
   };
 
-  #renderPopupCommentsContainerComponent = () => {
-    render(this.#commentsContainerComponent, this.#popupTopContainerComponent.element);
+  #historyClickHandler = () => {
+    const alreadyWatched = this.#movie.userDetails.alreadyWatched;
+
+    this.#changeData(
+      UserAction.UPDATE_MOVIE,
+      UpdateType.MINOR,
+      {
+        ...this.#movie,
+        userDetails: {
+          ...this.#movie.userDetails,
+          alreadyWatched: !alreadyWatched,
+          watchingDate: alreadyWatched ? '' : getNow(),
+        },
+      }
+    );
   };
 
-  /**
-   * Popup presenter initialization function
-   *
-   * @param {*} movie           movie object
-   * @param {*} commentsModel   all comments collection
-   * @param {*} popupContainer  container to render popup in
-   * @returns {FilmDetailsMainContainerView} Created popup component
-   * @memberof PopupPresenter
-   */
-  init = (movie) => {
-    this.#removeOldPopup();
+  #favoriteClickHandler = () => {
+    this.#changeData(
+      UserAction.UPDATE_MOVIE,
+      UpdateType.MINOR,
+      {
+        ...this.#movie,
+        userDetails: {
+          ...this.#movie.userDetails,
+          favorite: !this.#movie.userDetails.favorite,
+        },
+      }
+    );
+  };
 
-    this.#initialiseData(movie);
+  #deleteButtonClickHandler = (commentId) => {
+    this.#changeData(
+      UserAction.DELETE_COMMENT,
+      UpdateType.PATCH,
+      {
+        movieToUpdate: this.#movie,
+        comment: this.comments.find((c) => compareParameters(c.id.toString(), commentId)),
+      }
+    );
+  };
 
-    this.#setCloseBtnClickHandler();
-    this.#deactivateMainPageScrollbar();
-
-    this.#setChangeDataClickHandlers();
-    this.#renderPopupMainContainerComponent();
-    this.#renderMovieInfoComponent();
-    this.#renderPopupCommentsContainerComponent();
-
-    return this.#popupMainContainerComponent;
+  #addCommentHandler = (comment) => {
+    this.#changeData(
+      UserAction.ADD_COMMENT,
+      UpdateType.PATCH,
+      {
+        movieToUpdate: this.#movie,
+        comment,
+      }
+    );
   };
 }
