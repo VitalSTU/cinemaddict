@@ -11,9 +11,10 @@ import NavigationPresenter from './navigation-presenter.js';
 import MoviePresenter from './movie-presenter.js';
 import PopupPresenter from './popup-presenter.js';
 
+import FilterModel from '../model/filter-model.js';
+
 import { FILM_CARDS_QUANTITY_TO_SHOW_PER_STEP, MovieFilterType, SortType, UpdateType, UserAction } from '../const.js';
 import { render, remove } from '../framework/render.js';
-import { generateFilter } from '../mock/filter.js';
 import { sortMovieByDateDown, sortMovieByRatingDown, sortMovieByCommentsQuantityDown } from '../utils.js';
 
 const FILM_EXTRA_TEST_CARDS_QUANTITY = 2;
@@ -90,8 +91,9 @@ export default class MoviesPresenter {
   };
 
   #renderNavigationComponent = () => {
-    this.#navigationPresenter = new NavigationPresenter(this.#contentContainerElement);
-    this.#navigationPresenter.init(generateFilter(this.movies));
+    const filterModel = new FilterModel();
+    this.#navigationPresenter = new NavigationPresenter(this.#contentContainerElement, filterModel, this.#moviesModel);
+    this.#navigationPresenter.init();
   };
 
   #renderFilmsListEmptyComponent = () => {
