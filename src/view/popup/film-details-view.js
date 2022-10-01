@@ -1,3 +1,4 @@
+import he from 'he';
 import * as viewUtils from '../view-utils.js';
 import * as mainUtils from '../../utils.js';
 import AbstractStatefulView from '../../framework/view/abstract-stateful-view';
@@ -79,7 +80,7 @@ const createFilmDetailsCommentTemplate = ({id, author, comment, date, emotion}) 
               <img src="${viewUtils.getEmojieUri(emotion)}" width="55" height="55" alt="emoji-${emotion}">
             </span>
             <div>
-              <p class="film-details__comment-text">${comment}</p>
+              <p class="film-details__comment-text">${he.encode(comment)}</p>
               <p class="film-details__comment-info">
                 <span class="film-details__comment-author">${author}</span>
                 <span class="film-details__comment-day">${viewUtils.getCommentFullTDateTime(date)}</span>
