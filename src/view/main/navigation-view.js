@@ -32,11 +32,11 @@ export default class NavigationView extends AbstractView {
 
   setFilterTypeChangeHandler = (callback) => {
     this._callback.filterTypeChange = callback;
-    this.element.addEventListener('change', this.#filterTypeChangeHandler);
+    this.element.addEventListener('click', this.#filterTypeChangeHandler);
   };
 
   #filterTypeChangeHandler = (evt) => {
     evt.preventDefault();
-    this._callback.filterTypeChange(evt.target.value);
+    this._callback.filterTypeChange(evt.target.getAttribute('value'));
   };
 }

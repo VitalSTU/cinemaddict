@@ -15,7 +15,7 @@ import FilterModel from '../model/filter-model.js';
 
 import { FILM_CARDS_QUANTITY_TO_SHOW_PER_STEP, MovieFilterType, SortType, UpdateType, UserAction } from '../const.js';
 import { render, remove } from '../framework/render.js';
-import { sortMovieByDateDown, sortMovieByRatingDown, sortMovieByCommentsQuantityDown } from '../utils.js';
+import { sortMovieByDateDown, sortMovieByRatingDown, sortMovieByCommentsQuantityDown, filter } from '../utils.js';
 
 const FILM_EXTRA_TEST_CARDS_QUANTITY = 2;
 
@@ -40,6 +40,7 @@ export default class MoviesPresenter {
   #navigationPresenter = null;
 
   #currentSortType = SortType.DEFAULT;
+  #filterModel = new FilterModel();
   #moviesModel = null;
   #commentsModel = null;
 
@@ -60,19 +61,24 @@ export default class MoviesPresenter {
     this.#popupPresenter = new PopupPresenter(this.#handleViewAction, this.#commentsModel);
 
     this.#moviesModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
   };
 
-  #getSortedMovies = (sortType = this.#currentSortType) => {
+  #getSortedMovies = (sortType = this.#currentSortType, extraList = false) => {
+    const filterType = this.#filterModel.filter;
+    const movies = this.#moviesModel.movies;
+    const filteredMovies = extraList ? movies : filter[filterType](movies);
+
     switch (sortType) {
       case SortType.DATE:
-        return [...this.#moviesModel.movies].sort(sortMovieByDateDown);
+        return [...filteredMovies].sort(sortMovieByDateDown);
       case SortType.RATING:
-        return [...this.#moviesModel.movies].sort(sortMovieByRatingDown);
+        return [...filteredMovies].sort(sortMovieByRatingDown);
       case SortType.COMMENTS:
-        return [...this.#moviesModel.movies].sort(sortMovieByCommentsQuantityDown);
+        return [...filteredMovies].sort(sortMovieByCommentsQuantityDown);
     }
 
-    return this.#moviesModel.movies;
+    return filteredMovies;
   };
 
   #renderBoard = () => {
@@ -91,8 +97,7 @@ export default class MoviesPresenter {
   };
 
   #renderNavigationComponent = () => {
-    const filterModel = new FilterModel();
-    this.#navigationPresenter = new NavigationPresenter(this.#contentContainerElement, filterModel, this.#moviesModel);
+    this.#navigationPresenter = new NavigationPresenter(this.#contentContainerElement, this.#filterModel, this.#moviesModel);
     this.#navigationPresenter.init();
   };
 
@@ -150,14 +155,14 @@ export default class MoviesPresenter {
   };
 
   #renderFilmsListTopRatedComponent = () => {
-    const moviesQuqntity = this.movies.length;
-    const movies = this.#getSortedMovies(SortType.RATING).slice(0, Math.min(moviesQuqntity, FILM_EXTRA_TEST_CARDS_QUANTITY));
+    const moviesQuqntity = this.#moviesModel.movies.length;
+    const movies = this.#getSortedMovies(SortType.RATING, true).slice(0, Math.min(moviesQuqntity, FILM_EXTRA_TEST_CARDS_QUANTITY));
     this.#renderFilmsComponent(this.#filmsListTopRatedComponent, this.#filmsListContainerTopRatedComponent, movies);
   };
 
   #renderFilmsListMostCommentedComponent = () => {
-    const moviesQuqntity = this.movies.length;
-    const movies = this.#getSortedMovies(SortType.COMMENTS).slice(0, Math.min(moviesQuqntity, FILM_EXTRA_TEST_CARDS_QUANTITY));
+    const moviesQuqntity = this.#moviesModel.movies.length;
+    const movies = this.#getSortedMovies(SortType.COMMENTS, true).slice(0, Math.min(moviesQuqntity, FILM_EXTRA_TEST_CARDS_QUANTITY));
     this.#renderFilmsComponent(this.#filmsListMostCommentedComponent, this.#filmsListContainerMostCommentedComponent, movies);
   };
 
