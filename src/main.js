@@ -5,6 +5,7 @@ import MoviesPresenter from './presenter/movies-presenter.js';
 
 import MoviesModel from './model/movies-model.js';
 import CommentsModel from './model/comments-model.js';
+import FilterModel from './model/filter-model.js';
 
 import { render } from './framework/render.js';
 
@@ -14,6 +15,8 @@ const siteFooterElement = document.querySelector('.footer');
 
 const moviesModel = new MoviesModel();
 const commentsModel = new CommentsModel();
+const filterModel = new FilterModel();
+
 const moviesPresenter = new MoviesPresenter();
 
 render(new UserProfileView(), siteHeaderElement);
