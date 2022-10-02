@@ -18,7 +18,7 @@ export default class CommentsApiService extends ApiService {
       url: `comments/${movie.id}`,
       method: Method.POST,
       headers: new Headers({'Content-Type': 'application/json'}),
-      body: JSON.stringify(localConmment),
+      body: JSON.stringify(this.#adaptToServer(localConmment)),
     });
 
     const parsedResponse = await ApiService.parseResponse(response);
@@ -35,5 +35,17 @@ export default class CommentsApiService extends ApiService {
     const parsedResponse = await ApiService.parseResponse(response);
 
     return parsedResponse;
+  };
+
+  #adaptToServer = (localConmment) => {
+    const adaptedComment = {
+      ...localConmment,
+    };
+
+    delete adaptedComment.id;
+    delete adaptedComment.author;
+    delete adaptedComment.date;
+
+    return adaptedComment;
   };
 }
