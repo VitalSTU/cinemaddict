@@ -1,6 +1,7 @@
 import FilmDetailsView from '../view/popup/film-details-view.js';
 
-import CommentsModel from '../model/comments-model.js';//TODO new
+import CommentsModel from '../model/comments-model.js';
+import CommentsApiService from '../api/comments-api-service.js';
 
 import { render, remove } from '../framework/render.js';
 import { getCommentsByIds, getNow, compareParameters } from '../utils.js';
