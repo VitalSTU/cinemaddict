@@ -1,8 +1,10 @@
 import FilmDetailsView from '../view/popup/film-details-view.js';
 
+import CommentsModel from '../model/comments-model.js';//TODO new
+
 import { render, remove } from '../framework/render.js';
 import { getCommentsByIds, getNow, compareParameters } from '../utils.js';
-import { UserAction, UpdateType } from '../const.js';
+import { AUTHORIZATION, END_POINT, UserAction, UpdateType } from '../const.js';
 
 export default class PopupPresenter {
   #movie = null;
@@ -27,9 +29,9 @@ export default class PopupPresenter {
     return this.#commentsModel.comments;
   }
 
-  constructor(changeData, commentsModel) {
+  constructor(changeData/*, commentsModel*/) {//TODO delete commentsModel
     this.#changeData = changeData;
-    this.#commentsModel = commentsModel;
+    // this.#commentsModel = commentsModel;//TODO delete
   }
 
   /**
@@ -42,6 +44,8 @@ export default class PopupPresenter {
    * @memberof PopupPresenter
    */
   init = (movie, localData, resetOpenedStatusFlag) => {
+    this.#commentsModel = new CommentsModel(new CommentsApiService(END_POINT, AUTHORIZATION), movie);
+
     this.#removeOldPopup();
 
     this.#initialiseData(movie, localData, resetOpenedStatusFlag);
@@ -52,6 +56,14 @@ export default class PopupPresenter {
     this.#setChangeDataClickHandlers();
     this.#renderPopupComponent();
     this.#popupComponent.setScrollPosition();
+  };
+
+  addComment = (updateType, update) => {
+    this.#commentsModel.addComment(updateType, update);
+  };
+
+  deleteComment = (updateType, update) => {
+    this.#commentsModel.deleteComment(updateType, update);
   };
 
   #initialiseData = (movie, localData, resetOpenedStatusFlag) => {

@@ -4,11 +4,18 @@ import { compareParameters } from '../utils.js';
 import AbstractCommentsObservable from './abstract-comments-observable.js';
 
 export default class CommentsModel extends AbstractCommentsObservable {
-  #comments = Array.from({length: COMMENT_TEST_CARDS_QUANTITY}, generateComment);
+  #commentsApiService = null;
+  #comments = Array.from({length: COMMENT_TEST_CARDS_QUANTITY}, generateComment);//TODO #comments = null;
 
-  constructor() {
+  constructor(commentsApiService, movie) {
     super();
-    for (let i = 0; i < this.#comments.length; i++) {
+    this.#commentsApiService = commentsApiService;
+
+    this.#commentsApiService.getComments(movie).then((comments) => {
+      console.log(comments);
+    });
+
+    for (let i = 0; i < this.#comments.length; i++) {//TODO delete
       this.#comments[i].id = i;
     }
   }

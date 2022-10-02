@@ -43,23 +43,23 @@ export default class MoviesPresenter {
   #movieFilterType = MovieFilterType.ALL;
   #filterModel = new FilterModel();
   #moviesModel = null;
-  #commentsModel = null;
+  // #commentsModel = null;//TODO delete
 
   get movies() {
     return this.#getSortedMovies(this.#currentSortType);
   }
 
-  init = (contentContainer, moviesModel, commentsModel) => {
-    this.#initialiseData(contentContainer, moviesModel, commentsModel);
+  init = (contentContainer, moviesModel/*, commentsModel*/) => {//TODO delete commentsModel
+    this.#initialiseData(contentContainer, moviesModel/*, commentsModel*/);//TODO delete commentsModel
     this.#renderBoard();
   };
 
-  #initialiseData = (contentContainer, moviesModel, commentsModel) => {
+  #initialiseData = (contentContainer, moviesModel/*, commentsModel*/) => {//TODO delete commentsModel
     this.#contentContainerElement = contentContainer;
     this.#contentContainerElement.innerHTML = '';
     this.#moviesModel = moviesModel;
-    this.#commentsModel = commentsModel;
-    this.#popupPresenter = new PopupPresenter(this.#handleViewAction, this.#commentsModel);
+    // this.#commentsModel = commentsModel;//TODO delete
+    this.#popupPresenter = new PopupPresenter(this.#handleViewAction/*, this.#commentsModel*/);//TODO delete this.#commentsModel
 
     this.#moviesModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
@@ -222,12 +222,14 @@ export default class MoviesPresenter {
         break;
 
       case UserAction.ADD_COMMENT:
-        this.#commentsModel.addComment(updateType, update);
+        // this.#commentsModel.addComment(updateType, update);//TODO delete
+        this.#popupPresenter.addComment(updateType, update);
         this.#moviesModel.addComment(updateType, update);
         break;
 
       case UserAction.DELETE_COMMENT:
-        this.#commentsModel.deleteComment(updateType, update);
+        // this.#commentsModel.deleteComment(updateType, update);//TODO delete
+        this.#popupPresenter.deleteComment(updateType, update);
         this.#moviesModel.deleteComment(updateType, update);
         break;
 

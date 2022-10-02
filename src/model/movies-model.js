@@ -5,11 +5,18 @@ import AbstractCommentsObservable from './abstract-comments-observable.js';
 const FILM_TEST_CARDS_QUANTITY = 42;
 
 export default class MoviesModel extends AbstractCommentsObservable {
+  #moviesApiService = null;
   #movies = null;
 
-  constructor() {
+  constructor(moviesApiService) {
     super();
-    this.#movies = Array.from({length: FILM_TEST_CARDS_QUANTITY}, generateMovie);
+    this.#moviesApiService = moviesApiService;
+
+    this.#moviesApiService.movies.then((movies) => {
+      console.log(movies);
+    });
+
+    this.#movies = Array.from({length: FILM_TEST_CARDS_QUANTITY}, generateMovie);//TODO delete
   }
 
   get movies() {

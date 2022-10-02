@@ -5,6 +5,9 @@ export const MOVIE_CARD_ACTIVE = 'film-card__controls-item--active';
 export const MOVIE_DETAILS_ACTIVE = 'film-details__control-button--active';
 export const SORT_BUTTON_ACTIVE = 'sort__button--active';
 
+export const AUTHORIZATION = 'Basic hS2sfS4kolyshkin4wcl1sa2j';
+export const END_POINT = 'https://18.ecmascript.pages.academy/cinemaddict';
+
 export const BLANK_MOVIE = {
   id: null,
   comments: null,
