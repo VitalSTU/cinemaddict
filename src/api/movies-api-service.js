@@ -33,7 +33,6 @@ export default class MoviesApiService extends ApiService {
         'alternative_title': movie.filmInfo.alternativeTitle,
         'release': {
           ...movie.filmInfo.release,
-          // 'date': movie.filmInfo.release.date instanceof Date ? movie.filmInfo.release.date.toISOString() : null,
           'release_country': movie.filmInfo.release.releaseCountry,
         },
         'total_rating': movie.filmInfo.totalRating,
@@ -41,8 +40,7 @@ export default class MoviesApiService extends ApiService {
       'user_details': {
         ...movie.userDetails,
         'already_watched': movie.userDetails.alreadyWatched,
-        // 'watching_date': movie.userDetails.watchingDate instanceof Date ? movie.userDetails.watchingDate.toISOString() : null,
-        'watching_date': movie.userDetails.watchingDate,
+        'watching_date': movie.userDetails.watchingDate instanceof Date ? movie.userDetails.watchingDate.toISOString() : null,
       },
     };
 

@@ -31,7 +31,7 @@ export default class MoviesModel extends AbstractCommentsObservable {
     this._notify(UpdateType.INIT);
   };
 
-  updateMovie = (updateType, update) => {
+  updateMovie = async (updateType, update) => {
     this._checkParameter(updateType, 'updateType');
     this._checkParameter(update, 'update');
 
@@ -40,13 +40,20 @@ export default class MoviesModel extends AbstractCommentsObservable {
       throw new Error(`Can't update. Movie ${update} not found.`);
     }
 
-    this.movies = [
-      ...this.movies.slice(0, index),
-      update,
-      ...this.movies.slice(index + 1),
-    ];
+    try {
+      const response = await this.#moviesApiService.updateMovie(update);
+      const updatedMovie = this.#adaptToClient(response);
 
-    this._notify(updateType, update);
+      this.movies = [
+        ...this.movies.slice(0, index),
+        updatedMovie,
+        ...this.movies.slice(index + 1),
+      ];
+
+      this._notify(updateType, updatedMovie);
+    } catch (error) {
+      throw new Error('Can\'t update movie');
+    }
   };
 
   addComment = (updateType, {movieToUpdate, comment}) => {
