@@ -49,6 +49,7 @@ export default class MoviesPresenter {
   #moviesModel = null;
 
   #isLoading = true;
+  #openedPopupMovieId = -1;
 
   constructor(siteFooterElement) {
     this.#siteFooterElement = siteFooterElement;
@@ -137,7 +138,8 @@ export default class MoviesPresenter {
   };
 
   #renderFilmCard = (movie, {element: parentElement}) => {
-    const moviePresenter = new MoviePresenter(this.#popupPresenter, parentElement, this.#handleViewAction, this.#movieOpeningHandler);
+    const moviePresenter = new MoviePresenter(this.#popupPresenter, parentElement,
+      this.#handleViewAction, this.#handlePopupOpening, this.#handlePopupClosing);
     const presenters = !(this.#movieMainPresenters.has(movie.id)) ? [] : this.#movieMainPresenters.get(movie.id);
 
     moviePresenter.init(movie);
@@ -233,7 +235,16 @@ export default class MoviesPresenter {
     }
   };
 
-  #handleViewAction = (actionType, updateType, update) => {
+  #handlePopupOpening = (movie) => {
+    this.#openedPopupMovieId = movie.id;
+  };
+
+  #handlePopupClosing = () => {
+    this.#openedPopupMovieId = -1;
+  };
+
+  #handleViewAction = async (actionType, updateType, update) => {
+    let parsedMovie = null;
 
     switch (actionType) {
       case UserAction.UPDATE_MOVIE:
@@ -241,13 +252,13 @@ export default class MoviesPresenter {
         break;
 
       case UserAction.ADD_COMMENT:
-        this.#popupPresenter.addComment(updateType, update);
-        this.#moviesModel.addComment(updateType, update);
+        parsedMovie = await this.#popupPresenter.addComment(updateType, update, this.#moviesModel.adaptToClient);
+        this.#moviesModel.updateMovie(updateType, parsedMovie);
         break;
 
       case UserAction.DELETE_COMMENT:
-        this.#popupPresenter.deleteComment(updateType, update);
-        this.#moviesModel.deleteComment(updateType, update);
+        await this.#popupPresenter.deleteComment(updateType, update.comment);
+        this.#moviesModel.updateMovie(updateType, update.movie);
         break;
 
       default:
@@ -259,25 +270,6 @@ export default class MoviesPresenter {
 
     switch (updateType) {
 
-      case UpdateType.PATCH:
-        this.#movieMainPresenters.get(data.id).forEach((presenter) => {
-          presenter.init(data);
-          if (presenter.popupIsOpened) {
-            this.#popupPresenter.init(data, null, null);
-          }
-        });
-        break;
-
-      case UpdateType.MINOR:
-        this.#clearBoard();
-        this.#renderBoard();
-        break;
-
-      case UpdateType.MAJOR:
-        this.#clearBoard({resetRenderedMovieCardsQuantity: true, resetSortType: true});
-        this.#renderBoard();
-        break;
-
       case UpdateType.INIT:
         this.#isLoading = false;
         remove(this.#loadingComponent);
@@ -285,17 +277,34 @@ export default class MoviesPresenter {
         render(new StatisticsView(this.#moviesModel.movies.length), this.#siteFooterElement);
         break;
 
+      case UpdateType.PATCH:
+        this.#movieMainPresenters.get(data.id).forEach((presenter) => {
+          presenter.init(data);
+          if (data.id === this.#openedPopupMovieId) {
+            presenter.initialisePopup();
+          }
+        });
+        break;
+
+      case UpdateType.MINOR:
+        this.#clearBoard();
+        this.#renderBoard();
+
+        this.#movieMainPresenters.get(data.id).forEach((presenter) => {
+          if (data.id === this.#openedPopupMovieId) {
+            presenter.initialisePopup();
+          }
+        });
+        break;
+
+      case UpdateType.MAJOR:
+        this.#clearBoard({resetRenderedMovieCardsQuantity: true, resetSortType: true});
+        this.#renderBoard();
+        break;
+
       default:
         throw new Error(`Update type ${updateType} hasn't recognized.`);
     }
-  };
-
-  #movieOpeningHandler = () => {
-    this.#movieMainPresenters.forEach((presenters) => {
-      presenters.forEach((presenter) => {
-        presenter.popupIsOpened = false;
-      });
-    });
   };
 
   #sortTypeChangeHandler = (sortType) => {

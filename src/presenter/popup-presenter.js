@@ -16,7 +16,7 @@ export default class PopupPresenter {
   #commentsModel = null;
 
   #changeData = null;
-  #resetOpenedStatusFlag = null;
+  #handlePopupClosing = null;
 
   #localData = {
     localComment: {
@@ -43,13 +43,13 @@ export default class PopupPresenter {
    * @returns {FilmDetailsView} Created popup component
    * @memberof PopupPresenter
    */
-  init = (movie, localData, resetOpenedStatusFlag) => {
+  init = (movie, localData, handlePopupClosing) => {
     this.#commentsModel = new CommentsModel(new CommentsApiService(END_POINT, AUTHORIZATION));
     this.#commentsModel.init(movie)
       .finally(() => {
         this.#removeOldPopup();
 
-        this.#initialiseData(movie, localData, resetOpenedStatusFlag);
+        this.#initialiseData(movie, localData, handlePopupClosing);
 
         this.#setCloseBtnClickHandler();
         this.#deactivateMainPageScrollbar();
@@ -60,18 +60,16 @@ export default class PopupPresenter {
       });
   };
 
-  addComment = (updateType, update) => {
-    this.#commentsModel.addComment(updateType, update);
+  addComment = async (updateType, update, adaptMovieToClient) => await this.#commentsModel.addComment(updateType, update, adaptMovieToClient);
+
+  deleteComment = async (updateType, update) => {
+    await this.#commentsModel.deleteComment(updateType, update);
   };
 
-  deleteComment = (updateType, update) => {
-    this.#commentsModel.deleteComment(updateType, update);
-  };
-
-  #initialiseData = (movie, localData, resetOpenedStatusFlag) => {
+  #initialiseData = (movie, localData, handlePopupClosing) => {
     this.#movie = movie;
     this.#localData = (localData) ? localData : this.#localData;
-    this.#resetOpenedStatusFlag = (resetOpenedStatusFlag) ? resetOpenedStatusFlag : this.#resetOpenedStatusFlag;
+    this.#handlePopupClosing = handlePopupClosing;
 
     this.#popupComponent = new FilmDetailsView(
       this.#movie,
@@ -124,9 +122,9 @@ export default class PopupPresenter {
   };
 
   #closeBtnClickHandler = () => {
-    this.#resetOpenedStatusFlag();
     this.#removePopupComponent();
     this.#activateMainPageScrollbar();
+    this.#handlePopupClosing();
   };
 
   #watchlistClickHandler = () => {
@@ -175,11 +173,18 @@ export default class PopupPresenter {
   };
 
   #deleteButtonClickHandler = (commentId) => {
+    const index = this.#movie.comments.findIndex((id) => id === commentId);
     this.#changeData(
       UserAction.DELETE_COMMENT,
       UpdateType.PATCH,
       {
-        movieToUpdate: this.#movie,
+        movie: {
+          ...this.#movie,
+          comments: [
+            ...this.#movie.comments.slice(0, index),
+            ...this.#movie.comments.slice(index + 1),
+          ],
+        },
         comment: this.comments.find((c) => compareParameters(c.id.toString(), commentId)),
       }
     );
@@ -190,7 +195,7 @@ export default class PopupPresenter {
       UserAction.ADD_COMMENT,
       UpdateType.PATCH,
       {
-        movieToUpdate: this.#movie,
+        movie: this.#movie,
         comment,
       }
     );

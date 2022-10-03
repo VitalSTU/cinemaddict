@@ -12,7 +12,7 @@ export default class CommentsApiService extends ApiService {
     ._load({url: `comments/${movie.id}`})
     .then(ApiService.parseResponse);
 
-  postComment = async (movie, localConmment) => {
+  addComment = async (movie, localConmment) => {
     const response = await this._load({
       url: `comments/${movie.id}`,
       method: Method.POST,
@@ -20,9 +20,7 @@ export default class CommentsApiService extends ApiService {
       body: JSON.stringify(this.#adaptToServer(localConmment)),
     });
 
-    const parsedResponse = await ApiService.parseResponse(response);
-
-    return parsedResponse;
+    return await ApiService.parseResponse(response);
   };
 
   deleteComment = async (conmment) => {
@@ -31,9 +29,7 @@ export default class CommentsApiService extends ApiService {
       method: Method.DELETE,
     });
 
-    const parsedResponse = await ApiService.parseResponse(response);
-
-    return parsedResponse;
+    return response;
   };
 
   #adaptToServer = (localConmment) => {

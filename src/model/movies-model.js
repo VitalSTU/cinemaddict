@@ -1,7 +1,5 @@
 import AbstractCommentsObservable from './abstract-comments-observable.js';
-
 import { UpdateType } from '../const.js';
-import { compareParameters } from '../utils.js';
 
 export default class MoviesModel extends AbstractCommentsObservable {
   #moviesApiService = null;
@@ -23,7 +21,7 @@ export default class MoviesModel extends AbstractCommentsObservable {
   init = async () => {
     try {
       const movies = await this.#moviesApiService.movies;
-      this.#movies = movies.map(this.#adaptToClient);
+      this.#movies = movies.map(this.adaptToClient);
     } catch(err) {
       this.#movies = [];
     }
@@ -33,16 +31,16 @@ export default class MoviesModel extends AbstractCommentsObservable {
 
   updateMovie = async (updateType, update) => {
     this._checkParameter(updateType, 'updateType');
-    this._checkParameter(update, 'update');
+    this._checkParameter(update, 'movie');
 
-    const index = this.movies.findIndex((m) => compareParameters(m.id, update.id));
+    const index = this.movies.findIndex((m) => m.id === update.id);
     if (index < 0) {
-      throw new Error(`Can't update. Movie ${update} not found.`);
+      throw new Error(`Can't update. Movie ${update.toString()} not found.`);
     }
 
     try {
       const response = await this.#moviesApiService.updateMovie(update);
-      const updatedMovie = this.#adaptToClient(response);
+      const updatedMovie = this.adaptToClient(response);
 
       this.movies = [
         ...this.movies.slice(0, index),
@@ -51,60 +49,13 @@ export default class MoviesModel extends AbstractCommentsObservable {
       ];
 
       this._notify(updateType, updatedMovie);
+
     } catch (error) {
       throw new Error('Can\'t update movie');
     }
   };
 
-  addComment = (updateType, {movieToUpdate, comment}) => {
-    this._checkParameter(updateType, 'updateType');
-    this._checkParameter(movieToUpdate, 'movie');
-    this._checkParameter(comment, 'comment');
-
-    const commentId = comment.id;
-    const movieId = movieToUpdate.id;
-    const movieIndex = this.movies.findIndex((m) => compareParameters(m.id, movieId));
-    if (movieIndex < 0) {
-      throw new Error(`Movie ${movieToUpdate} not found.`);
-    }
-
-    const movie = this.movies[movieIndex];
-    const update = {
-      ...movie,
-      comments: [...movie.comments, commentId],
-    };
-
-    this.updateMovie(updateType, update);
-  };
-
-  deleteComment = (updateType, {movieToUpdate, comment}) => {
-    this._checkParameter(updateType, 'updateType');
-    this._checkParameter(movieToUpdate, 'movie');
-    this._checkParameter(comment, 'comment');
-
-    const commentId = comment.id;
-    const movieIndex = this.movies.findIndex((m) => compareParameters(m.id, movieToUpdate.id));
-    if (movieIndex < 0) {
-      throw new Error(`Movie ${movieToUpdate} not found.`);
-    }
-
-    const movie = this.movies[movieIndex];
-    const commentIndex = movie.comments.findIndex((id) => compareParameters(id, commentId));
-    if (commentIndex < 0) {
-      throw new Error(`Comment with id ${commentId} not found in movie ${movieToUpdate}.`);
-    }
-
-    const update = {
-      ...movie, comments: [
-        ...movie.comments.slice(0, commentIndex),
-        ...movie.comments.slice(commentIndex + 1),
-      ],
-    };
-
-    this.updateMovie(updateType, update);
-  };
-
-  #adaptToClient = (movie) => {
+  adaptToClient = (movie) => {
     const adaptedMovie = {...movie,
       filmInfo: {
         ...movie['film_info'],
