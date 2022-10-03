@@ -1,5 +1,7 @@
-import { compareParameters } from '../utils.js';
 import AbstractCommentsObservable from './abstract-comments-observable.js';
+
+import { UpdateType } from '../const.js';
+import { compareParameters } from '../utils.js';
 
 export default class MoviesModel extends AbstractCommentsObservable {
   #moviesApiService = null;
@@ -25,6 +27,8 @@ export default class MoviesModel extends AbstractCommentsObservable {
     } catch(err) {
       this.#movies = [];
     }
+
+    this._notify(UpdateType.INIT);
   };
 
   updateMovie = (updateType, update) => {

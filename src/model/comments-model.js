@@ -1,5 +1,7 @@
-import { compareParameters } from '../utils.js';
 import AbstractCommentsObservable from './abstract-comments-observable.js';
+
+import { UpdateType } from '../const.js';
+import { compareParameters } from '../utils.js';
 
 export default class CommentsModel extends AbstractCommentsObservable {
   #commentsApiService = null;
@@ -25,6 +27,8 @@ export default class CommentsModel extends AbstractCommentsObservable {
     } catch(err) {
       this.#comments = [];
     }
+
+    this._notify(UpdateType.INIT);
   };
 
   addComment = (updateType, {comment: update}) => {
