@@ -6,6 +6,8 @@ import FilmsListMostCommentedView from '../view/content/films-list-most-commente
 import FilmsListContainerView from '../view/content/films-list-container-view.js';
 import SortView from '../view/main/sort-view.js';
 import ShowMoreButtonView from '../view/content/show-more-button-view.js';
+import FilmsListLoadingView from '../view/content/films-list-loading-view.js';
+import StatisticsView from '../view/footer/statistics-view.js';
 
 import NavigationPresenter from './navigation-presenter.js';
 import MoviePresenter from './movie-presenter.js';
@@ -14,13 +16,14 @@ import PopupPresenter from './popup-presenter.js';
 import FilterModel from '../model/filter-model.js';
 
 import { FILM_CARDS_QUANTITY_TO_SHOW_PER_STEP, MovieFilterType, SortType, UpdateType, UserAction } from '../const.js';
-import { render, remove } from '../framework/render.js';
+import { render, RenderPosition, remove } from '../framework/render.js';
 import { sortMovieByDateDown, sortMovieByRatingDown, sortMovieByCommentsQuantityDown, filter } from '../utils.js';
 
 const FILM_EXTRA_TEST_CARDS_QUANTITY = 2;
 
 export default class MoviesPresenter {
   #contentContainerElement = null;
+  #siteFooterElement = null;
 
   #sortComponent = null;
   #filmsMainSectionComponent = new FilmsMainSectionView();
@@ -32,6 +35,7 @@ export default class MoviesPresenter {
   #filmsListMostCommentedComponent = new FilmsListMostCommentedView();
   #filmsListContainerMostCommentedComponent = new FilmsListContainerView();
   #showMoreButtonComponent = null;
+  #loadingComponent = new FilmsListLoadingView();
 
   #renderedMovieCardsQuantity = FILM_CARDS_QUANTITY_TO_SHOW_PER_STEP;
 
@@ -43,23 +47,27 @@ export default class MoviesPresenter {
   #movieFilterType = MovieFilterType.ALL;
   #filterModel = new FilterModel();
   #moviesModel = null;
-  // #commentsModel = null;//TODO delete
+
+  #isLoading = true;
+
+  constructor(siteFooterElement) {
+    this.#siteFooterElement = siteFooterElement;
+  }
 
   get movies() {
     return this.#getSortedMovies(this.#currentSortType);
   }
 
-  init = (contentContainer, moviesModel/*, commentsModel*/) => {//TODO delete commentsModel
-    this.#initialiseData(contentContainer, moviesModel/*, commentsModel*/);//TODO delete commentsModel
+  init = (contentContainer, moviesModel) => {
+    this.#initialiseData(contentContainer, moviesModel);
     this.#renderBoard();
   };
 
-  #initialiseData = (contentContainer, moviesModel/*, commentsModel*/) => {//TODO delete commentsModel
+  #initialiseData = (contentContainer, moviesModel) => {
     this.#contentContainerElement = contentContainer;
     this.#contentContainerElement.innerHTML = '';
     this.#moviesModel = moviesModel;
-    // this.#commentsModel = commentsModel;//TODO delete
-    this.#popupPresenter = new PopupPresenter(this.#handleViewAction/*, this.#commentsModel*/);//TODO delete this.#commentsModel
+    this.#popupPresenter = new PopupPresenter(this.#handleViewAction);
 
     this.#moviesModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
@@ -83,6 +91,12 @@ export default class MoviesPresenter {
   };
 
   #renderBoard = () => {
+
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
+
     this.#renderNavigationComponent();
 
     if (this.movies.length < 1) {
@@ -100,6 +114,10 @@ export default class MoviesPresenter {
   #renderNavigationComponent = () => {
     this.#navigationPresenter = new NavigationPresenter(this.#contentContainerElement, this.#filterModel, this.#moviesModel);
     this.#navigationPresenter.init();
+  };
+
+  #renderLoading = () => {
+    render(this.#loadingComponent, this.#contentContainerElement, RenderPosition.AFTERBEGIN);
   };
 
   #renderFilmsListEmptyComponent = () => {
@@ -199,6 +217,7 @@ export default class MoviesPresenter {
     }
 
     remove(this.#sortComponent);
+    remove(this.#loadingComponent);
     remove(this.#filmsMainSectionComponent);
 
     this.#destroyNavigationComponent();
@@ -222,13 +241,11 @@ export default class MoviesPresenter {
         break;
 
       case UserAction.ADD_COMMENT:
-        // this.#commentsModel.addComment(updateType, update);//TODO delete
         this.#popupPresenter.addComment(updateType, update);
         this.#moviesModel.addComment(updateType, update);
         break;
 
       case UserAction.DELETE_COMMENT:
-        // this.#commentsModel.deleteComment(updateType, update);//TODO delete
         this.#popupPresenter.deleteComment(updateType, update);
         this.#moviesModel.deleteComment(updateType, update);
         break;
@@ -260,6 +277,14 @@ export default class MoviesPresenter {
         this.#clearBoard({resetRenderedMovieCardsQuantity: true, resetSortType: true});
         this.#renderBoard();
         break;
+
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        this.#renderBoard();
+        render(new StatisticsView(this.#moviesModel.movies.length), this.#siteFooterElement);
+        break;
+
       default:
         throw new Error(`Update type ${updateType} hasn't recognized.`);
     }

@@ -30,9 +30,8 @@ export default class PopupPresenter {
     return this.#commentsModel.comments;
   }
 
-  constructor(changeData/*, commentsModel*/) {//TODO delete commentsModel
+  constructor(changeData) {
     this.#changeData = changeData;
-    // this.#commentsModel = commentsModel;//TODO delete
   }
 
   /**
@@ -44,9 +43,9 @@ export default class PopupPresenter {
    * @returns {FilmDetailsView} Created popup component
    * @memberof PopupPresenter
    */
-  init = (movie, localData, resetOpenedStatusFlag) => {
+  init = async (movie, localData, resetOpenedStatusFlag) => {
     this.#commentsModel = new CommentsModel(new CommentsApiService(END_POINT, AUTHORIZATION));
-    this.#commentsModel.init(movie);
+    await this.#commentsModel.init(movie);
 
     this.#removeOldPopup();
 

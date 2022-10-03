@@ -105,7 +105,6 @@ export default class MoviesModel extends AbstractCommentsObservable {
         alternativeTitle: movie['film_info']['alternative_title'],
         release: {
           ...movie['film_info']['release'],
-          // date: movie['film_info']['release']['date'] !== null ? new Date(movie['film_info']['release']['date']) : movie['film_info']['release']['date'],
           releaseCountry: movie['film_info']['release']['release_country'],
         },
         totalRating: movie['film_info']['total_rating'],
@@ -113,7 +112,6 @@ export default class MoviesModel extends AbstractCommentsObservable {
       userDetails: {
         ...movie['user_details'],
         alreadyWatched: movie['user_details']['already_watched'],
-        // watchingDate: movie['user_details']['watching_date'] !== null ? new Date(movie['user_details']['watching_date']) : movie['user_details']['watching_date'],
         watchingDate: movie['user_details']['watching_date'],
       },
     };

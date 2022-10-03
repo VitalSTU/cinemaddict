@@ -3,7 +3,6 @@ import * as viewUtils from '../view-utils.js';
 import * as mainUtils from '../../utils.js';
 import AbstractStatefulView from '../../framework/view/abstract-stateful-view';
 import { BLANK_MOVIE, BLANK_COMMENT, BLANK_LOCAL_DATA } from '../../const.js';
-import { nanoid } from 'nanoid';
 
 const createFilmDetailsTopContainerTemplate = ({filmInfo: movie, userDetails}) => `
     <div class="film-details__inner">
@@ -307,7 +306,7 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
 
       const emotionElement = this.addEmojiContainer.querySelector('img');
       if (!emotionElement) {
-        this.shake();
+        this.shake.apply({element: this.commentInput.closest('.film-details__new-comment')});
 
       } else {
         const comment = evt.target.value.trim();
@@ -316,7 +315,7 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
           ...BLANK_COMMENT,
           comment,
           emotion,
-          id: nanoid() //TODO replace nanoid() with null after application is connected to server
+          id: null,
         };
 
         this.#clearExternalHandlers();
