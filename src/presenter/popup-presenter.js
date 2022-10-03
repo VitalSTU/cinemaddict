@@ -43,20 +43,21 @@ export default class PopupPresenter {
    * @returns {FilmDetailsView} Created popup component
    * @memberof PopupPresenter
    */
-  init = async (movie, localData, resetOpenedStatusFlag) => {
+  init = (movie, localData, resetOpenedStatusFlag) => {
     this.#commentsModel = new CommentsModel(new CommentsApiService(END_POINT, AUTHORIZATION));
-    await this.#commentsModel.init(movie);
+    this.#commentsModel.init(movie)
+      .finally(() => {
+        this.#removeOldPopup();
 
-    this.#removeOldPopup();
+        this.#initialiseData(movie, localData, resetOpenedStatusFlag);
 
-    this.#initialiseData(movie, localData, resetOpenedStatusFlag);
+        this.#setCloseBtnClickHandler();
+        this.#deactivateMainPageScrollbar();
 
-    this.#setCloseBtnClickHandler();
-    this.#deactivateMainPageScrollbar();
-
-    this.#setChangeDataClickHandlers();
-    this.#renderPopupComponent();
-    this.#popupComponent.setScrollPosition();
+        this.#setChangeDataClickHandlers();
+        this.#renderPopupComponent();
+        this.#popupComponent.setScrollPosition();
+      });
   };
 
   addComment = (updateType, update) => {
