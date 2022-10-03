@@ -1,15 +1,15 @@
-import { generateMovie } from '../mock/movie.js';
-import { compareParameters } from '../utils.js';
 import AbstractCommentsObservable from './abstract-comments-observable.js';
 
-const FILM_TEST_CARDS_QUANTITY = 42;
+import { UpdateType } from '../const.js';
+import { compareParameters } from '../utils.js';
 
 export default class MoviesModel extends AbstractCommentsObservable {
-  #movies = null;
+  #moviesApiService = null;
+  #movies = [];
 
-  constructor() {
+  constructor(moviesApiService) {
     super();
-    this.#movies = Array.from({length: FILM_TEST_CARDS_QUANTITY}, generateMovie);
+    this.#moviesApiService = moviesApiService;
   }
 
   get movies() {
@@ -20,7 +20,18 @@ export default class MoviesModel extends AbstractCommentsObservable {
     this.#movies = movies;
   }
 
-  updateMovie = (updateType, update) => {
+  init = async () => {
+    try {
+      const movies = await this.#moviesApiService.movies;
+      this.#movies = movies.map(this.#adaptToClient);
+    } catch(err) {
+      this.#movies = [];
+    }
+
+    this._notify(UpdateType.INIT);
+  };
+
+  updateMovie = async (updateType, update) => {
     this._checkParameter(updateType, 'updateType');
     this._checkParameter(update, 'update');
 
@@ -29,13 +40,20 @@ export default class MoviesModel extends AbstractCommentsObservable {
       throw new Error(`Can't update. Movie ${update} not found.`);
     }
 
-    this.movies = [
-      ...this.movies.slice(0, index),
-      update,
-      ...this.movies.slice(index + 1),
-    ];
+    try {
+      const response = await this.#moviesApiService.updateMovie(update);
+      const updatedMovie = this.#adaptToClient(response);
 
-    this._notify(updateType, update);
+      this.movies = [
+        ...this.movies.slice(0, index),
+        updatedMovie,
+        ...this.movies.slice(index + 1),
+      ];
+
+      this._notify(updateType, updatedMovie);
+    } catch (error) {
+      throw new Error('Can\'t update movie');
+    }
   };
 
   addComment = (updateType, {movieToUpdate, comment}) => {
@@ -84,5 +102,36 @@ export default class MoviesModel extends AbstractCommentsObservable {
     };
 
     this.updateMovie(updateType, update);
+  };
+
+  #adaptToClient = (movie) => {
+    const adaptedMovie = {...movie,
+      filmInfo: {
+        ...movie['film_info'],
+        ageRating: movie['film_info']['age_rating'],
+        alternativeTitle: movie['film_info']['alternative_title'],
+        release: {
+          ...movie['film_info']['release'],
+          releaseCountry: movie['film_info']['release']['release_country'],
+        },
+        totalRating: movie['film_info']['total_rating'],
+      },
+      userDetails: {
+        ...movie['user_details'],
+        alreadyWatched: movie['user_details']['already_watched'],
+        watchingDate: movie['user_details']['watching_date'],
+      },
+    };
+
+    delete adaptedMovie['film_info'];
+    delete adaptedMovie.filmInfo['age_rating'];
+    delete adaptedMovie.filmInfo['alternative_title'];
+    delete adaptedMovie.filmInfo.release['release_country'];
+    delete adaptedMovie.filmInfo['total_rating'];
+    delete adaptedMovie['user_details'];
+    delete adaptedMovie.userDetails['already_watched'];
+    delete adaptedMovie.userDetails['watching_date'];
+
+    return adaptedMovie;
   };
 }

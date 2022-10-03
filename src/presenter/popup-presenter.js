@@ -1,8 +1,11 @@
 import FilmDetailsView from '../view/popup/film-details-view.js';
 
+import CommentsModel from '../model/comments-model.js';
+import CommentsApiService from '../api/comments-api-service.js';
+
 import { render, remove } from '../framework/render.js';
 import { getCommentsByIds, getNow, compareParameters } from '../utils.js';
-import { UserAction, UpdateType } from '../const.js';
+import { AUTHORIZATION, END_POINT, UserAction, UpdateType } from '../const.js';
 
 export default class PopupPresenter {
   #movie = null;
@@ -27,9 +30,8 @@ export default class PopupPresenter {
     return this.#commentsModel.comments;
   }
 
-  constructor(changeData, commentsModel) {
+  constructor(changeData) {
     this.#changeData = changeData;
-    this.#commentsModel = commentsModel;
   }
 
   /**
@@ -42,16 +44,28 @@ export default class PopupPresenter {
    * @memberof PopupPresenter
    */
   init = (movie, localData, resetOpenedStatusFlag) => {
-    this.#removeOldPopup();
+    this.#commentsModel = new CommentsModel(new CommentsApiService(END_POINT, AUTHORIZATION));
+    this.#commentsModel.init(movie)
+      .finally(() => {
+        this.#removeOldPopup();
 
-    this.#initialiseData(movie, localData, resetOpenedStatusFlag);
+        this.#initialiseData(movie, localData, resetOpenedStatusFlag);
 
-    this.#setCloseBtnClickHandler();
-    this.#deactivateMainPageScrollbar();
+        this.#setCloseBtnClickHandler();
+        this.#deactivateMainPageScrollbar();
 
-    this.#setChangeDataClickHandlers();
-    this.#renderPopupComponent();
-    this.#popupComponent.setScrollPosition();
+        this.#setChangeDataClickHandlers();
+        this.#renderPopupComponent();
+        this.#popupComponent.setScrollPosition();
+      });
+  };
+
+  addComment = (updateType, update) => {
+    this.#commentsModel.addComment(updateType, update);
+  };
+
+  deleteComment = (updateType, update) => {
+    this.#commentsModel.deleteComment(updateType, update);
   };
 
   #initialiseData = (movie, localData, resetOpenedStatusFlag) => {

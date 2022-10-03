@@ -1,16 +1,15 @@
-import { COMMENT_TEST_CARDS_QUANTITY } from '../mock/const.js';
-import { generateComment } from '../mock/comment.js';
-import { compareParameters } from '../utils.js';
 import AbstractCommentsObservable from './abstract-comments-observable.js';
 
-export default class CommentsModel extends AbstractCommentsObservable {
-  #comments = Array.from({length: COMMENT_TEST_CARDS_QUANTITY}, generateComment);
+import { UpdateType } from '../const.js';
+import { compareParameters } from '../utils.js';
 
-  constructor() {
+export default class CommentsModel extends AbstractCommentsObservable {
+  #commentsApiService = null;
+  #comments = [];
+
+  constructor(commentsApiService) {
     super();
-    for (let i = 0; i < this.#comments.length; i++) {
-      this.#comments[i].id = i;
-    }
+    this.#commentsApiService = commentsApiService;
   }
 
   get comments() {
@@ -20,6 +19,17 @@ export default class CommentsModel extends AbstractCommentsObservable {
   set comments(comments = []) {
     this.#comments = comments;
   }
+
+  init = async (movie) => {
+    try {
+      const comments = await this.#commentsApiService.getComments(movie);
+      this.#comments = comments.map(this.#adaptToClient);
+    } catch(err) {
+      this.#comments = [];
+    }
+
+    this._notify(UpdateType.INIT);
+  };
 
   addComment = (updateType, {comment: update}) => {
     this._checkParameter(updateType, 'updateType');
@@ -46,4 +56,8 @@ export default class CommentsModel extends AbstractCommentsObservable {
       ...this.comments.slice(index + 1),
     ];
   };
+
+  #adaptToClient = (comment) => ({
+    ...comment,
+  });
 }
