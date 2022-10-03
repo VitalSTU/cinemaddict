@@ -45,7 +45,8 @@ export default class PopupPresenter {
    * @memberof PopupPresenter
    */
   init = (movie, localData, resetOpenedStatusFlag) => {
-    this.#commentsModel = new CommentsModel(new CommentsApiService(END_POINT, AUTHORIZATION), movie);
+    this.#commentsModel = new CommentsModel(new CommentsApiService(END_POINT, AUTHORIZATION));
+    this.#commentsModel.init(movie);
 
     this.#removeOldPopup();
 

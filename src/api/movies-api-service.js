@@ -55,8 +55,6 @@ export default class MoviesApiService extends ApiService {
     delete adaptedMovie['user_details'].alreadyWatched;
     delete adaptedMovie['user_details'].watchingDate;
 
-    console.log(adaptedMovie);
-
     return adaptedMovie;
   };
 }

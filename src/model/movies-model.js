@@ -1,22 +1,13 @@
-import { generateMovie } from '../mock/movie.js';
 import { compareParameters } from '../utils.js';
 import AbstractCommentsObservable from './abstract-comments-observable.js';
 
-const FILM_TEST_CARDS_QUANTITY = 42;
-
 export default class MoviesModel extends AbstractCommentsObservable {
   #moviesApiService = null;
-  #movies = null;
+  #movies = [];
 
   constructor(moviesApiService) {
     super();
     this.#moviesApiService = moviesApiService;
-
-    this.#moviesApiService.movies.then((movies) => {
-      console.log(movies.map(this.#adaptToClient));
-    });
-
-    this.#movies = Array.from({length: FILM_TEST_CARDS_QUANTITY}, generateMovie);//TODO delete
   }
 
   get movies() {
@@ -26,6 +17,15 @@ export default class MoviesModel extends AbstractCommentsObservable {
   set movies(movies = []) {
     this.#movies = movies;
   }
+
+  init = async () => {
+    try {
+      const movies = await this.#moviesApiService.movies;
+      this.#movies = movies.map(this.#adaptToClient);
+    } catch(err) {
+      this.#movies = [];
+    }
+  };
 
   updateMovie = (updateType, update) => {
     this._checkParameter(updateType, 'updateType');

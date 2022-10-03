@@ -21,3 +21,4 @@ const moviesPresenter = new MoviesPresenter();
 render(new UserProfileView(), siteHeaderElement);
 render(new StatisticsView(moviesModel.movies.length), siteFooterElement);
 moviesPresenter.init(siteMainElement, moviesModel/*, commentsModel*/);//TODO delete commentsModel
+moviesModel.init();
