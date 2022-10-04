@@ -1,10 +1,10 @@
 import he from 'he';
+import AbstractStatefulView from '../../framework/view/abstract-stateful-view';
 import * as viewUtils from '../view-utils.js';
 import * as mainUtils from '../../utils.js';
-import AbstractStatefulView from '../../framework/view/abstract-stateful-view';
 import { BLANK_MOVIE, BLANK_COMMENT, BLANK_LOCAL_DATA } from '../../const.js';
 
-const createFilmDetailsTopContainerTemplate = ({filmInfo: movie, userDetails}) => `
+const createFilmDetailsTopContainerTemplate = ({filmInfo: movie, userDetails}, isDisabled) => `
     <div class="film-details__inner">
       <div class="film-details__top-container">
         <div class="film-details__close">
@@ -66,14 +66,14 @@ const createFilmDetailsTopContainerTemplate = ({filmInfo: movie, userDetails}) =
         </div>
 
         <section class="film-details__controls">
-          <button type="button" class="film-details__control-button${viewUtils.getPopupFlagIfActive(userDetails.watchlist)} film-details__control-button--watchlist" id="watchlist" name="watchlist">Add to watchlist</button>
-          <button type="button" class="film-details__control-button${viewUtils.getPopupFlagIfActive(userDetails.alreadyWatched)} film-details__control-button--watched" id="watched" name="watched">Already watched</button>
-          <button type="button" class="film-details__control-button${viewUtils.getPopupFlagIfActive(userDetails.favorite)} film-details__control-button--favorite" id="favorite" name="favorite">Add to favorites</button>
+          <button type="button" class="film-details__control-button${viewUtils.getPopupFlagIfActive(userDetails.watchlist)} film-details__control-button--watchlist" id="watchlist" name="watchlist"${isDisabled ? ' disabled' : ''}>Add to watchlist</button>
+          <button type="button" class="film-details__control-button${viewUtils.getPopupFlagIfActive(userDetails.alreadyWatched)} film-details__control-button--watched" id="watched" name="watched"${isDisabled ? ' disabled' : ''}>Already watched</button>
+          <button type="button" class="film-details__control-button${viewUtils.getPopupFlagIfActive(userDetails.favorite)} film-details__control-button--favorite" id="favorite" name="favorite"${isDisabled ? ' disabled' : ''}>Add to favorites</button>
         </section>
       </div>
     </div>`;
 
-const createFilmDetailsCommentTemplate = ({id, author, comment, date, emotion}) => `
+const createFilmDetailsCommentTemplate = ({id, author, comment, date, emotion}, isDisabled, isDeleting) => `
           <li class="film-details__comment">
             <span class="film-details__comment-emoji">
               <img src="${viewUtils.getEmojieUri(emotion)}" width="55" height="55" alt="emoji-${emotion}">
@@ -83,7 +83,7 @@ const createFilmDetailsCommentTemplate = ({id, author, comment, date, emotion}) 
               <p class="film-details__comment-info">
                 <span class="film-details__comment-author">${author}</span>
                 <span class="film-details__comment-day">${viewUtils.getCommentFullTDateTime(date)}</span>
-                <button class="film-details__comment-delete" data-comment-id="${id}">Delete</button>
+                <button class="film-details__comment-delete" data-comment-id="${id}"${isDisabled ? ' disabled' : ''}>${isDeleting ? 'Deleting...' : 'Delete'}</button>
               </p>
             </div>
           </li>
@@ -93,12 +93,12 @@ const createEmotionTemplate = (emotion) => (!emotion) ? '' : `
 <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji">
 `;
 
-const createFilmDetailsAddCommentTemplate = ({comment, emotion}) => `
+const createFilmDetailsAddCommentTemplate = ({comment, emotion}, isDisabled, isSaving) => `
           <form class="film-details__new-comment" action="" method="get">
             <div class="film-details__add-emoji-label">${createEmotionTemplate(emotion)}</div>
 
             <label class="film-details__comment-label">
-              <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${(comment) ? comment : ''}</textarea>
+              <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"${(isDisabled || isSaving) ? ' disabled' : ''}>${(comment) ? comment : ''}</textarea>
             </label>
 
             <div class="film-details__emoji-list">
@@ -124,30 +124,30 @@ const createFilmDetailsAddCommentTemplate = ({comment, emotion}) => `
             </div>
           </form>`;
 
-const createFilmDetailsCommentsContainerTemplate = ({comments, localComment}) => {
+const createFilmDetailsCommentsContainerTemplate = ({comments, localComment}, isDisabled, isSaving, isDeleting) => {
   const commentsTemplate = [...comments]
-    .map((comment) => createFilmDetailsCommentTemplate(comment))
+    .map((comment) => createFilmDetailsCommentTemplate(comment, isDisabled, isDeleting))
     .join('');
 
   return `
         <ul class="film-details__comments-list">
           ${commentsTemplate}
-          ${createFilmDetailsAddCommentTemplate(localComment)}
+          ${createFilmDetailsAddCommentTemplate(localComment, isDisabled, isSaving)}
         </ul>`;
 };
 
-const createFilmDetailsBottomContainerTemplate = (comments) => `
+const createFilmDetailsBottomContainerTemplate = (comments, isDisabled, isSaving, isDeleting) => `
     <div class="film-details__bottom-container">
       <section class="film-details__comments-wrap">
         <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${viewUtils.getCommentsQuantity(comments)}</span></h3>
-        ${createFilmDetailsCommentsContainerTemplate(comments)}
+        ${createFilmDetailsCommentsContainerTemplate(comments, isDisabled, isSaving, isDeleting)}
       </section>
     </div>`;
 
-const createFilmDetailsMainContainerTemplate = ({movie, comments}) => `
+const createFilmDetailsMainContainerTemplate = ({movie, comments, isDisabled, isSaving, isDeleting}) => `
   <section class="film-details">
-    ${createFilmDetailsTopContainerTemplate(movie)}
-    ${createFilmDetailsBottomContainerTemplate(comments)}
+    ${createFilmDetailsTopContainerTemplate(movie, isDisabled)}
+    ${createFilmDetailsBottomContainerTemplate(comments, isDisabled, isSaving, isDeleting)}
   </section>`;
 
 export default class FilmDetailsMainContainerView extends AbstractStatefulView {
@@ -357,10 +357,12 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
 
   #watchlistToggleHandler = (evt) => {
     evt.preventDefault();
+
+    const movie = FilmDetailsMainContainerView.parseStateToMovie(this._state);
     this.updateElement({
-      movie: {...this._state.movie,
-        userDetails: {...this._state.movie.userDetails,
-          watchlist: !this._state.movie.userDetails.watchlist
+      movie: {...movie,
+        userDetails: {...movie.userDetails,
+          watchlist: !movie.userDetails.watchlist
         },
       },
       scrollTop: this.element.scrollTop,
@@ -375,17 +377,17 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
   #watchedToggleHandler = (evt) => {
     evt.preventDefault();
 
+    const movie = FilmDetailsMainContainerView.parseStateToMovie(this._state);
     const update = {
-      movie: {...this._state.movie,
-        userDetails: {...this._state.movie.userDetails,
-          alreadyWatched: !this._state.movie.userDetails.alreadyWatched
+      movie: {...movie,
+        userDetails: {...movie.userDetails,
+          alreadyWatched: !movie.userDetails.alreadyWatched
         },
       },
       scrollTop: this.element.scrollTop,
     };
 
-    update.movie.userDetails.watchingDate = FilmDetailsMainContainerView
-      .updateMovieUserDetailsDate(update);
+    update.movie.userDetails.watchingDate = FilmDetailsMainContainerView.updateMovieUserDetailsDate(update);
     this.updateElement(update);
 
     this.#updateLocalData({
@@ -396,10 +398,12 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
 
   #favoriteToggleHandler = (evt) => {
     evt.preventDefault();
+
+    const movie = FilmDetailsMainContainerView.parseStateToMovie(this._state);
     this.updateElement({
-      movie: {...this._state.movie,
-        userDetails: {...this._state.movie.userDetails,
-          favorite: !this._state.movie.userDetails.favorite
+      movie: {...movie,
+        userDetails: {...movie.userDetails,
+          favorite: !movie.userDetails.favorite
         },
       },
       scrollTop: this.element.scrollTop,
@@ -489,6 +493,8 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
     return watchingDate;
   };
 
+  static parseStateToMovie = ({movie}) => mainUtils.duplicateMovie(movie);
+
   static parseMovieToState = (movie, comments, localData) => ({
     movie: mainUtils.duplicateMovie(movie),
     comments: {
@@ -496,5 +502,8 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
       localComment: localData.localComment,
     },
     scrollTop: localData.scrollTop,
+    isDisabled: false,
+    isSaving: false,
+    isDeleting: false,
   });
 }
