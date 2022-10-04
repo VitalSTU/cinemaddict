@@ -237,6 +237,10 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
     this.element.scrollTop = this._state.scrollTop;
   };
 
+  clearHandlers = () => {
+    this.#clearExternalHandlers();
+  };
+
   _restoreHandlers = () => {
     this.#setInnerHandlers();
     this.setCloseBtnClickHandler(this._callback.closeClick);

@@ -96,6 +96,7 @@ export default class PopupPresenter {
   };
 
   #removePopupComponent = () => {
+    this.#popupComponent.clearHandlers();
     remove(this.#popupComponent);
   };
 

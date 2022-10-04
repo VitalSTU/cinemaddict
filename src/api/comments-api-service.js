@@ -20,6 +20,10 @@ export default class CommentsApiService extends ApiService {
       body: JSON.stringify(this.#adaptToServer(localConmment)),
     });
 
+    if (!response.ok) {
+      throw new Error('Can\'t add comment');
+    }
+
     return await ApiService.parseResponse(response);
   };
 
@@ -28,6 +32,10 @@ export default class CommentsApiService extends ApiService {
       url: `comments/${conmment.id}`,
       method: Method.DELETE,
     });
+
+    if (!response.ok) {
+      throw new Error('Can\'t delete comment');
+    }
 
     return response;
   };
