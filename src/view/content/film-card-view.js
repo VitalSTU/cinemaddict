@@ -1,4 +1,4 @@
-import AbstractView from '../../framework/view/abstract-view.js';
+import AbstractStatefulView from '../../framework/view/abstract-stateful-view';
 import * as viewUtils from '../view-utils.js';
 import * as mainUtils from '../../utils.js';
 import { BLANK_MOVIE } from '../../const.js';
@@ -24,7 +24,7 @@ const createFilmCardTemplate = ({comments, filmInfo: movie, userDetails}, isDisa
           </div>
         </article>`;
 
-export default class FilmCardView extends AbstractView {
+export default class FilmCardView extends AbstractStatefulView {
 
   constructor(movie = BLANK_MOVIE) {
     super();
@@ -58,6 +58,8 @@ export default class FilmCardView extends AbstractView {
     this._callback.favoriteClick = callback;
     this.element.querySelector('.film-card__controls-item--favorite').addEventListener('click', this.#favoriteClickHandler);
   };
+
+  _restoreHandlers = () => {};
 
   #cardClickHandler = (evt) => {
     evt.preventDefault();

@@ -53,7 +53,7 @@ export default class MoviePresenter {
   };
 
   setDisabled = () => {
-    this.#popupComponent.updateElement({
+    this.#movieComponent.updateElement({
       isDisabled: true,
     });
   };

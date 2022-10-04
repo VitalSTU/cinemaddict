@@ -248,15 +248,39 @@ export default class MoviesPresenter {
 
     switch (actionType) {
       case UserAction.UPDATE_MOVIE:
+
+        this.#movieMainPresenters.get(update.id).forEach((presenter) => {
+          presenter.setDisabled();
+          if (update.id === this.#openedPopupMovieId) {
+            this.#popupPresenter.setDisabled();
+          }
+        });
+
         this.#moviesModel.updateMovie(updateType, update);
         break;
 
       case UserAction.ADD_COMMENT:
+
+        this.#movieMainPresenters.get(update.movie.id).forEach((presenter) => {
+          presenter.setDisabled();
+          if (update.movie.id === this.#openedPopupMovieId) {
+            this.#popupPresenter.setSaving();
+          }
+        });
+
         parsedMovie = await this.#popupPresenter.addComment(updateType, update, this.#moviesModel.adaptToClient);
         this.#moviesModel.updateMovie(updateType, parsedMovie);
         break;
 
       case UserAction.DELETE_COMMENT:
+
+        this.#movieMainPresenters.get(update.movie.id).forEach((presenter) => {
+          presenter.setDisabled();
+          if (update.movie.id === this.#openedPopupMovieId) {
+            this.#popupPresenter.setDeleting();
+          }
+        });
+
         await this.#popupPresenter.deleteComment(updateType, update.comment);
         this.#moviesModel.updateMovie(updateType, update.movie);
         break;
