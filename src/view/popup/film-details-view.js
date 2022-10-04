@@ -150,13 +150,13 @@ const createFilmDetailsMainContainerTemplate = ({movie, comments, isDisabled, is
     ${createFilmDetailsBottomContainerTemplate(comments, isDisabled, isSaving, isDeleting)}
   </section>`;
 
-export default class FilmDetailsMainContainerView extends AbstractStatefulView {
+export default class FilmDetailsView extends AbstractStatefulView {
   #updateLocalData = null;
   #metaKey = false;
 
   constructor(movie = BLANK_MOVIE, comments = [BLANK_COMMENT], localData = BLANK_LOCAL_DATA, updateLocalData) {
     super();
-    this._state = FilmDetailsMainContainerView.parseMovieToState(movie, comments, localData);
+    this._state = FilmDetailsView.parseMovieToState(movie, comments, localData);
     this.#updateLocalData = updateLocalData;
     this.#setInnerHandlers();
   }
@@ -358,7 +358,7 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
   #watchlistToggleHandler = (evt) => {
     evt.preventDefault();
 
-    const movie = FilmDetailsMainContainerView.parseStateToMovie(this._state);
+    const movie = FilmDetailsView.parseStateToMovie(this._state);
     this.updateElement({
       movie: {...movie,
         userDetails: {...movie.userDetails,
@@ -377,7 +377,7 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
   #watchedToggleHandler = (evt) => {
     evt.preventDefault();
 
-    const movie = FilmDetailsMainContainerView.parseStateToMovie(this._state);
+    const movie = FilmDetailsView.parseStateToMovie(this._state);
     const update = {
       movie: {...movie,
         userDetails: {...movie.userDetails,
@@ -387,7 +387,7 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
       scrollTop: this.element.scrollTop,
     };
 
-    update.movie.userDetails.watchingDate = FilmDetailsMainContainerView.updateMovieUserDetailsDate(update);
+    update.movie.userDetails.watchingDate = FilmDetailsView.updateMovieUserDetailsDate(update);
     this.updateElement(update);
 
     this.#updateLocalData({
@@ -399,7 +399,7 @@ export default class FilmDetailsMainContainerView extends AbstractStatefulView {
   #favoriteToggleHandler = (evt) => {
     evt.preventDefault();
 
-    const movie = FilmDetailsMainContainerView.parseStateToMovie(this._state);
+    const movie = FilmDetailsView.parseStateToMovie(this._state);
     this.updateElement({
       movie: {...movie,
         userDetails: {...movie.userDetails,

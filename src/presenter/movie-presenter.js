@@ -52,6 +52,12 @@ export default class MoviePresenter {
     remove(this.#movieComponent);
   };
 
+  setDisabled = () => {
+    this.#popupComponent.updateElement({
+      isDisabled: true,
+    });
+  };
+
   #initialiseData = (movie) => {
     this.#movie = movie;
   };

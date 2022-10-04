@@ -66,6 +66,26 @@ export default class PopupPresenter {
     await this.#commentsModel.deleteComment(updateType, update);
   };
 
+  setDisabled = () => {
+    this.#popupComponent.updateElement({
+      isDisabled: true,
+    });
+  };
+
+  setSaving = () => {
+    this.#popupComponent.updateElement({
+      isDisabled: true,
+      isSaving: true,
+    });
+  };
+
+  setDeleting = () => {
+    this.#popupComponent.updateElement({
+      isDisabled: true,
+      isDeleting: true,
+    });
+  };
+
   #initialiseData = (movie, localData, handlePopupClosing) => {
     this.#movie = movie;
     this.#localData = (localData) ? localData : this.#localData;
