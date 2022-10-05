@@ -1,6 +1,8 @@
 import AbstractStatefulView from '../../framework/view/abstract-stateful-view';
+
 import * as viewUtils from '../view-utils.js';
 import * as mainUtils from '../../utils.js';
+
 import { BLANK_MOVIE } from '../../const.js';
 
 const createFilmCardTemplate = ({comments, filmInfo: movie, userDetails}, isDisabled) => `

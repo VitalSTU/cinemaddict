@@ -1,4 +1,5 @@
 import Observable from '../framework/observable.js';
+
 import { MovieFilterType } from '../const.js';
 
 export default class FilterModel extends Observable {

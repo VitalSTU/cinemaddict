@@ -1,4 +1,5 @@
 import AbstractView from '../../framework/view/abstract-view.js';
+
 import { SORT_BUTTON_ACTIVE, SortType } from '../../const.js';
 
 const createSortTemplate = (currentSortType) => `

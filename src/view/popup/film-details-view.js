@@ -1,7 +1,10 @@
 import he from 'he';
+
 import AbstractStatefulView from '../../framework/view/abstract-stateful-view';
+
 import * as viewUtils from '../view-utils.js';
 import * as mainUtils from '../../utils.js';
+
 import { BLANK_MOVIE, BLANK_COMMENT, BLANK_LOCAL_DATA, POPUP_MOVIE_CHANGE_INITIATOR } from '../../const.js';
 
 const createFilmDetailsTopContainerTemplate = ({filmInfo: movie, userDetails}, isDisabled) => `

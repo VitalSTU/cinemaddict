@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+
 import { DESCRIPTION_MAX_LENGTH, MOVIE_CARD_ACTIVE, MOVIE_DETAILS_ACTIVE, EmojiUri } from '../const.js';
 
 const MINUTES_IN_ONE_HOUR = 60;

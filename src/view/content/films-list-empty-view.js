@@ -1,5 +1,6 @@
-import { MovieFilterType } from '../../const.js';
 import AbstractView from '../../framework/view/abstract-view.js';
+
+import { MovieFilterType } from '../../const.js';
 
 const createFilmsListEmptyTemplate = (filter) => {
   let title;

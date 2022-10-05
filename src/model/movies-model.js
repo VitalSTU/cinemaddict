@@ -1,4 +1,5 @@
 import AbstractCommentsObservable from './abstract-comments-observable.js';
+
 import { UpdateType } from '../const.js';
 
 export default class MoviesModel extends AbstractCommentsObservable {
