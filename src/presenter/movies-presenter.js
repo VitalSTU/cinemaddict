@@ -1,3 +1,5 @@
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
+
 import FilmsMainSectionView from '../view/content/films-main-section-view.js';
 import FilmsListEmptyView from '../view/content/films-list-empty-view.js';
 import FilmsListAllUpcomingView from '../view/content/films-list-all-upcoming-view.js';
@@ -20,6 +22,10 @@ import { render, RenderPosition, remove } from '../framework/render.js';
 import { sortMovieByDateDown, sortMovieByRatingDown, sortMovieByCommentsQuantityDown, filter } from '../utils.js';
 
 const FILM_EXTRA_TEST_CARDS_QUANTITY = 2;
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
 
 export default class MoviesPresenter {
   #contentContainerElement = null;
@@ -48,6 +54,7 @@ export default class MoviesPresenter {
   #filterModel = new FilterModel();
   #moviesModel = null;
 
+  #uiBlocker = new UiBlocker(TimeLimit.LOWER_LIMIT, TimeLimit.UPPER_LIMIT);
   #isLoading = true;
   #openedPopupMovieId = -1;
 
@@ -256,6 +263,8 @@ export default class MoviesPresenter {
     let parsedMovie = null;
     let parsedComments = null;
 
+    this.#uiBlocker.block();
+
     switch (actionType) {
       case UserAction.UPDATE_MOVIE:
 
@@ -294,6 +303,8 @@ export default class MoviesPresenter {
       default:
         throw new Error(`Action type ${actionType} hasn't recognized.`);
     }
+
+    this.#uiBlocker.unblock();
   };
 
   #handleModelEvent = (updateType, data) => {
