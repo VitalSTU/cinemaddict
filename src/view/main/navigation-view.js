@@ -37,6 +37,8 @@ export default class NavigationView extends AbstractView {
 
   #filterTypeChangeHandler = (evt) => {
     evt.preventDefault();
-    this._callback.filterTypeChange(evt.target.getAttribute('value'));
+    if (evt.target.classList.contains('main-navigation__item')) {
+      this._callback.filterTypeChange(evt.target.getAttribute('value'));
+    }
   };
 }

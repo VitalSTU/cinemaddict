@@ -31,30 +31,44 @@ export default class CommentsModel extends AbstractCommentsObservable {
     this._notify(UpdateType.INIT);
   };
 
-  addComment = (updateType, {comment: update}) => {
+  addComment = async (updateType, {movie, comment}, adaptMovieToClient) => {
     this._checkParameter(updateType, 'updateType');
-    this._checkParameter(update, 'comment');
+    this._checkParameter(movie, 'movie');
+    this._checkParameter(comment, 'comment');
 
-    this.comments = [
-      ...this.comments,
-      update,
-    ];
+    try {
+      const response = await this.#commentsApiService.addComment(movie, comment);
+      const parsedComments = this.#adaptToClient(response.comments);
+      const parsedMovie = adaptMovieToClient(response.movie);
+
+      return {parsedMovie, parsedComments};
+
+    } catch(error) {
+      throw new Error('Can\'t add comment');
+    }
   };
 
-  deleteComment = (updateType, {comment: update}) => {
+  deleteComment = async (updateType, update) => {
     this._checkParameter(updateType, 'updateType');
     this._checkParameter(update, 'comment');
 
-    const id = update.id;
-    const index = this.comments.findIndex((c) => compareParameters(c.id, id));
+    const index = this.comments.findIndex((c) => compareParameters(c.id, update.id));
     if (index < 0) {
-      throw new Error(`Comment with id ${id} not found`);
+      throw new Error(`Comment with id ${update.id} not found`);
     }
 
-    this.comments = [
-      ...this.comments.slice(0, index),
-      ...this.comments.slice(index + 1),
-    ];
+    try {
+      await this.#commentsApiService.deleteComment(update);
+      const comments = [
+        ...this.comments.slice(0, index),
+        ...this.comments.slice(index + 1),
+      ];
+
+      return comments;
+
+    } catch(error) {
+      throw new Error('Can\'t delete comment');
+    }
   };
 
   #adaptToClient = (comment) => ({

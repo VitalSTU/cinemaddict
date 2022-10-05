@@ -1,3 +1,6 @@
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
+
+import UserProfileView from '../view/header/user-profile-view.js';
 import FilmsMainSectionView from '../view/content/films-main-section-view.js';
 import FilmsListEmptyView from '../view/content/films-list-empty-view.js';
 import FilmsListAllUpcomingView from '../view/content/films-list-all-upcoming-view.js';
@@ -20,10 +23,16 @@ import { render, RenderPosition, remove } from '../framework/render.js';
 import { sortMovieByDateDown, sortMovieByRatingDown, sortMovieByCommentsQuantityDown, filter } from '../utils.js';
 
 const FILM_EXTRA_TEST_CARDS_QUANTITY = 2;
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
 
 export default class MoviesPresenter {
   #contentContainerElement = null;
   #siteFooterElement = null;
+  #siteHeaderElement = null;
+  #userProfileComponent = null;
 
   #sortComponent = null;
   #filmsMainSectionComponent = new FilmsMainSectionView();
@@ -48,10 +57,14 @@ export default class MoviesPresenter {
   #filterModel = new FilterModel();
   #moviesModel = null;
 
+  #uiBlocker = new UiBlocker(TimeLimit.LOWER_LIMIT, TimeLimit.UPPER_LIMIT);
   #isLoading = true;
+  #openedPopupMovieId = -1;
 
-  constructor(siteFooterElement) {
+  constructor(siteFooterElement, siteHeaderElement) {
     this.#siteFooterElement = siteFooterElement;
+    this.#siteHeaderElement = siteHeaderElement;
+    this.#userProfileComponent = new UserProfileView([]);
   }
 
   get movies() {
@@ -90,7 +103,14 @@ export default class MoviesPresenter {
     return filteredMovies;
   };
 
+  #renderUserProfileComponent = () => {
+    remove(this.#userProfileComponent);
+    this.#userProfileComponent = new UserProfileView(this.#moviesModel.movies);
+    render(this.#userProfileComponent, this.#siteHeaderElement);
+  };
+
   #renderBoard = () => {
+    this.#renderUserProfileComponent();
 
     if (this.#isLoading) {
       this.#renderLoading();
@@ -137,7 +157,8 @@ export default class MoviesPresenter {
   };
 
   #renderFilmCard = (movie, {element: parentElement}) => {
-    const moviePresenter = new MoviePresenter(this.#popupPresenter, parentElement, this.#handleViewAction, this.#movieOpeningHandler);
+    const moviePresenter = new MoviePresenter(this.#popupPresenter, parentElement,
+      this.#handleViewAction, this.#handlePopupOpening, this.#handlePopupClosing);
     const presenters = !(this.#movieMainPresenters.has(movie.id)) ? [] : this.#movieMainPresenters.get(movie.id);
 
     moviePresenter.init(movie);
@@ -233,50 +254,74 @@ export default class MoviesPresenter {
     }
   };
 
-  #handleViewAction = (actionType, updateType, update) => {
+  #handlePopupOpening = (movie) => {
+    this.#openedPopupMovieId = movie.id;
+  };
+
+  #handlePopupClosing = () => {
+    this.#openedPopupMovieId = -1;
+  };
+
+  #setMovieCardStatus = (movieId, movieStatusHandler, popupStatusHandler, initiator, beingDeletedCommentId) => {
+    this.#movieMainPresenters.get(movieId).forEach((presenter) => {
+      presenter[movieStatusHandler](initiator);
+      if (movieId === this.#openedPopupMovieId) {
+        this.#popupPresenter[popupStatusHandler](initiator, beingDeletedCommentId);
+      }
+    });
+  };
+
+  #handleViewAction = async (actionType, updateType, update, initiator) => {
+    let parsedMovie = null;
+    let parsedComments = null;
+
+    this.#uiBlocker.block();
 
     switch (actionType) {
       case UserAction.UPDATE_MOVIE:
-        this.#moviesModel.updateMovie(updateType, update);
+
+        this.#setMovieCardStatus(update.id, 'setDisabled', 'setDisabled', initiator);
+        try {
+          await this.#moviesModel.updateMovie(updateType, update);
+        } catch(err) {
+          this.#setMovieCardStatus(update.id, 'setAborting', 'setAborting', initiator);
+        }
         break;
 
       case UserAction.ADD_COMMENT:
-        this.#popupPresenter.addComment(updateType, update);
-        this.#moviesModel.addComment(updateType, update);
+
+        this.#setMovieCardStatus(update.movie.id, 'setDisabled', 'setSaving', initiator);
+        try {
+          ({parsedMovie, parsedComments} = await this.#popupPresenter.addComment(updateType, update, this.#moviesModel.adaptToClient));
+          await this.#moviesModel.updateMovie(updateType, parsedMovie);
+          this.#popupPresenter.setComments(parsedComments);
+        } catch(err) {
+          this.#setMovieCardStatus(update.movie.id, 'setAborting', 'setAborting', initiator);
+        }
         break;
 
       case UserAction.DELETE_COMMENT:
-        this.#popupPresenter.deleteComment(updateType, update);
-        this.#moviesModel.deleteComment(updateType, update);
+
+        this.#setMovieCardStatus(update.movie.id, 'setDisabled', 'setDeleting', initiator, update.comment.id);
+        try {
+          parsedComments = await this.#popupPresenter.deleteComment(updateType, update.comment);
+          await this.#moviesModel.updateMovie(updateType, update.movie);
+          this.#popupPresenter.setComments(parsedComments);
+        } catch(err) {
+          this.#setMovieCardStatus(update.movie.id, 'setAborting', 'setAborting', initiator, update.comment.id);
+        }
         break;
 
       default:
         throw new Error(`Action type ${actionType} hasn't recognized.`);
     }
+
+    this.#uiBlocker.unblock();
   };
 
   #handleModelEvent = (updateType, data) => {
 
     switch (updateType) {
-
-      case UpdateType.PATCH:
-        this.#movieMainPresenters.get(data.id).forEach((presenter) => {
-          presenter.init(data);
-          if (presenter.popupIsOpened) {
-            this.#popupPresenter.init(data, null, null);
-          }
-        });
-        break;
-
-      case UpdateType.MINOR:
-        this.#clearBoard();
-        this.#renderBoard();
-        break;
-
-      case UpdateType.MAJOR:
-        this.#clearBoard({resetRenderedMovieCardsQuantity: true, resetSortType: true});
-        this.#renderBoard();
-        break;
 
       case UpdateType.INIT:
         this.#isLoading = false;
@@ -285,17 +330,34 @@ export default class MoviesPresenter {
         render(new StatisticsView(this.#moviesModel.movies.length), this.#siteFooterElement);
         break;
 
+      case UpdateType.PATCH:
+        this.#movieMainPresenters.get(data.id).forEach((presenter) => {
+          presenter.init(data);
+          if (data.id === this.#openedPopupMovieId) {
+            presenter.initialisePopup();
+          }
+        });
+        break;
+
+      case UpdateType.MINOR:
+        this.#clearBoard();
+        this.#renderBoard();
+
+        this.#movieMainPresenters.get(data.id).forEach((presenter) => {
+          if (data.id === this.#openedPopupMovieId) {
+            presenter.initialisePopup();
+          }
+        });
+        break;
+
+      case UpdateType.MAJOR:
+        this.#clearBoard({resetRenderedMovieCardsQuantity: true, resetSortType: true});
+        this.#renderBoard();
+        break;
+
       default:
         throw new Error(`Update type ${updateType} hasn't recognized.`);
     }
-  };
-
-  #movieOpeningHandler = () => {
-    this.#movieMainPresenters.forEach((presenters) => {
-      presenters.forEach((presenter) => {
-        presenter.popupIsOpened = false;
-      });
-    });
   };
 
   #sortTypeChangeHandler = (sortType) => {

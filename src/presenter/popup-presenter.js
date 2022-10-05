@@ -5,7 +5,7 @@ import CommentsApiService from '../api/comments-api-service.js';
 
 import { render, remove } from '../framework/render.js';
 import { getCommentsByIds, getNow, compareParameters } from '../utils.js';
-import { AUTHORIZATION, END_POINT, UserAction, UpdateType } from '../const.js';
+import { AUTHORIZATION, END_POINT, POPUP_MOVIE_CHANGE_INITIATOR, UserAction, UpdateType } from '../const.js';
 
 export default class PopupPresenter {
   #movie = null;
@@ -16,7 +16,7 @@ export default class PopupPresenter {
   #commentsModel = null;
 
   #changeData = null;
-  #resetOpenedStatusFlag = null;
+  #handlePopupClosing = null;
 
   #localData = {
     localComment: {
@@ -43,13 +43,13 @@ export default class PopupPresenter {
    * @returns {FilmDetailsView} Created popup component
    * @memberof PopupPresenter
    */
-  init = (movie, localData, resetOpenedStatusFlag) => {
+  init = (movie, localData, handlePopupClosing) => {
     this.#commentsModel = new CommentsModel(new CommentsApiService(END_POINT, AUTHORIZATION));
     this.#commentsModel.init(movie)
       .finally(() => {
         this.#removeOldPopup();
 
-        this.#initialiseData(movie, localData, resetOpenedStatusFlag);
+        this.#initialiseData(movie, localData, handlePopupClosing);
 
         this.#setCloseBtnClickHandler();
         this.#deactivateMainPageScrollbar();
@@ -60,18 +60,53 @@ export default class PopupPresenter {
       });
   };
 
-  addComment = (updateType, update) => {
-    this.#commentsModel.addComment(updateType, update);
+  addComment = async (updateType, update, adaptMovieToClient) => await this.#commentsModel.addComment(updateType, update, adaptMovieToClient);
+
+  deleteComment = async (updateType, update) => {
+    await this.#commentsModel.deleteComment(updateType, update);
   };
 
-  deleteComment = (updateType, update) => {
-    this.#commentsModel.deleteComment(updateType, update);
+  setComments = (comments) => {
+    this.#commentsModel.comments = comments;
   };
 
-  #initialiseData = (movie, localData, resetOpenedStatusFlag) => {
+  setDisabled = () => {
+    this.#popupComponent.updateElement({
+      isDisabled: true,
+    });
+  };
+
+  setSaving = () => {
+    this.#popupComponent.updateElement({
+      isDisabled: true,
+      isSaving: true,
+    });
+  };
+
+  setDeleting = (_initiator, beingDeletedCommentId) => {
+    this.#popupComponent.updateElement({
+      isDisabled: true,
+      isDeleting: true,
+      beingDeletedCommentId,
+    });
+  };
+
+  setAborting = (initiator, beingDeletedCommentId) => {
+    const resetState = () => {
+      this.#popupComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#popupComponent.setAborting(resetState, initiator, beingDeletedCommentId);
+  };
+
+  #initialiseData = (movie, localData, handlePopupClosing) => {
     this.#movie = movie;
     this.#localData = (localData) ? localData : this.#localData;
-    this.#resetOpenedStatusFlag = (resetOpenedStatusFlag) ? resetOpenedStatusFlag : this.#resetOpenedStatusFlag;
+    this.#handlePopupClosing = handlePopupClosing;
 
     this.#popupComponent = new FilmDetailsView(
       this.#movie,
@@ -98,6 +133,7 @@ export default class PopupPresenter {
   };
 
   #removePopupComponent = () => {
+    this.#popupComponent.clearHandlers();
     remove(this.#popupComponent);
   };
 
@@ -124,9 +160,9 @@ export default class PopupPresenter {
   };
 
   #closeBtnClickHandler = () => {
-    this.#resetOpenedStatusFlag();
     this.#removePopupComponent();
     this.#activateMainPageScrollbar();
+    this.#handlePopupClosing();
   };
 
   #watchlistClickHandler = () => {
@@ -139,7 +175,8 @@ export default class PopupPresenter {
           ...this.#movie.userDetails,
           watchlist: !this.#movie.userDetails.watchlist,
         },
-      }
+      },
+      POPUP_MOVIE_CHANGE_INITIATOR.CHANGE_MOVIE
     );
   };
 
@@ -156,7 +193,8 @@ export default class PopupPresenter {
           alreadyWatched: !alreadyWatched,
           watchingDate: alreadyWatched ? '' : getNow(),
         },
-      }
+      },
+      POPUP_MOVIE_CHANGE_INITIATOR.CHANGE_MOVIE
     );
   };
 
@@ -170,18 +208,27 @@ export default class PopupPresenter {
           ...this.#movie.userDetails,
           favorite: !this.#movie.userDetails.favorite,
         },
-      }
+      },
+      POPUP_MOVIE_CHANGE_INITIATOR.CHANGE_MOVIE
     );
   };
 
   #deleteButtonClickHandler = (commentId) => {
+    const index = this.#movie.comments.findIndex((id) => id === commentId);
     this.#changeData(
       UserAction.DELETE_COMMENT,
       UpdateType.PATCH,
       {
-        movieToUpdate: this.#movie,
+        movie: {
+          ...this.#movie,
+          comments: [
+            ...this.#movie.comments.slice(0, index),
+            ...this.#movie.comments.slice(index + 1),
+          ],
+        },
         comment: this.comments.find((c) => compareParameters(c.id.toString(), commentId)),
-      }
+      },
+      POPUP_MOVIE_CHANGE_INITIATOR.DELETE_COMMENT
     );
   };
 
@@ -190,9 +237,10 @@ export default class PopupPresenter {
       UserAction.ADD_COMMENT,
       UpdateType.PATCH,
       {
-        movieToUpdate: this.#movie,
+        movie: this.#movie,
         comment,
-      }
+      },
+      POPUP_MOVIE_CHANGE_INITIATOR.ADD_COMMENT
     );
   };
 }
