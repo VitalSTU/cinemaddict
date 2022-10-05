@@ -1,5 +1,6 @@
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
+import UserProfileView from '../view/header/user-profile-view.js';
 import FilmsMainSectionView from '../view/content/films-main-section-view.js';
 import FilmsListEmptyView from '../view/content/films-list-empty-view.js';
 import FilmsListAllUpcomingView from '../view/content/films-list-all-upcoming-view.js';
@@ -30,6 +31,8 @@ const TimeLimit = {
 export default class MoviesPresenter {
   #contentContainerElement = null;
   #siteFooterElement = null;
+  #siteHeaderElement = null;
+  #userProfileComponent = null;
 
   #sortComponent = null;
   #filmsMainSectionComponent = new FilmsMainSectionView();
@@ -58,8 +61,10 @@ export default class MoviesPresenter {
   #isLoading = true;
   #openedPopupMovieId = -1;
 
-  constructor(siteFooterElement) {
+  constructor(siteFooterElement, siteHeaderElement) {
     this.#siteFooterElement = siteFooterElement;
+    this.#siteHeaderElement = siteHeaderElement;
+    this.#userProfileComponent = new UserProfileView([]);
   }
 
   get movies() {
@@ -98,7 +103,14 @@ export default class MoviesPresenter {
     return filteredMovies;
   };
 
+  #renderUserProfileComponent = () => {
+    remove(this.#userProfileComponent);
+    this.#userProfileComponent = new UserProfileView(this.#moviesModel.movies);
+    render(this.#userProfileComponent, this.#siteHeaderElement);
+  };
+
   #renderBoard = () => {
+    this.#renderUserProfileComponent();
 
     if (this.#isLoading) {
       this.#renderLoading();
