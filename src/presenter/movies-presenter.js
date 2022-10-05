@@ -243,46 +243,52 @@ export default class MoviesPresenter {
     this.#openedPopupMovieId = -1;
   };
 
-  #handleViewAction = async (actionType, updateType, update) => {
+  #setMovieCardStatus = (movieId, movieStatusHandler, popupStatusHandler, initiator, beingDeletedCommentId) => {
+    this.#movieMainPresenters.get(movieId).forEach((presenter) => {
+      presenter[movieStatusHandler](initiator);
+      if (movieId === this.#openedPopupMovieId) {
+        this.#popupPresenter[popupStatusHandler](initiator, beingDeletedCommentId);
+      }
+    });
+  };
+
+  #handleViewAction = async (actionType, updateType, update, initiator) => {
     let parsedMovie = null;
+    let parsedComments = null;
 
     switch (actionType) {
       case UserAction.UPDATE_MOVIE:
 
-        this.#movieMainPresenters.get(update.id).forEach((presenter) => {
-          presenter.setDisabled();
-          if (update.id === this.#openedPopupMovieId) {
-            this.#popupPresenter.setDisabled();
-          }
-        });
-
-        this.#moviesModel.updateMovie(updateType, update);
+        this.#setMovieCardStatus(update.id, 'setDisabled', 'setDisabled', initiator);
+        try {
+          await this.#moviesModel.updateMovie(updateType, update);
+        } catch(err) {
+          this.#setMovieCardStatus(update.id, 'setAborting', 'setAborting', initiator);
+        }
         break;
 
       case UserAction.ADD_COMMENT:
 
-        this.#movieMainPresenters.get(update.movie.id).forEach((presenter) => {
-          presenter.setDisabled();
-          if (update.movie.id === this.#openedPopupMovieId) {
-            this.#popupPresenter.setSaving();
-          }
-        });
-
-        parsedMovie = await this.#popupPresenter.addComment(updateType, update, this.#moviesModel.adaptToClient);
-        this.#moviesModel.updateMovie(updateType, parsedMovie);
+        this.#setMovieCardStatus(update.movie.id, 'setDisabled', 'setSaving', initiator);
+        try {
+          ({parsedMovie, parsedComments} = await this.#popupPresenter.addComment(updateType, update, this.#moviesModel.adaptToClient));
+          await this.#moviesModel.updateMovie(updateType, parsedMovie);
+          this.#popupPresenter.setComments(parsedComments);
+        } catch(err) {
+          this.#setMovieCardStatus(update.movie.id, 'setAborting', 'setAborting', initiator);
+        }
         break;
 
       case UserAction.DELETE_COMMENT:
 
-        this.#movieMainPresenters.get(update.movie.id).forEach((presenter) => {
-          presenter.setDisabled();
-          if (update.movie.id === this.#openedPopupMovieId) {
-            this.#popupPresenter.setDeleting();
-          }
-        });
-
-        await this.#popupPresenter.deleteComment(updateType, update.comment);
-        this.#moviesModel.updateMovie(updateType, update.movie);
+        this.#setMovieCardStatus(update.movie.id, 'setDisabled', 'setDeleting', initiator, update.comment.id);
+        try {
+          parsedComments = await this.#popupPresenter.deleteComment(updateType, update.comment);
+          await this.#moviesModel.updateMovie(updateType, update.movie);
+          this.#popupPresenter.setComments(parsedComments);
+        } catch(err) {
+          this.#setMovieCardStatus(update.movie.id, 'setAborting', 'setAborting', initiator, update.comment.id);
+        }
         break;
 
       default:

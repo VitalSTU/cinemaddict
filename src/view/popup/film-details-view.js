@@ -2,7 +2,7 @@ import he from 'he';
 import AbstractStatefulView from '../../framework/view/abstract-stateful-view';
 import * as viewUtils from '../view-utils.js';
 import * as mainUtils from '../../utils.js';
-import { BLANK_MOVIE, BLANK_COMMENT, BLANK_LOCAL_DATA } from '../../const.js';
+import { BLANK_MOVIE, BLANK_COMMENT, BLANK_LOCAL_DATA, POPUP_MOVIE_CHANGE_INITIATOR } from '../../const.js';
 
 const createFilmDetailsTopContainerTemplate = ({filmInfo: movie, userDetails}, isDisabled) => `
     <div class="film-details__inner">
@@ -94,7 +94,7 @@ const createEmotionTemplate = (emotion) => (!emotion) ? '' : `
 `;
 
 const createFilmDetailsAddCommentTemplate = ({comment, emotion}, isDisabled, isSaving) => `
-          <form class="film-details__new-comment" action="" method="get">
+          <form class="film-details__new-comment" action="" method="get"${(isDisabled || isSaving) ? ' disabled' : ''}>
             <div class="film-details__add-emoji-label">${createEmotionTemplate(emotion)}</div>
 
             <label class="film-details__comment-label">
@@ -102,31 +102,31 @@ const createFilmDetailsAddCommentTemplate = ({comment, emotion}, isDisabled, isS
             </label>
 
             <div class="film-details__emoji-list">
-              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile">
+              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile"${(isDisabled || isSaving) ? ' disabled' : ''}>
               <label class="film-details__emoji-label" for="emoji-smile">
                 <img src="./images/emoji/smile.png" width="30" height="30" alt="emoji">
               </label>
 
-              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping">
+              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping"${(isDisabled || isSaving) ? ' disabled' : ''}>
               <label class="film-details__emoji-label" for="emoji-sleeping">
                 <img src="./images/emoji/sleeping.png" width="30" height="30" alt="emoji">
               </label>
 
-              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke">
+              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke"${(isDisabled || isSaving) ? ' disabled' : ''}>
               <label class="film-details__emoji-label" for="emoji-puke">
                 <img src="./images/emoji/puke.png" width="30" height="30" alt="emoji">
               </label>
 
-              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry">
+              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry"${(isDisabled || isSaving) ? ' disabled' : ''}>
               <label class="film-details__emoji-label" for="emoji-angry">
                 <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji">
               </label>
             </div>
           </form>`;
 
-const createFilmDetailsCommentsContainerTemplate = ({comments, localComment}, isDisabled, isSaving, isDeleting) => {
+const createFilmDetailsCommentsContainerTemplate = ({comments, localComment}, isDisabled, isSaving, isDeleting, beingDeletedCommentId) => {
   const commentsTemplate = [...comments]
-    .map((comment) => createFilmDetailsCommentTemplate(comment, isDisabled, isDeleting))
+    .map((comment) => createFilmDetailsCommentTemplate(comment, isDisabled, (beingDeletedCommentId === comment.id) && isDeleting))
     .join('');
 
   return `
@@ -136,18 +136,18 @@ const createFilmDetailsCommentsContainerTemplate = ({comments, localComment}, is
         </ul>`;
 };
 
-const createFilmDetailsBottomContainerTemplate = (comments, isDisabled, isSaving, isDeleting) => `
+const createFilmDetailsBottomContainerTemplate = (comments, isDisabled, isSaving, isDeleting, beingDeletedCommentId) => `
     <div class="film-details__bottom-container">
       <section class="film-details__comments-wrap">
         <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${viewUtils.getCommentsQuantity(comments)}</span></h3>
-        ${createFilmDetailsCommentsContainerTemplate(comments, isDisabled, isSaving, isDeleting)}
+        ${createFilmDetailsCommentsContainerTemplate(comments, isDisabled, isSaving, isDeleting, beingDeletedCommentId)}
       </section>
     </div>`;
 
-const createFilmDetailsMainContainerTemplate = ({movie, comments, isDisabled, isSaving, isDeleting}) => `
+const createFilmDetailsMainContainerTemplate = ({movie, comments, isDisabled, isSaving, isDeleting, beingDeletedCommentId}) => `
   <section class="film-details">
     ${createFilmDetailsTopContainerTemplate(movie, isDisabled)}
-    ${createFilmDetailsBottomContainerTemplate(comments, isDisabled, isSaving, isDeleting)}
+    ${createFilmDetailsBottomContainerTemplate(comments, isDisabled, isSaving, isDeleting, beingDeletedCommentId)}
   </section>`;
 
 export default class FilmDetailsView extends AbstractStatefulView {
@@ -239,6 +239,30 @@ export default class FilmDetailsView extends AbstractStatefulView {
 
   clearHandlers = () => {
     this.#clearExternalHandlers();
+  };
+
+  setAborting = (resetState, initiator, beingDeletedCommentId) => {
+    switch (initiator) {
+      case POPUP_MOVIE_CHANGE_INITIATOR.CHANGE_MOVIE:
+        this.shake.call({element: this.element.querySelector('.film-details__controls')}, resetState);
+        break;
+
+      case POPUP_MOVIE_CHANGE_INITIATOR.DELETE_COMMENT:
+        this.shake.call({
+          element: [...this.deleteButtons]
+            .find((elem) => elem.dataset.commentId === beingDeletedCommentId)
+            .closest('.film-details__comment')
+        }, resetState);
+        break;
+
+      case POPUP_MOVIE_CHANGE_INITIATOR.ADD_COMMENT:
+        this.shake.call({element: this.commentInput.closest('.film-details__new-comment')}, resetState);
+        break;
+
+      default:
+        resetState();
+        break;
+    }
   };
 
   _restoreHandlers = () => {
@@ -358,16 +382,6 @@ export default class FilmDetailsView extends AbstractStatefulView {
   #watchlistToggleHandler = (evt) => {
     evt.preventDefault();
 
-    const movie = FilmDetailsView.parseStateToMovie(this._state);
-    this.updateElement({
-      movie: {...movie,
-        userDetails: {...movie.userDetails,
-          watchlist: !movie.userDetails.watchlist
-        },
-      },
-      scrollTop: this.element.scrollTop,
-    });
-
     this.#updateLocalData({
       localComment: {...this._state.comments.localComment},
       scrollTop: this._state.scrollTop
@@ -377,19 +391,6 @@ export default class FilmDetailsView extends AbstractStatefulView {
   #watchedToggleHandler = (evt) => {
     evt.preventDefault();
 
-    const movie = FilmDetailsView.parseStateToMovie(this._state);
-    const update = {
-      movie: {...movie,
-        userDetails: {...movie.userDetails,
-          alreadyWatched: !movie.userDetails.alreadyWatched
-        },
-      },
-      scrollTop: this.element.scrollTop,
-    };
-
-    update.movie.userDetails.watchingDate = FilmDetailsView.updateMovieUserDetailsDate(update);
-    this.updateElement(update);
-
     this.#updateLocalData({
       localComment: {...this._state.comments.localComment},
       scrollTop: this._state.scrollTop
@@ -398,16 +399,6 @@ export default class FilmDetailsView extends AbstractStatefulView {
 
   #favoriteToggleHandler = (evt) => {
     evt.preventDefault();
-
-    const movie = FilmDetailsView.parseStateToMovie(this._state);
-    this.updateElement({
-      movie: {...movie,
-        userDetails: {...movie.userDetails,
-          favorite: !movie.userDetails.favorite
-        },
-      },
-      scrollTop: this.element.scrollTop,
-    });
 
     this.#updateLocalData({
       localComment: {...this._state.comments.localComment},
@@ -505,5 +496,6 @@ export default class FilmDetailsView extends AbstractStatefulView {
     isDisabled: false,
     isSaving: false,
     isDeleting: false,
+    beingDeletedCommentId: -1,
   });
 }

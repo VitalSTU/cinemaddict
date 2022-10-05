@@ -5,7 +5,7 @@ import CommentsApiService from '../api/comments-api-service.js';
 
 import { render, remove } from '../framework/render.js';
 import { getCommentsByIds, getNow, compareParameters } from '../utils.js';
-import { AUTHORIZATION, END_POINT, UserAction, UpdateType } from '../const.js';
+import { AUTHORIZATION, END_POINT, POPUP_MOVIE_CHANGE_INITIATOR, UserAction, UpdateType } from '../const.js';
 
 export default class PopupPresenter {
   #movie = null;
@@ -66,6 +66,10 @@ export default class PopupPresenter {
     await this.#commentsModel.deleteComment(updateType, update);
   };
 
+  setComments = (comments) => {
+    this.#commentsModel.comments = comments;
+  };
+
   setDisabled = () => {
     this.#popupComponent.updateElement({
       isDisabled: true,
@@ -79,11 +83,24 @@ export default class PopupPresenter {
     });
   };
 
-  setDeleting = () => {
+  setDeleting = (_initiator, beingDeletedCommentId) => {
     this.#popupComponent.updateElement({
       isDisabled: true,
       isDeleting: true,
+      beingDeletedCommentId,
     });
+  };
+
+  setAborting = (initiator, beingDeletedCommentId) => {
+    const resetState = () => {
+      this.#popupComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#popupComponent.setAborting(resetState, initiator, beingDeletedCommentId);
   };
 
   #initialiseData = (movie, localData, handlePopupClosing) => {
@@ -158,7 +175,8 @@ export default class PopupPresenter {
           ...this.#movie.userDetails,
           watchlist: !this.#movie.userDetails.watchlist,
         },
-      }
+      },
+      POPUP_MOVIE_CHANGE_INITIATOR.CHANGE_MOVIE
     );
   };
 
@@ -175,7 +193,8 @@ export default class PopupPresenter {
           alreadyWatched: !alreadyWatched,
           watchingDate: alreadyWatched ? '' : getNow(),
         },
-      }
+      },
+      POPUP_MOVIE_CHANGE_INITIATOR.CHANGE_MOVIE
     );
   };
 
@@ -189,7 +208,8 @@ export default class PopupPresenter {
           ...this.#movie.userDetails,
           favorite: !this.#movie.userDetails.favorite,
         },
-      }
+      },
+      POPUP_MOVIE_CHANGE_INITIATOR.CHANGE_MOVIE
     );
   };
 
@@ -207,7 +227,8 @@ export default class PopupPresenter {
           ],
         },
         comment: this.comments.find((c) => compareParameters(c.id.toString(), commentId)),
-      }
+      },
+      POPUP_MOVIE_CHANGE_INITIATOR.DELETE_COMMENT
     );
   };
 
@@ -218,7 +239,8 @@ export default class PopupPresenter {
       {
         movie: this.#movie,
         comment,
-      }
+      },
+      POPUP_MOVIE_CHANGE_INITIATOR.ADD_COMMENT
     );
   };
 }

@@ -38,12 +38,10 @@ export default class CommentsModel extends AbstractCommentsObservable {
 
     try {
       const response = await this.#commentsApiService.addComment(movie, comment);
-      const adaptedComments = this.#adaptToClient(response.comments);
-      const adaptedMovie = adaptMovieToClient(response.movie);
+      const parsedComments = this.#adaptToClient(response.comments);
+      const parsedMovie = adaptMovieToClient(response.movie);
 
-      this.comments = adaptedComments;
-
-      return adaptedMovie;
+      return {parsedMovie, parsedComments};
 
     } catch(error) {
       throw new Error('Can\'t add comment');
@@ -61,10 +59,12 @@ export default class CommentsModel extends AbstractCommentsObservable {
 
     try {
       await this.#commentsApiService.deleteComment(update);
-      this.comments = [
+      const comments = [
         ...this.comments.slice(0, index),
         ...this.comments.slice(index + 1),
       ];
+
+      return comments;
 
     } catch(error) {
       throw new Error('Can\'t delete comment');

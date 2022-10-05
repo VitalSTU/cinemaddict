@@ -4,6 +4,8 @@ import { render, remove, replace } from '../framework/render.js';
 import { getNow } from '../utils.js';
 import { UserAction, UpdateType } from '../const.js';
 
+const MOVIE_CHANGE_INITIATOR = 'movieCard';
+
 export default class MoviePresenter {
   #movie = null;
 
@@ -58,6 +60,21 @@ export default class MoviePresenter {
     });
   };
 
+  setAborting = (initiator) => {
+    const resetState = () => {
+      this.#movieComponent.updateElement({
+        isDisabled: false,
+      });
+    };
+
+    if (initiator === MOVIE_CHANGE_INITIATOR) {
+      this.#movieComponent.shake(resetState);
+      return;
+    }
+
+    resetState();
+  };
+
   #initialiseData = (movie) => {
     this.#movie = movie;
   };
@@ -88,7 +105,8 @@ export default class MoviePresenter {
           ...this.#movie.userDetails,
           watchlist: !this.#movie.userDetails.watchlist,
         },
-      }
+      },
+      MOVIE_CHANGE_INITIATOR
     );
   };
 
@@ -105,7 +123,8 @@ export default class MoviePresenter {
           alreadyWatched: !alreadyWatched,
           watchingDate: alreadyWatched ? '' : getNow(),
         },
-      }
+      },
+      MOVIE_CHANGE_INITIATOR
     );
   };
 
@@ -119,7 +138,8 @@ export default class MoviePresenter {
           ...this.#movie.userDetails,
           favorite: !this.#movie.userDetails.favorite,
         },
-      }
+      },
+      MOVIE_CHANGE_INITIATOR
     );
   };
 }

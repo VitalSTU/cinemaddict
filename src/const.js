@@ -8,6 +8,12 @@ export const SORT_BUTTON_ACTIVE = 'sort__button--active';
 export const AUTHORIZATION = 'Basic hS2sfS4kolyshkin4wcl1sa2j';
 export const END_POINT = 'https://18.ecmascript.pages.academy/cinemaddict';
 
+export const POPUP_MOVIE_CHANGE_INITIATOR = {
+  CHANGE_MOVIE: 'popupChangeMovie',
+  ADD_COMMENT: 'popupAddComment',
+  DELETE_COMMENT: 'popupDeleteComment',
+};
+
 export const BLANK_MOVIE = {
   id: null,
   comments: null,
