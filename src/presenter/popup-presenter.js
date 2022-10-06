@@ -26,12 +26,12 @@ export default class PopupPresenter {
     scrollTop: 0,
   };
 
-  get comments() {
-    return this.#commentsModel.comments;
-  }
-
   constructor(changeData) {
     this.#changeData = changeData;
+  }
+
+  get comments() {
+    return this.#commentsModel.comments;
   }
 
   /**
@@ -62,9 +62,7 @@ export default class PopupPresenter {
 
   addComment = async (updateType, update, adaptMovieToClient) => await this.#commentsModel.addComment(updateType, update, adaptMovieToClient);
 
-  deleteComment = async (updateType, update) => {
-    await this.#commentsModel.deleteComment(updateType, update);
-  };
+  deleteComment = async (updateType, update) => await this.#commentsModel.deleteComment(updateType, update);
 
   setComments = (comments) => {
     this.#commentsModel.comments = comments;
@@ -222,7 +220,7 @@ export default class PopupPresenter {
     const index = this.#movie.comments.findIndex((id) => id === commentId);
     this.#changeData(
       UserAction.DELETE_COMMENT,
-      UpdateType.PATCH,
+      UpdateType.MINOR,
       {
         movie: {
           ...this.#movie,
@@ -240,7 +238,7 @@ export default class PopupPresenter {
   #addCommentHandler = (comment) => {
     this.#changeData(
       UserAction.ADD_COMMENT,
-      UpdateType.PATCH,
+      UpdateType.MINOR,
       {
         movie: this.#movie,
         comment,

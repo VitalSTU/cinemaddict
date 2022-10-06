@@ -20,7 +20,7 @@ import FilterModel from '../model/filter-model.js';
 
 import { FILM_CARDS_QUANTITY_TO_SHOW_PER_STEP, MovieFilterType, SortType, UpdateType, UserAction } from '../const.js';
 import { render, RenderPosition, remove } from '../framework/render.js';
-import { sortMovieByDateDown, sortMovieByRatingDown, sortMovieByCommentsQuantityDown, filter } from '../utils.js';
+import { sortMovieByDateDown, sortMovieByRatingDown, sortMovieByCommentsQuantityDown, filter, getRandomNumber } from '../utils.js';
 
 const FILM_EXTRA_TEST_CARDS_QUANTITY = 2;
 const TimeLimit = {
@@ -196,15 +196,39 @@ export default class MoviesPresenter {
   };
 
   #renderFilmsListTopRatedComponent = () => {
-    const moviesQuantity = this.#moviesModel.movies.length;
-    const movies = this.#getSortedMovies(SortType.RATING, true).slice(0, Math.min(moviesQuantity, FILM_EXTRA_TEST_CARDS_QUANTITY));
-    this.#renderFilmsComponent(this.#filmsListTopRatedComponent, this.#filmsListContainerTopRatedComponent, movies);
+    const sortedMovies = this.#getSortedMovies(SortType.RATING, true);
+    const allRatingsAreEqual = sortedMovies.map((m) => m.filmInfo.totalRating).reduce((r1, r2) => r1 === r2);
+    let moviesToRender = [];
+
+    if (allRatingsAreEqual) {
+      const allRatingsAreZero = (sortedMovies.find((m) => m.filmInfo.totalRating > 0) ?? -1) < 0;
+      if (allRatingsAreZero) {
+        return;
+      }
+      moviesToRender = this.#getArrayOfTwoRandomElements(sortedMovies);
+    } else {
+      moviesToRender = sortedMovies.slice(0, Math.min(sortedMovies.length, FILM_EXTRA_TEST_CARDS_QUANTITY));
+    }
+
+    this.#renderFilmsComponent(this.#filmsListTopRatedComponent, this.#filmsListContainerTopRatedComponent, moviesToRender);
   };
 
   #renderFilmsListMostCommentedComponent = () => {
-    const moviesQuantity = this.#moviesModel.movies.length;
-    const movies = this.#getSortedMovies(SortType.COMMENTS, true).slice(0, Math.min(moviesQuantity, FILM_EXTRA_TEST_CARDS_QUANTITY));
-    this.#renderFilmsComponent(this.#filmsListMostCommentedComponent, this.#filmsListContainerMostCommentedComponent, movies);
+    const sortedMovies = this.#getSortedMovies(SortType.COMMENTS, true);
+    const allCommentsQuantitiesAreEqual = sortedMovies.map((m) => m.comments.length).reduce((l1, l2) => l1 === l2);
+    let moviesToRender = [];
+
+    if (allCommentsQuantitiesAreEqual) {
+      const allCommentsQuantitiesAreZero = (sortedMovies.find((m) => m.comments.length > 0) ?? -1) < 0;
+      if (allCommentsQuantitiesAreZero) {
+        return;
+      }
+      moviesToRender = this.#getArrayOfTwoRandomElements(sortedMovies);
+    } else {
+      moviesToRender = sortedMovies.slice(0, Math.min(sortedMovies.length, FILM_EXTRA_TEST_CARDS_QUANTITY));
+    }
+
+    this.#renderFilmsComponent(this.#filmsListMostCommentedComponent, this.#filmsListContainerMostCommentedComponent, moviesToRender);
   };
 
   #destroyShowMoreButtonComponent = () => {
@@ -265,10 +289,10 @@ export default class MoviesPresenter {
   #setMovieCardStatus = (movieId, movieStatusHandler, popupStatusHandler, initiator, beingDeletedCommentId) => {
     this.#movieMainPresenters.get(movieId).forEach((presenter) => {
       presenter[movieStatusHandler](initiator);
-      if (movieId === this.#openedPopupMovieId) {
-        this.#popupPresenter[popupStatusHandler](initiator, beingDeletedCommentId);
-      }
     });
+    if (movieId === this.#openedPopupMovieId) {
+      this.#popupPresenter[popupStatusHandler](initiator, beingDeletedCommentId);
+    }
   };
 
   #handleViewAction = async (actionType, updateType, update, initiator) => {
@@ -292,7 +316,7 @@ export default class MoviesPresenter {
 
         this.#setMovieCardStatus(update.movie.id, 'setDisabled', 'setSaving', initiator);
         try {
-          ({parsedMovie, parsedComments} = await this.#popupPresenter.addComment(updateType, update, this.#moviesModel.adaptToClient));
+          [parsedMovie, parsedComments] = await this.#popupPresenter.addComment(updateType, update, this.#moviesModel.adaptToClient);
           await this.#moviesModel.updateMovie(updateType, parsedMovie);
           this.#popupPresenter.setComments(parsedComments);
         } catch(err) {
@@ -333,21 +357,19 @@ export default class MoviesPresenter {
       case UpdateType.PATCH:
         this.#movieMainPresenters.get(data.id).forEach((presenter) => {
           presenter.init(data);
-          if (data.id === this.#openedPopupMovieId) {
-            presenter.initialisePopup();
-          }
         });
+        if (data.id === this.#openedPopupMovieId) {
+          this.#movieMainPresenters.get(data.id)[0].initialisePopup();
+        }
         break;
 
       case UpdateType.MINOR:
         this.#clearBoard();
         this.#renderBoard();
 
-        this.#movieMainPresenters.get(data.id).forEach((presenter) => {
-          if (data.id === this.#openedPopupMovieId) {
-            presenter.initialisePopup();
-          }
-        });
+        if (data.id === this.#openedPopupMovieId) {
+          this.#movieMainPresenters.get(data.id)[0].initialisePopup();
+        }
         break;
 
       case UpdateType.MAJOR:
@@ -381,5 +403,17 @@ export default class MoviesPresenter {
     if (this.#renderedMovieCardsQuantity >= moviesQuantity) {
       this.#destroyShowMoreButtonComponent();
     }
+  };
+
+  #getArrayOfTwoRandomElements = (inletObject) => {
+    const array = [...inletObject];
+    const max = array.length - 1;
+    const index1 = getRandomNumber(max);
+    let index2 = getRandomNumber(max);
+    while (index1 === index2) {
+      index2 = getRandomNumber(max);
+    }
+
+    return [ array[index1], array[index2] ];
   };
 }

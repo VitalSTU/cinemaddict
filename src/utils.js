@@ -10,6 +10,17 @@ export const filter = {
 };
 
 const isNumber = (value) => (typeof value === 'number') && isFinite(value);
+const randomizerParametersAreCorrect = (min, max, errorMessage) => {
+  if (max === undefined) {
+    throw new Error(`${errorMessage} There are must be two numbers parameters.`);
+  } else if (!Number.isFinite(min) || !Number.isFinite(max) || min < 0 || max < 0) {
+    throw new Error(`${errorMessage}  Parameters "min" and "max" must be numbers greater or equal to zero.`);
+  } else if (min > max || min === max) {
+    throw new Error(`${errorMessage} Parameter "min" must be less then parameter "max".`);
+  }
+
+  return true;
+};
 const getWeightForNullValue = (valueA, valueB) => {
   if (valueA === null && valueB === null) {
     return 0;
@@ -49,6 +60,25 @@ export const duplicateMovie = (movie) => ({
 });
 export const getCommentsByIds = (ids, comments) => comments.filter((c) => ids.includes(c.id));
 export const getNow = () => dayjs().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
+export const getRandomNumber = (border1, border2, tail = 0, errorMessage = '') => {
+  let result = null;
+  let min;
+  let max;
+
+  if (border2) {
+    min = border1;
+    max = border2;
+  } else {
+    min = 0;
+    max = border1;
+  }
+
+  if (randomizerParametersAreCorrect(min, max, errorMessage)) {
+    result = +( ( Math.random() * (max - min) + min ).toFixed(tail) );
+  }
+
+  return result;
+};
 export const sortMovieByCommentsQuantityDown = ({comments: commentsA}, {comments: commentsB}) => {
   const quantityA = getCommentsQuantity(commentsA);
   const quantityB = getCommentsQuantity(commentsB);
