@@ -77,16 +77,3 @@ export const sortMovieByRatingDown = ({filmInfo: {totalRating: ratingA}}, {filmI
 
   return weight ?? result;
 };
-export const updateItem = (items, update) => {
-  const updateIndex = items.find((item) => item.id === update.id);
-
-  if (updateIndex === -1) {
-    return items;
-  }
-
-  return [
-    ...items.slice(0, updateIndex),
-    update,
-    ...items.slice(updateIndex + 1),
-  ];
-};

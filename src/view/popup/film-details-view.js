@@ -55,7 +55,7 @@ const createFilmDetailsTopContainerTemplate = ({filmInfo: movie, userDetails}, i
                 <td class="film-details__cell">${viewUtils.getReleaseCountry(movie)}</td>
               </tr>
               <tr class="film-details__row">
-                <td class="film-details__term">Genre${viewUtils.getCommentsQuantity(movie.comments) > 1 ? 's' : ''}</td>
+                <td class="film-details__term">Genre${viewUtils.getCommentsQuantity(movie.genre) > 1 ? 's' : ''}</td>
                 <td class="film-details__cell">${viewUtils.getGenres(movie)}</td>
               </tr>
             </table>

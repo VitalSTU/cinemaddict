@@ -46,8 +46,8 @@ export default class MoviePresenter {
     remove(prevMovieComponent);
   };
 
-  initialisePopup = () => {
-    this.#popupPresenter.init(this.#movieComponent.movie, null, this.#handlePopupClosing);
+  initialisePopup = (localData) => {
+    this.#popupPresenter.init(this.#movieComponent.movie, localData, this.#handlePopupClosing);
   };
 
   destroy = () => {

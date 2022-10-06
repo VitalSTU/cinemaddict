@@ -186,24 +186,24 @@ export default class MoviesPresenter {
   };
 
   #renderFilmsListAllUpcomingComponent = () => {
-    const moviesQuqntity = this.movies.length;
-    const movies = this.movies.slice(0, Math.min(moviesQuqntity, this.#renderedMovieCardsQuantity));
+    const moviesQuantity = this.movies.length;
+    const movies = this.movies.slice(0, Math.min(moviesQuantity, this.#renderedMovieCardsQuantity));
     this.#renderFilmsComponent(this.#filmsListAllUpcomingComponent, this.#filmsListContainerAllComponent, movies);
 
-    if (moviesQuqntity > FILM_CARDS_QUANTITY_TO_SHOW_PER_STEP) {
+    if (moviesQuantity > FILM_CARDS_QUANTITY_TO_SHOW_PER_STEP) {
       this.#renderShowMoreButtonComponent();
     }
   };
 
   #renderFilmsListTopRatedComponent = () => {
-    const moviesQuqntity = this.#moviesModel.movies.length;
-    const movies = this.#getSortedMovies(SortType.RATING, true).slice(0, Math.min(moviesQuqntity, FILM_EXTRA_TEST_CARDS_QUANTITY));
+    const moviesQuantity = this.#moviesModel.movies.length;
+    const movies = this.#getSortedMovies(SortType.RATING, true).slice(0, Math.min(moviesQuantity, FILM_EXTRA_TEST_CARDS_QUANTITY));
     this.#renderFilmsComponent(this.#filmsListTopRatedComponent, this.#filmsListContainerTopRatedComponent, movies);
   };
 
   #renderFilmsListMostCommentedComponent = () => {
-    const moviesQuqntity = this.#moviesModel.movies.length;
-    const movies = this.#getSortedMovies(SortType.COMMENTS, true).slice(0, Math.min(moviesQuqntity, FILM_EXTRA_TEST_CARDS_QUANTITY));
+    const moviesQuantity = this.#moviesModel.movies.length;
+    const movies = this.#getSortedMovies(SortType.COMMENTS, true).slice(0, Math.min(moviesQuantity, FILM_EXTRA_TEST_CARDS_QUANTITY));
     this.#renderFilmsComponent(this.#filmsListMostCommentedComponent, this.#filmsListContainerMostCommentedComponent, movies);
   };
 
@@ -371,14 +371,14 @@ export default class MoviesPresenter {
   };
 
   #showMoreButtonClickHandler = () => {
-    const moviesQuqntity = this.movies.length;
-    const newRenderedMoviesQuqntity = Math.min(moviesQuqntity, this.#renderedMovieCardsQuantity + FILM_CARDS_QUANTITY_TO_SHOW_PER_STEP);
-    const movies = this.movies.slice(this.#renderedMovieCardsQuantity, newRenderedMoviesQuqntity);
+    const moviesQuantity = this.movies.length;
+    const newRenderedMoviesQuantity = Math.min(moviesQuantity, this.#renderedMovieCardsQuantity + FILM_CARDS_QUANTITY_TO_SHOW_PER_STEP);
+    const movies = this.movies.slice(this.#renderedMovieCardsQuantity, newRenderedMoviesQuantity);
 
     this.#renderMoviesPortion(this.#filmsListContainerAllComponent, movies);
-    this.#renderedMovieCardsQuantity = newRenderedMoviesQuqntity;
+    this.#renderedMovieCardsQuantity = newRenderedMoviesQuantity;
 
-    if (this.#renderedMovieCardsQuantity >= moviesQuqntity) {
+    if (this.#renderedMovieCardsQuantity >= moviesQuantity) {
       this.#destroyShowMoreButtonComponent();
     }
   };

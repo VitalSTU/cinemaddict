@@ -31,12 +31,12 @@ export const getGenres = ({genre: genres}) => {
 
   if (isNotExist(genres) || genres.length === 0) {
     return '';
-  } else {
-    for (let i = 0; i < [...genres].length; i++) {
-      genresString += `
-                <span class="film-details__genre">${genres[i]}</span>`;
-    }
   }
+
+  [...genres].forEach((genre) => {
+    genresString += `
+              <span class="film-details__genre">${genre}</span>`;
+  });
 
   return genresString;
 };

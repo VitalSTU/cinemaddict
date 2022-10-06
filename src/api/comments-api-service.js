@@ -8,7 +8,7 @@ const Method = {
 
 export default class CommentsApiService extends ApiService {
 
-  getComments = async (movie) => this
+  getComments = async (movie) => await this
     ._load({url: `comments/${movie.id}`})
     .then(ApiService.parseResponse);
 

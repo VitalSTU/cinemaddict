@@ -39,6 +39,8 @@ export default class NavigationView extends AbstractView {
     evt.preventDefault();
     if (evt.target.classList.contains('main-navigation__item')) {
       this._callback.filterTypeChange(evt.target.getAttribute('value'));
+    } else if (evt.target.classList.contains('main-navigation__item-count')) {
+      this._callback.filterTypeChange(evt.target.closest('.main-navigation__item').getAttribute('value'));
     }
   };
 }

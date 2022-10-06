@@ -118,9 +118,14 @@ export default class PopupPresenter {
   };
 
   #updateLocalData = (localData) => {
-    this.#localData = null;
-    if (localData) {
-      this.#localData = {...localData, localComment: {...localData.localComment}};
+    if (localData && localData.scrollTop) {
+      this.#localData.scrollTop = localData.scrollTop;
+    }
+    if (localData && localData.localComment) {
+      this.#localData.localComment = {localComment: {
+        comment: (localData.localComment.comment) ? localData.localComment.comment : null,
+        emotion: (localData.localComment.emotion) ? localData.localComment.emotion : null,
+      }};
     }
   };
 
